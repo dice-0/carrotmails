@@ -17,8 +17,6 @@ type Result = { email: string; ok: boolean; error?: string };
 
 function Page() {
   const send = useServerFn(sendBulk);
-  const [apiKey, setApiKey] = useState("");
-  const [from, setFrom] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [list, setList] = useState("");
@@ -40,14 +38,14 @@ function Page() {
 
   const sent = results.filter((r) => r.ok).length;
   const failed = results.filter((r) => !r.ok).length;
-  const ready = apiKey && from && subject && body && recipients.length > 0;
+  const ready = subject && body && recipients.length > 0;
 
   async function onSend() {
     if (!ready || sending) return;
     setSending(true);
     setResults([]);
     try {
-      const res = await send({ data: { apiKey, from, subject, body, recipients } });
+      const res = await send({ data: { subject, body, recipients } });
       setResults(res.results);
     } catch (e: any) {
       setResults([{ email: "—", ok: false, error: String(e?.message ?? e) }]);
@@ -61,30 +59,11 @@ function Page() {
       <header className="flex items-baseline justify-between mb-10">
         <h1 className="text-base font-medium tracking-tight">bulk.</h1>
         <span className="text-muted-foreground text-xs">
-          {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
+          gmail · {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
         </span>
       </header>
 
       <div className="space-y-3">
-        <Field label="resend api key">
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="re_..."
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="from">
-          <input
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            placeholder="You <you@domain.com>"
-            className={inputCls}
-          />
-        </Field>
-
         <Field label="subject">
           <input
             value={subject}
