@@ -14,6 +14,37 @@ export const Route = createFileRoute("/")({
 });
 
 type Result = { email: string; ok: boolean; error?: string };
+type Recipient = { email: string; name?: string };
+
+const EMAIL_RE = /[^\s<>,;"']+@[^\s<>,;"']+\.[^\s<>,;"']+/;
+
+function parseRecipients(raw: string): Recipient[] {
+  const out = new Map<string, Recipient>();
+  for (const line of raw.split(/\r?\n/)) {
+    for (const chunk of line.split(/[,;\t]/)) {
+      const s = chunk.trim();
+      if (!s) continue;
+      // "Name <email@x>" | "email, Name" | "email Name" | "email"
+      const angle = s.match(/^(.*?)<\s*([^>]+)\s*>$/);
+      let email = "";
+      let name: string | undefined;
+      if (angle) {
+        name = angle[1].trim().replace(/^["']|["']$/g, "") || undefined;
+        email = angle[2].trim();
+      } else {
+        const m = s.match(EMAIL_RE);
+        if (!m) continue;
+        email = m[0];
+        const rest = s.replace(email, "").trim().replace(/^["']|["']$/g, "");
+        if (rest) name = rest;
+      }
+      if (!EMAIL_RE.test(email)) continue;
+      const key = email.toLowerCase();
+      if (!out.has(key)) out.set(key, { email, name });
+    }
+  }
+  return [...out.values()];
+}
 
 function Page() {
   const send = useServerFn(sendBulk);
@@ -23,18 +54,7 @@ function Page() {
   const [sending, setSending] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
 
-  const recipients = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          list
-            .split(/[\s,;]+/)
-            .map((s) => s.trim())
-            .filter((s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)),
-        ),
-      ),
-    [list],
-  );
+  const recipients = useMemo(() => parseRecipients(list), [list]);
 
   const sent = results.filter((r) => r.ok).length;
   const failed = results.filter((r) => !r.ok).length;
@@ -64,30 +84,35 @@ function Page() {
       </header>
 
       <div className="space-y-3">
-        <Field label="subject">
+        <Field label="subject" hint="use {name} to personalize">
           <input
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
+            placeholder="hi {name}"
             className={inputCls}
           />
         </Field>
 
-        <Field label="body (html ok)">
+        <Field
+          label="body"
+          hint="plain text — links auto-format · use {name} · blank line = paragraph"
+        >
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            rows={6}
-            className={inputCls + " resize-y"}
+            rows={8}
+            placeholder={`Hi {name},\n\nQuick note — check this out: https://example.com\n\nThanks`}
+            className={inputCls + " resize-y font-mono text-[13px] leading-relaxed"}
           />
         </Field>
 
-        <Field label="recipients">
+        <Field label="recipients" hint="one per line — `email` or `Name <email>` or `email, Name`">
           <textarea
             value={list}
             onChange={(e) => setList(e.target.value)}
             rows={5}
-            placeholder="paste emails — commas, spaces, or newlines"
-            className={inputCls + " resize-y"}
+            placeholder={`alice@x.com, Alice\nBob Smith <bob@y.com>\ncarol@z.com`}
+            className={inputCls + " resize-y font-mono text-[13px]"}
           />
         </Field>
       </div>
@@ -110,10 +135,16 @@ function Page() {
             {results.map((r, i) => (
               <li
                 key={i}
-                className="flex items-center justify-between py-2 border-b text-xs"
+                className="flex items-center justify-between py-2 border-b text-xs gap-3"
               >
                 <span className="truncate">{r.email}</span>
-                <span className={r.ok ? "text-muted-foreground" : "text-foreground"}>
+                <span
+                  className={
+                    r.ok
+                      ? "text-muted-foreground shrink-0"
+                      : "text-foreground truncate text-right"
+                  }
+                >
                   {r.ok ? "ok" : r.error?.slice(0, 60) ?? "error"}
                 </span>
               </li>
@@ -128,10 +159,21 @@ function Page() {
 const inputCls =
   "w-full bg-transparent border border-border px-3 py-2 text-sm outline-none focus:border-foreground transition-colors";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
-      <span className="block text-xs text-muted-foreground mb-1.5">{label}</span>
+      <div className="flex items-baseline justify-between mb-1.5">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        {hint && <span className="text-[10px] text-muted-foreground/70">{hint}</span>}
+      </div>
       {children}
     </label>
   );
