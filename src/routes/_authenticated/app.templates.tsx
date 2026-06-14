@@ -81,10 +81,12 @@ function TemplatesPage() {
         <div className="divide-y divide-border border-y border-border">
           {templates.map((template) => (
             <article key={template.id} className="grid gap-4 py-5 sm:grid-cols-[1fr_auto] sm:items-center">
-              <button className="min-w-0 text-left" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>
+              <Button variant="ghost" className="h-auto min-w-0 justify-start px-0 py-0 text-left hover:bg-transparent" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>
+                <span className="min-w-0">
                 <h2 className="font-medium">{template.name}</h2>
                 <p className="mt-1 truncate text-sm text-muted-foreground">{template.subject || "No subject"}</p>
-              </button>
+                </span>
+              </Button>
               <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 <span>{new Date(template.updated_at).toLocaleDateString()}</span>
                 <Button variant="ghost" size="sm" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Edit</Button>

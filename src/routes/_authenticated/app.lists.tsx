@@ -89,10 +89,10 @@ function ListsPage() {
               <label className="block"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">List name</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder="June prospects" className="mt-2 w-full border-b border-border bg-transparent py-2 outline-none focus:border-foreground" /></label>
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Source file</p>
-                <button type="button" onClick={() => inputRef.current?.click()} className="mt-2 flex min-h-28 w-full flex-col items-center justify-center border border-dashed border-border px-6 text-center transition hover:bg-muted">
+                <Button type="button" variant="ghost" onClick={() => inputRef.current?.click()} className="mt-2 flex min-h-28 w-full flex-col items-center justify-center rounded-none border border-dashed border-border px-6 text-center hover:bg-muted">
                   <span className="text-sm font-medium">{fileName || "Choose a CSV or TSV file"}</span>
                   <span className="mt-1 text-xs text-muted-foreground">First row must contain headers, including email</span>
-                </button>
+                </Button>
                 <input ref={inputRef} type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" className="hidden" onChange={(event) => readFile(event.target.files?.[0])} />
               </div>
               {raw && <div className="grid grid-cols-3 divide-x divide-border border-y border-border py-4 text-center"><Metric value={parsed.contacts.length} label="clean" /><Metric value={parsed.duplicates} label="duplicates" /><Metric value={parsed.invalid} label="invalid" /></div>}
