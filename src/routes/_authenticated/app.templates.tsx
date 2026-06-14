@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { deleteTemplate, listTemplates, saveTemplate } from "@/lib/templates.functions";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
-  head: () => ({ meta: [{ title: "Templates — Quill" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Templates | Quill" }, { name: "robots", content: "noindex" }] }),
   component: TemplatesPage,
 });
 
@@ -28,7 +28,7 @@ const starterTemplates: Draft[] = [
   },
   {
     name: "Meeting recap",
-    subject: "Great speaking today — next steps",
+    subject: "Great speaking today: next steps",
     bodyHtml: "<p>Hi {{name}},</p><p>Thanks for your time today. It was helpful to learn more about {{company}} and what your team is working toward.</p><p>As discussed, the next step is:</p><ul><li>Add your agreed next step here</li></ul><p>I’ll follow up by the date we agreed.</p><p>Best,<br>Your name</p>",
   },
   {
