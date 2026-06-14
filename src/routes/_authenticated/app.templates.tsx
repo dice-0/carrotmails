@@ -34,7 +34,7 @@ const starterTemplates: Draft[] = [
   {
     name: "Re-engagement",
     subject: "Still relevant for {{company}}?",
-    bodyHtml: "<p>Hi {{name}},</p><p>It’s been a little while since we last connected. Is this still something your team at {{company}} is considering?</p><p>If priorities have changed, no problem at all—just let me know and I’ll close the loop.</p><p>Best,<br>Your name</p>",
+    bodyHtml: "<p>Hi {{name}},</p><p>It’s been a little while since we last connected. Is this still something your team at {{company}} is considering?</p><p>If priorities have changed, no problem at all. Just let me know and I’ll close the loop.</p><p>Best,<br>Your name</p>",
   },
 ];
 
