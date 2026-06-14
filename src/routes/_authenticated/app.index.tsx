@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { sendBulk, getGmailProfile } from "@/lib/bulk-send.functions";
 import { RichEditor } from "@/components/RichEditor";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -255,13 +256,13 @@ function Index() {
               <div className="font-mono text-xs text-muted-foreground">
                 {parsed.rows.length} recipient{parsed.rows.length === 1 ? "" : "s"} ready
               </div>
-              <button
+              <Button
                 onClick={handleSend}
-              disabled={sending || !profile?.email || parsed.rows.length === 0 || !subject.trim() || !bodyHtml.replace(/<[^>]+>/g, "").trim()}
-                className="bg-primary px-6 py-2.5 text-sm font-medium tracking-wide text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-30"
+                disabled={sending || !profile?.email || parsed.rows.length === 0 || !subject.trim() || !bodyHtml.replace(/<[^>]+>/g, "").trim()}
+                className="px-6 py-2.5 tracking-wide"
               >
                 {sending ? "sending…" : `send → ${parsed.rows.length}`}
-              </button>
+              </Button>
             </div>
           </section>
 
