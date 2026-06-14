@@ -15,6 +15,28 @@ export const Route = createFileRoute("/_authenticated/app/templates")({
 
 type Draft = { id?: string; name: string; subject: string; bodyHtml: string };
 const emptyDraft: Draft = { name: "", subject: "", bodyHtml: "<p></p>" };
+const starterTemplates: Draft[] = [
+  {
+    name: "Warm introduction",
+    subject: "A quick introduction, {{name}}",
+    bodyHtml: "<p>Hi {{name}},</p><p>I came across {{company}} and wanted to introduce myself. I think there may be a useful way for us to work together.</p><p>Would you be open to a quick conversation next week?</p><p>Best,<br>Your name</p>",
+  },
+  {
+    name: "Friendly follow-up",
+    subject: "Following up, {{name}}",
+    bodyHtml: "<p>Hi {{name}},</p><p>Just following up on my last note in case it got buried.</p><p>Would a brief conversation be useful, or is there someone else at {{company}} I should speak with?</p><p>Best,<br>Your name</p>",
+  },
+  {
+    name: "Meeting recap",
+    subject: "Great speaking today — next steps",
+    bodyHtml: "<p>Hi {{name}},</p><p>Thanks for your time today. It was helpful to learn more about {{company}} and what your team is working toward.</p><p>As discussed, the next step is:</p><ul><li>Add your agreed next step here</li></ul><p>I’ll follow up by the date we agreed.</p><p>Best,<br>Your name</p>",
+  },
+  {
+    name: "Re-engagement",
+    subject: "Still relevant for {{company}}?",
+    bodyHtml: "<p>Hi {{name}},</p><p>It’s been a little while since we last connected. Is this still something your team at {{company}} is considering?</p><p>If priorities have changed, no problem at all—just let me know and I’ll close the loop.</p><p>Best,<br>Your name</p>",
+  },
+];
 
 function TemplatesPage() {
   const qc = useQueryClient();
@@ -73,27 +95,56 @@ function TemplatesPage() {
             </ul>
           </aside>
         </div>
-      ) : isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading templates…</p>
-      ) : templates.length === 0 ? (
-        <EmptyState title="No templates yet" body="Save your first reusable message instead of rebuilding each campaign from scratch." action="Create a template" onClick={() => setDraft({ ...emptyDraft })} />
       ) : (
-        <div className="divide-y divide-border border-y border-border">
-          {templates.map((template) => (
-            <article key={template.id} className="grid gap-4 py-5 sm:grid-cols-[1fr_auto] sm:items-center">
-              <Button variant="ghost" className="h-auto min-w-0 justify-start px-0 py-0 text-left hover:bg-transparent" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>
-                <span className="min-w-0">
-                <h2 className="font-medium">{template.name}</h2>
-                <p className="mt-1 truncate text-sm text-muted-foreground">{template.subject || "No subject"}</p>
-                </span>
-              </Button>
-              <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                <span>{new Date(template.updated_at).toLocaleDateString()}</span>
-                <Button variant="ghost" size="sm" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Edit</Button>
-                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${template.name}?`) && deleteMutation.mutate(template.id)}>Delete</Button>
+        <div className="space-y-12">
+          <section>
+            <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Ready to customize</p>
+                <h2 className="mt-1 text-lg font-medium">Starter templates</h2>
               </div>
-            </article>
-          ))}
+              <span className="text-xs text-muted-foreground">Variables adapt to your list</span>
+            </div>
+            <div className="grid gap-px overflow-hidden border border-border bg-border md:grid-cols-2">
+              {starterTemplates.map((template) => (
+                <article key={template.name} className="flex min-h-40 flex-col bg-background p-5">
+                  <h3 className="font-medium">{template.name}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{template.subject}</p>
+                  <Button variant="outline" size="sm" className="mt-auto self-start" onClick={() => setDraft({ ...template })}>Use template</Button>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-3 border-b border-border pb-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Your library</p>
+              <h2 className="mt-1 text-lg font-medium">Saved templates</h2>
+            </div>
+            {isLoading ? (
+              <p className="py-8 text-sm text-muted-foreground">Loading templates…</p>
+            ) : templates.length === 0 ? (
+              <EmptyState title="No saved templates yet" body="Choose a starter above or create your own reusable message." action="Create a template" onClick={() => setDraft({ ...emptyDraft })} />
+            ) : (
+              <div className="divide-y divide-border border-b border-border">
+                {templates.map((template) => (
+                  <article key={template.id} className="grid gap-4 py-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                    <Button variant="ghost" className="h-auto min-w-0 justify-start px-0 py-0 text-left hover:bg-transparent" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>
+                      <span className="min-w-0">
+                        <h3 className="font-medium">{template.name}</h3>
+                        <p className="mt-1 truncate text-sm text-muted-foreground">{template.subject || "No subject"}</p>
+                      </span>
+                    </Button>
+                    <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      <span>{new Date(template.updated_at).toLocaleDateString()}</span>
+                      <Button variant="ghost" size="sm" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Edit</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${template.name}?`) && deleteMutation.mutate(template.id)}>Delete</Button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       )}
     </AppPage>
