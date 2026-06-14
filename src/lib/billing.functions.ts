@@ -46,6 +46,7 @@ export const getBillingStatus = createServerFn({ method: "GET" })
     const subscription = subscriptionsResult.data?.[0] ?? null;
     const purchase = purchasesResult.data?.[0] ?? null;
     const offer = offerResult.data;
+    if (!offer) throw new Error("Lifetime offer is not configured");
 
     return {
       hasPaidAccess,
