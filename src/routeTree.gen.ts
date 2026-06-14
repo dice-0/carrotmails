@@ -9,38 +9,164 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
+import { Route as AuthenticatedAppMailboxesRouteImport } from './routes/_authenticated/app.mailboxes'
+import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticated/app.lists'
+import { Route as AuthenticatedAppCampaignsRouteImport } from './routes/_authenticated/app.campaigns'
+import { Route as ApiPublicOauthGoogleCallbackRouteImport } from './routes/api/public/oauth/google/callback'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppTemplatesRoute =
+  AuthenticatedAppTemplatesRouteImport.update({
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppMailboxesRoute =
+  AuthenticatedAppMailboxesRouteImport.update({
+    id: '/mailboxes',
+    path: '/mailboxes',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppListsRoute = AuthenticatedAppListsRouteImport.update({
+  id: '/lists',
+  path: '/lists',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppCampaignsRoute =
+  AuthenticatedAppCampaignsRouteImport.update({
+    id: '/campaigns',
+    path: '/campaigns',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const ApiPublicOauthGoogleCallbackRoute =
+  ApiPublicOauthGoogleCallbackRouteImport.update({
+    id: '/api/public/oauth/google/callback',
+    path: '/api/public/oauth/google/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app': typeof AuthenticatedAppRouteWithChildren
+  '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
+  '/app/lists': typeof AuthenticatedAppListsRoute
+  '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
+  '/app/lists': typeof AuthenticatedAppListsRoute
+  '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/app': typeof AuthenticatedAppIndexRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/app/campaigns': typeof AuthenticatedAppCampaignsRoute
+  '/_authenticated/app/lists': typeof AuthenticatedAppListsRoute
+  '/_authenticated/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/_authenticated/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/app/campaigns'
+    | '/app/lists'
+    | '/app/mailboxes'
+    | '/app/templates'
+    | '/app/'
+    | '/api/public/oauth/google/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/campaigns'
+    | '/app/lists'
+    | '/app/mailboxes'
+    | '/app/templates'
+    | '/app'
+    | '/api/public/oauth/google/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/app'
+    | '/_authenticated/app/campaigns'
+    | '/_authenticated/app/lists'
+    | '/_authenticated/app/mailboxes'
+    | '/_authenticated/app/templates'
+    | '/_authenticated/app/'
+    | '/api/public/oauth/google/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ApiPublicOauthGoogleCallbackRoute: typeof ApiPublicOauthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +174,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/templates': {
+      id: '/_authenticated/app/templates'
+      path: '/templates'
+      fullPath: '/app/templates'
+      preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/mailboxes': {
+      id: '/_authenticated/app/mailboxes'
+      path: '/mailboxes'
+      fullPath: '/app/mailboxes'
+      preLoaderRoute: typeof AuthenticatedAppMailboxesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/lists': {
+      id: '/_authenticated/app/lists'
+      path: '/lists'
+      fullPath: '/app/lists'
+      preLoaderRoute: typeof AuthenticatedAppListsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/campaigns': {
+      id: '/_authenticated/app/campaigns'
+      path: '/campaigns'
+      fullPath: '/app/campaigns'
+      preLoaderRoute: typeof AuthenticatedAppCampaignsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/oauth/google/callback': {
+      id: '/api/public/oauth/google/callback'
+      path: '/api/public/oauth/google/callback'
+      fullPath: '/api/public/oauth/google/callback'
+      preLoaderRoute: typeof ApiPublicOauthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppCampaignsRoute: typeof AuthenticatedAppCampaignsRoute
+  AuthenticatedAppListsRoute: typeof AuthenticatedAppListsRoute
+  AuthenticatedAppMailboxesRoute: typeof AuthenticatedAppMailboxesRoute
+  AuthenticatedAppTemplatesRoute: typeof AuthenticatedAppTemplatesRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppCampaignsRoute: AuthenticatedAppCampaignsRoute,
+  AuthenticatedAppListsRoute: AuthenticatedAppListsRoute,
+  AuthenticatedAppMailboxesRoute: AuthenticatedAppMailboxesRoute,
+  AuthenticatedAppTemplatesRoute: AuthenticatedAppTemplatesRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedAppRouteWithChildren =
+  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ApiPublicOauthGoogleCallbackRoute: ApiPublicOauthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

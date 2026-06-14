@@ -1,180 +1,162 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
-import { sendBulk } from "@/lib/sender.functions";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) throw redirect({ to: "/app" });
+  },
   head: () => ({
     meta: [
-      { title: "bulk — minimalist mail sender" },
-      { name: "description", content: "Paste a list. Send. Done." },
+      { title: "Quill — mass mail, from your own inbox" },
+      { name: "description", content: "Personalized bulk email from your Gmail or Outlook. Smart variables, reply detection, deliverability built-in." },
+      { property: "og:title", content: "Quill — mass mail, sharp and simple" },
+      { property: "og:description", content: "Personalized bulk email from your own inbox." },
     ],
   }),
-  component: Page,
+  component: PreviewDashboard,
 });
 
-type Result = { email: string; ok: boolean; error?: string };
-type Recipient = { email: string; name?: string };
+const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes"];
 
-const EMAIL_RE = /[^\s<>,;"']+@[^\s<>,;"']+\.[^\s<>,;"']+/;
+const TILES = [
+  { k: "From your inbox", v: "Connect Gmail or Outlook. Sends look — and are — personal." },
+  { k: "Real personalization", v: "{{name|fallback}}, spintax, conditionals, AI rewrites per recipient." },
+  { k: "Reply detection", v: "When someone replies, we auto-pause future sends to them." },
+  { k: "List hygiene", v: "Dedupe, syntax + MX checks, automatic suppression for bounces." },
+];
 
-function parseRecipients(raw: string): Recipient[] {
-  const out = new Map<string, Recipient>();
-  for (const line of raw.split(/\r?\n/)) {
-    for (const chunk of line.split(/[,;\t]/)) {
-      const s = chunk.trim();
-      if (!s) continue;
-      // "Name <email@x>" | "email, Name" | "email Name" | "email"
-      const angle = s.match(/^(.*?)<\s*([^>]+)\s*>$/);
-      let email = "";
-      let name: string | undefined;
-      if (angle) {
-        name = angle[1].trim().replace(/^["']|["']$/g, "") || undefined;
-        email = angle[2].trim();
-      } else {
-        const m = s.match(EMAIL_RE);
-        if (!m) continue;
-        email = m[0];
-        const rest = s.replace(email, "").trim().replace(/^["']|["']$/g, "");
-        if (rest) name = rest;
-      }
-      if (!EMAIL_RE.test(email)) continue;
-      const key = email.toLowerCase();
-      if (!out.has(key)) out.set(key, { email, name });
-    }
-  }
-  return [...out.values()];
-}
-
-function Page() {
-  const send = useServerFn(sendBulk);
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
-  const [list, setList] = useState("");
-  const [sending, setSending] = useState(false);
-  const [results, setResults] = useState<Result[]>([]);
-
-  const recipients = useMemo(() => parseRecipients(list), [list]);
-
-  const sent = results.filter((r) => r.ok).length;
-  const failed = results.filter((r) => !r.ok).length;
-  const ready = subject && body && recipients.length > 0;
-
-  async function onSend() {
-    if (!ready || sending) return;
-    setSending(true);
-    setResults([]);
-    try {
-      const res = await send({ data: { subject, body, recipients } });
-      setResults(res.results);
-    } catch (e: any) {
-      setResults([{ email: "—", ok: false, error: String(e?.message ?? e) }]);
-    } finally {
-      setSending(false);
-    }
-  }
-
+function PreviewDashboard() {
   return (
-    <main className="min-h-screen mx-auto max-w-2xl px-6 py-16">
-      <header className="flex items-baseline justify-between mb-10">
-        <h1 className="text-base font-medium tracking-tight">bulk.</h1>
-        <span className="text-muted-foreground text-xs">
-          gmail · {recipients.length} recipient{recipients.length === 1 ? "" : "s"}
-        </span>
-      </header>
-
-      <div className="space-y-3">
-        <Field label="subject" hint="use {name} to personalize">
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="hi {name}"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field
-          label="body"
-          hint="plain text — links auto-format · use {name} · blank line = paragraph"
-        >
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={8}
-            placeholder={`Hi {name},\n\nQuick note — check this out: https://example.com\n\nThanks`}
-            className={inputCls + " resize-y font-mono text-[13px] leading-relaxed"}
-          />
-        </Field>
-
-        <Field label="recipients" hint="one per line — `email` or `Name <email>` or `email, Name`">
-          <textarea
-            value={list}
-            onChange={(e) => setList(e.target.value)}
-            rows={5}
-            placeholder={`alice@x.com, Alice\nBob Smith <bob@y.com>\ncarol@z.com`}
-            className={inputCls + " resize-y font-mono text-[13px]"}
-          />
-        </Field>
-      </div>
-
-      <button
-        onClick={onSend}
-        disabled={!ready || sending}
-        className="mt-6 w-full h-11 bg-foreground text-background text-sm tracking-tight disabled:opacity-30 transition-opacity"
-      >
-        {sending ? "sending…" : `send → ${recipients.length}`}
-      </button>
-
-      {results.length > 0 && (
-        <section className="mt-10">
-          <div className="flex justify-between text-xs text-muted-foreground mb-3">
-            <span>{sent} sent</span>
-            {failed > 0 && <span>{failed} failed</span>}
-          </div>
-          <ul className="border-t">
-            {results.map((r, i) => (
-              <li
-                key={i}
-                className="flex items-center justify-between py-2 border-b text-xs gap-3"
-              >
-                <span className="truncate">{r.email}</span>
-                <span
-                  className={
-                    r.ok
-                      ? "text-muted-foreground shrink-0"
-                      : "text-foreground truncate text-right"
-                  }
-                >
-                  {r.ok ? "ok" : r.error?.slice(0, 60) ?? "error"}
-                </span>
-              </li>
+    <div className="relative min-h-screen bg-background text-foreground">
+      {/* App-shell preview, deliberately styled to match /app */}
+      <div className="mx-auto flex max-w-7xl">
+        <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border p-6 md:flex">
+          <span className="mb-10 text-lg font-semibold tracking-tight">Quill</span>
+          <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
+            {NAV.map((n, i) => (
+              <span key={n} className={`px-2 py-1.5 ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{n}</span>
             ))}
-          </ul>
-        </section>
-      )}
-    </main>
+          </nav>
+          <div className="mt-auto pt-6 font-mono text-[11px] text-muted-foreground">
+            <div>not signed in</div>
+          </div>
+        </aside>
+
+        <main className="min-h-screen flex-1">
+          {/* Top bar with the highlighted Sign-in CTA */}
+          <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4 md:px-10">
+            <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              preview · sign in to send
+            </div>
+            <div className="flex items-center gap-3">
+              <Link to="/auth" className="font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                Sign in
+              </Link>
+              <Link
+                to="/auth"
+                className="relative inline-flex items-center gap-2 bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-primary)_25%,transparent)] transition hover:opacity-90"
+              >
+                Get started — free
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="px-6 py-10 md:px-10">
+            {/* Hero copy framed as a workspace headline */}
+            <div className="mb-10">
+              <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
+                Mass mail, <span className="text-accent">sharpened</span>.
+              </h1>
+              <p className="mt-3 max-w-xl text-base text-muted-foreground">
+                Send personalized email at scale from the inbox you already use. None of the bloat. None of the spam‑flag risk.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+              {/* LEFT: a faux composer that mirrors /app */}
+              <section className="space-y-5">
+                <FauxField label="From">
+                  <div className="border-b border-border py-2 text-sm text-muted-foreground">you@your-inbox.com</div>
+                </FauxField>
+                <FauxField label="Subject" hint="Use {{name}} or any column from your list">
+                  <div className="border-b border-border py-2 text-base">Quick hello, {"{{name}}"}</div>
+                </FauxField>
+                <FauxField label="Body" hint="Paste from Word keeps tables & formatting.">
+                  <div className="space-y-2 border border-border bg-card p-4 text-[15px] leading-relaxed">
+                    <p>Hi {"{{name}}"},</p>
+                    <p>I wanted to share something with you — take a look <span className="text-accent underline">here</span>.</p>
+                    <p>Best,<br/>Me</p>
+                  </div>
+                </FauxField>
+                <FauxField label="Recipients" hint="CSV or TSV. First row = headers (email required).">
+                  <pre className="border border-border bg-background p-3 font-mono text-xs leading-relaxed text-muted-foreground">{`email,name,company
+ada@hey.com,Ada,Analytica
+grace@hey.com,Grace,USN`}</pre>
+                </FauxField>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div className="font-mono text-xs text-muted-foreground">2 recipients ready</div>
+                  <Link
+                    to="/auth"
+                    className="bg-primary px-6 py-2.5 text-sm font-medium tracking-wide text-primary-foreground transition hover:opacity-90"
+                  >
+                    Sign in to send →
+                  </Link>
+                </div>
+              </section>
+
+              {/* RIGHT: marketing copy as "empty states" inside the dashboard */}
+              <section className="space-y-6 lg:sticky lg:top-10 lg:self-start">
+                <div className="border border-border bg-card p-6">
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Preview</div>
+                  <div className="mt-3 text-base font-medium">Quick hello, Ada</div>
+                  <p className="mt-3 text-[15px] leading-relaxed text-foreground">
+                    Hi Ada, I wanted to share something with you — take a look <span className="text-accent underline">here</span>.
+                  </p>
+                  <p className="mt-2 text-[15px] leading-relaxed">Best,<br/>Me</p>
+                </div>
+
+                <div className="grid gap-px bg-border md:grid-cols-2">
+                  {TILES.map((t) => (
+                    <div key={t.k} className="bg-background p-5">
+                      <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{t.k}</div>
+                      <p className="mt-2 text-sm leading-relaxed text-foreground">{t.v}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border border-border bg-card p-6">
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Mailboxes</div>
+                  <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click — Quill never stores your password.</p>
+                  <Link to="/auth" className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2 text-sm hover:bg-muted">
+                    Continue with Google →
+                  </Link>
+                </div>
+              </section>
+            </div>
+
+            <footer className="mt-16 flex items-center justify-between border-t border-border pt-6 font-mono text-xs text-muted-foreground">
+              <span>© Quill</span>
+              <span>Built sharp.</span>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }
 
-const inputCls =
-  "w-full bg-transparent border border-border px-3 py-2 text-sm outline-none focus:border-foreground transition-colors";
-
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function FauxField({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <label className="block">
-      <div className="flex items-baseline justify-between mb-1.5">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        {hint && <span className="text-[10px] text-muted-foreground/70">{hint}</span>}
+    <div>
+      <div className="mb-1 flex items-baseline justify-between">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{label}</span>
+        {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
       </div>
       {children}
-    </label>
+    </div>
   );
 }
