@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const recipientSchema = z.object({
   email: z.string().email().max(320),
@@ -132,8 +133,20 @@ function totalAttachmentBytes(atts: Attachment[]) {
 }
 
 export const sendBulk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
-  .handler(async ({ data }: { data: Payload }) => {
+  .handler(async ({ data, context }: { data: Payload; context: { supabase: { from: (table: string) => any }; userId: string } }) => {
+    const { data: entitlements, error: entitlementError } = await context.supabase
+      .from("billing_entitlements")
+      .select("active, expires_at")
+      .eq("user_id", context.userId)
+      .eq("active", true);
+    if (entitlementError) throw new Error("Unable to verify paid access");
+    const hasPaidAccess = (entitlements ?? []).some(
+      (item: { active: boolean; expires_at: string | null }) => item.active && (!item.expires_at || new Date(item.expires_at).getTime() > Date.now()),
+    );
+    if (!hasPaidAccess) throw new Error("Choose a paid plan before sending email");
+
     const lovableKey = process.env.LOVABLE_API_KEY;
     const gmailKey = process.env.GOOGLE_MAIL_API_KEY;
     if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");

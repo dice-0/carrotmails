@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
 import { Route as AuthenticatedAppMailboxesRouteImport } from './routes/_authenticated/app.mailboxes'
 import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticated/app.lists'
@@ -50,6 +51,11 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
+  id: '/api/public/dodo-webhook',
+  path: '/api/public/dodo-webhook',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppTemplatesRoute =
   AuthenticatedAppTemplatesRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/app/lists': typeof AuthenticatedAppListsRoute
   '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/app/lists': typeof AuthenticatedAppListsRoute
   '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated/app/lists': typeof AuthenticatedAppListsRoute
   '/_authenticated/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
   '/_authenticated/app/templates': typeof AuthenticatedAppTemplatesRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/api/public/oauth/google/callback': typeof ApiPublicOauthGoogleCallbackRoute
 }
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/app/lists'
     | '/app/mailboxes'
     | '/app/templates'
+    | '/api/public/dodo-webhook'
     | '/app/'
     | '/api/public/oauth/google/callback'
   fileRoutesByTo: FileRoutesByTo
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/app/lists'
     | '/app/mailboxes'
     | '/app/templates'
+    | '/api/public/dodo-webhook'
     | '/app'
     | '/api/public/oauth/google/callback'
   id:
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/lists'
     | '/_authenticated/app/mailboxes'
     | '/_authenticated/app/templates'
+    | '/api/public/dodo-webhook'
     | '/_authenticated/app/'
     | '/api/public/oauth/google/callback'
   fileRoutesById: FileRoutesById
@@ -173,6 +185,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
   ApiPublicOauthGoogleCallbackRoute: typeof ApiPublicOauthGoogleCallbackRoute
 }
 
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/dodo-webhook': {
+      id: '/api/public/dodo-webhook'
+      path: '/api/public/dodo-webhook'
+      fullPath: '/api/public/dodo-webhook'
+      preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/templates': {
       id: '/_authenticated/app/templates'
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
   ApiPublicOauthGoogleCallbackRoute: ApiPublicOauthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
