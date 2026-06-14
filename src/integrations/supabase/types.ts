@@ -14,6 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
+      billing_customers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          provider: string
+          provider_customer_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          provider?: string
+          provider_customer_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          provider?: string
+          provider_customer_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      billing_entitlements: {
+        Row: {
+          active: boolean
+          created_at: string
+          entitlement: string
+          expires_at: string | null
+          id: string
+          source_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          entitlement: string
+          expires_at?: string | null
+          id?: string
+          source_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          entitlement?: string
+          expires_at?: string | null
+          id?: string
+          source_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      billing_offers: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          currency: string
+          max_redemptions: number
+          name: string
+          price_cents: number
+          redemption_count: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          currency?: string
+          max_redemptions: number
+          name: string
+          price_cents: number
+          redemption_count?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          currency?: string
+          max_redemptions?: number
+          name?: string
+          price_cents?: number
+          redemption_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      billing_purchases: {
+        Row: {
+          amount_cents: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          product: string
+          provider_payment_id: string
+          provider_product_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          product: string
+          provider_payment_id: string
+          provider_product_id: string
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          product?: string
+          provider_payment_id?: string
+          provider_product_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      billing_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan: string
+          provider_product_id: string
+          provider_subscription_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          provider_product_id: string
+          provider_subscription_id: string
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          provider_product_id?: string
+          provider_subscription_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      billing_webhook_events: {
+        Row: {
+          event_type: string
+          id: string
+          processed_at: string
+          provider_event_id: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          processed_at?: string
+          provider_event_id: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          processed_at?: string
+          provider_event_id?: string
+        }
+        Relationships: []
+      }
       campaign_recipients: {
         Row: {
           campaign_id: string
