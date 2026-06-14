@@ -9,9 +9,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Quill — mass mail, from your own inbox" },
+      { title: "Quill | mass mail, from your own inbox" },
       { name: "description", content: "Personalized bulk email from your Gmail or Outlook. Smart variables, reply detection, deliverability built-in." },
-      { property: "og:title", content: "Quill — mass mail, sharp and simple" },
+      { property: "og:title", content: "Quill | mass mail, sharp and simple" },
       { property: "og:description", content: "Personalized bulk email from your own inbox." },
     ],
   }),
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes"];
 
 const TILES = [
-  { k: "From your inbox", v: "Connect Gmail or Outlook. Sends look — and are — personal." },
+  { k: "From your inbox", v: "Connect Gmail or Outlook. Sends look personal because they are." },
   { k: "Real personalization", v: "{{name|fallback}}, spintax, conditionals, AI rewrites per recipient." },
   { k: "Reply detection", v: "When someone replies, we auto-pause future sends to them." },
   { k: "List hygiene", v: "Dedupe, syntax + MX checks, automatic suppression for bounces." },
@@ -58,7 +58,7 @@ function PreviewDashboard() {
                 to="/auth"
                 className="relative inline-flex items-center gap-2 bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-primary)_25%,transparent)] transition hover:opacity-90"
               >
-                Get started — free
+                Get started, free
                 <span aria-hidden>→</span>
               </Link>
             </div>
@@ -87,7 +87,7 @@ function PreviewDashboard() {
                 <FauxField label="Body" hint="Paste from Word keeps tables & formatting.">
                   <div className="space-y-2 border border-border bg-card p-4 text-[15px] leading-relaxed">
                     <p>Hi {"{{name}}"},</p>
-                    <p>I wanted to share something with you — take a look <span className="text-accent underline">here</span>.</p>
+                    <p>I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.</p>
                     <p>Best,<br/>Me</p>
                   </div>
                 </FauxField>
@@ -114,7 +114,7 @@ grace@hey.com,Grace,USN`}</pre>
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Preview</div>
                   <div className="mt-3 text-base font-medium">Quick hello, Ada</div>
                   <p className="mt-3 text-[15px] leading-relaxed text-foreground">
-                    Hi Ada, I wanted to share something with you — take a look <span className="text-accent underline">here</span>.
+                    Hi Ada, I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.
                   </p>
                   <p className="mt-2 text-[15px] leading-relaxed">Best,<br/>Me</p>
                 </div>
@@ -130,7 +130,7 @@ grace@hey.com,Grace,USN`}</pre>
 
                 <div className="border border-border bg-card p-6">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Mailboxes</div>
-                  <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click — Quill never stores your password.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click. Quill never stores your password.</p>
                   <Link to="/auth" className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2 text-sm hover:bg-muted">
                     Continue with Google →
                   </Link>

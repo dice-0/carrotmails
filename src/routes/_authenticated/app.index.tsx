@@ -8,9 +8,9 @@ import { RichEditor } from "@/components/RichEditor";
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Quill — bulk mail, sharp and simple" },
+      { title: "Quill | bulk mail, sharp and simple" },
       { name: "description", content: "Personalized bulk email from your own inbox. No clutter." },
-      { property: "og:title", content: "Quill — bulk mail, sharp and simple" },
+      { property: "og:title", content: "Quill | bulk mail, sharp and simple" },
       { property: "og:description", content: "Personalized bulk email from your own inbox." },
     ],
   }),
@@ -93,7 +93,7 @@ function Index() {
   const [fromName, setFromName] = useState("");
   const [subject, setSubject] = useState("Quick hello, {{name}}");
   const [bodyHtml, setBodyHtml] = useState(
-    '<p>Hi {{name}},</p><p>I wanted to share something with you — take a look <a href="https://example.com" target="_blank" rel="noopener">here</a>.</p><p>Best,<br/>Me</p>',
+    '<p>Hi {{name}},</p><p>I wanted to share something with you. Take a look <a href="https://example.com" target="_blank" rel="noopener">here</a>.</p><p>Best,<br/>Me</p>',
   );
   const [raw, setRaw] = useState("email,name\n");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -131,7 +131,7 @@ function Index() {
       });
       setResult(r);
     } catch (e) {
-      setResult({ sent: 0, failed: parsed.rows.length, results: [{ email: "—", ok: false, error: (e as Error).message }] });
+      setResult({ sent: 0, failed: parsed.rows.length, results: [{ email: "N/A", ok: false, error: (e as Error).message }] });
     } finally {
       setSending(false);
     }
@@ -240,7 +240,7 @@ function Index() {
 
             <Field
               label="Recipients"
-              hint={`CSV or TSV. First row = headers (email required). ${parsed.rows.length} valid · cols: ${parsed.headers.join(", ") || "—"}`}
+              hint={`CSV or TSV. First row = headers (email required). ${parsed.rows.length} valid · cols: ${parsed.headers.join(", ") || "none"}`}
             >
               <textarea
                 value={raw}
@@ -281,7 +281,7 @@ function Index() {
                   Subject
                 </div>
                 <div className="mt-1 text-base font-medium">
-                  {applyVars(subject, sample) || <span className="text-muted-foreground">—</span>}
+                  {applyVars(subject, sample) || <span className="text-muted-foreground">None</span>}
                 </div>
               </div>
               <div
@@ -313,7 +313,7 @@ function Index() {
                       .filter((r) => !r.ok)
                       .map((r) => (
                         <li key={r.email}>
-                          {r.email} — {r.error}
+                          {r.email}: {r.error}
                         </li>
                       ))}
                   </ul>

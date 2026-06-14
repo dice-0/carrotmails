@@ -7,7 +7,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Quill" },
+      { title: "Sign in | Quill" },
       { name: "description", content: "Sign in to Quill, the sharpest mass-mail tool." },
       { name: "robots", content: "noindex" },
     ],
