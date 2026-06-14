@@ -79,6 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "3Cwbc0L9C0P7U5DB9ccne78RaX0J4ZfjPdZfFPW-Sck" },
       { title: "Quill - bulk mail, sharp and simple" },
       { name: "description", content: "Send personalized bulk emails from your own inbox. Minimal, smart, fast." },
       { name: "author", content: "Lovable" },
