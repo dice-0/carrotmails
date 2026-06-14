@@ -135,7 +135,7 @@ function totalAttachmentBytes(atts: Attachment[]) {
 export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
-  .handler(async ({ data, context }: { data: Payload; context: { supabase: { from: (table: string) => any }; userId: string } }) => {
+  .handler(async ({ data, context }) => {
     const { data: entitlements, error: entitlementError } = await context.supabase
       .from("billing_entitlements")
       .select("active, expires_at")
