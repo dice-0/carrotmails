@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { CarrotLogo } from "@/components/CarrotLogo";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
@@ -51,7 +52,7 @@ function AppShell() {
       <div className="mx-auto flex max-w-[90rem]">
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border px-6 py-7 md:flex">
           <div className="mb-10 flex items-center justify-between">
-            <Link to="/app" className="text-lg font-semibold tracking-tight">Carrot Mails</Link>
+            <Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={26} /></Link>
             <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"} title={dark ? "Light mode" : "Dark mode"}>{dark ? "☀" : "◐"}</Button>
           </div>
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
@@ -75,7 +76,7 @@ function AppShell() {
         </aside>
         <main className="min-h-screen flex-1">
           <div className="sticky top-0 z-20 border-b border-border bg-background/95 px-4 py-3 backdrop-blur md:hidden">
-            <div className="flex items-center justify-between"><Link to="/app" className="font-semibold">Carrot Mails</Link><Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"}>{dark ? "☀" : "◐"}</Button></div>
+            <div className="flex items-center justify-between"><Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={22} /></Link><Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"}>{dark ? "☀" : "◐"}</Button></div>
             <nav className="mt-3 flex gap-4 overflow-x-auto pb-1 font-mono text-[10px] uppercase tracking-widest">
               {NAV.map((n) => { const active = n.end ? pathname === n.to : pathname.startsWith(n.to); return <Link key={n.to} to={n.to} className={active ? "text-foreground" : "text-muted-foreground"}>{n.label}</Link>; })}
             </nav>

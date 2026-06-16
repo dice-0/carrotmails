@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CarrotLogo } from "@/components/CarrotLogo";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -33,7 +34,7 @@ function PreviewDashboard() {
       {/* App-shell preview, deliberately styled to match /app */}
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border p-6 md:flex">
-          <span className="mb-10 text-lg font-semibold tracking-tight">Carrot Mails</span>
+          <CarrotLogo size={26} className="mb-10" />
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n, i) => (
               <span key={n} className={`px-2 py-1.5 ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{n}</span>
@@ -68,7 +69,7 @@ function PreviewDashboard() {
             {/* Hero copy framed as a workspace headline */}
             <div className="mb-10">
               <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
-                Mass mail, <span className="text-accent">sharpened</span>.
+                Mass mail, <span className="text-primary">delivered fresh</span>.
               </h1>
               <p className="mt-3 max-w-xl text-base text-muted-foreground">
                 Send personalized email at scale from the inbox you already use. None of the bloat. None of the spam‑flag risk.
