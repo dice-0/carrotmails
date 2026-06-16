@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CarrotLogo } from "@/components/CarrotLogo";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -9,9 +10,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Quill | mass mail, from your own inbox" },
+      { title: "Carrot Mails | mass mail, from your own inbox" },
       { name: "description", content: "Personalized bulk email from your Gmail or Outlook. Smart variables, reply detection, deliverability built-in." },
-      { property: "og:title", content: "Quill | mass mail, sharp and simple" },
+      { property: "og:title", content: "Carrot Mails | mass mail, sharp and simple" },
       { property: "og:description", content: "Personalized bulk email from your own inbox." },
     ],
   }),
@@ -33,7 +34,7 @@ function PreviewDashboard() {
       {/* App-shell preview, deliberately styled to match /app */}
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border p-6 md:flex">
-          <span className="mb-10 text-lg font-semibold tracking-tight">Quill</span>
+          <CarrotLogo size={26} className="mb-10" />
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n, i) => (
               <span key={n} className={`px-2 py-1.5 ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{n}</span>
@@ -68,7 +69,7 @@ function PreviewDashboard() {
             {/* Hero copy framed as a workspace headline */}
             <div className="mb-10">
               <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
-                Mass mail, <span className="text-accent">sharpened</span>.
+                Mass mail, <span className="text-primary">delivered fresh</span>.
               </h1>
               <p className="mt-3 max-w-xl text-base text-muted-foreground">
                 Send personalized email at scale from the inbox you already use. None of the bloat. None of the spam‑flag risk.
@@ -130,7 +131,7 @@ grace@hey.com,Grace,USN`}</pre>
 
                 <div className="border border-border bg-card p-6">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Mailboxes</div>
-                  <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click. Quill never stores your password.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click. Carrot Mails never stores your password.</p>
                   <Link to="/auth" className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2 text-sm hover:bg-muted">
                     Continue with Google →
                   </Link>
@@ -139,7 +140,7 @@ grace@hey.com,Grace,USN`}</pre>
             </div>
 
             <footer className="mt-16 flex items-center justify-between border-t border-border pt-6 font-mono text-xs text-muted-foreground">
-              <span>© Quill</span>
+              <span>© Carrot Mails</span>
               <span>Built sharp.</span>
             </footer>
           </div>

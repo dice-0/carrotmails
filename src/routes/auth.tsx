@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
+import { CarrotLogo } from "@/components/CarrotLogo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in | Quill" },
-      { name: "description", content: "Sign in to Quill, the sharpest mass-mail tool." },
+      { title: "Sign in | Carrot Mails" },
+      { name: "description", content: "Sign in to Carrot Mails, the sharpest mass-mail tool." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -70,8 +71,9 @@ function AuthPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-        <Link to="/" className="mb-10 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
-          ← Quill
+        <Link to="/" className="mb-10 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground" aria-label="Back to Carrot Mails home">
+          <span className="font-mono text-xs uppercase tracking-widest">←</span>
+          <CarrotLogo size={22} />
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Sign in" : "Create your account"}
