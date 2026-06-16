@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { deleteTemplate, listTemplates, saveTemplate } from "@/lib/templates.functions";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
-  head: () => ({ meta: [{ title: "Templates | Quill" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Templates | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
   component: TemplatesPage,
 });
 

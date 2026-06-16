@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/app/mailboxes")({
     connected: typeof s.connected === "string" ? s.connected : undefined,
     error: typeof s.error === "string" ? s.error : undefined,
   }),
-  head: () => ({ meta: [{ title: "Mailboxes | Quill" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Mailboxes | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
   component: MailboxesPage,
 });
 
@@ -51,7 +51,7 @@ function MailboxesPage() {
     <div className="mx-auto max-w-3xl p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Mailboxes</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Connect your Gmail account. Quill never sees your password. Google handles sign-in, and you can revoke access at any time.
+        Connect your Gmail account. Carrot Mails never sees your password. Google handles sign-in, and you can revoke access at any time.
       </p>
 
       <div className="mt-8 space-y-3">
@@ -112,7 +112,7 @@ function MailboxesPage() {
       </div>
 
       <p className="mt-10 text-xs text-muted-foreground">
-        Scopes requested: gmail.send, gmail.readonly, gmail.modify. We only read to detect replies on threads you started from Quill.
+        Scopes requested: gmail.send, gmail.readonly, gmail.modify. We only read to detect replies on threads you started from Carrot Mails.
       </p>
     </div>
   );

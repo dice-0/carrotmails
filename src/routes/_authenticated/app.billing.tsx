@@ -9,8 +9,8 @@ import { createBillingCheckout, createCustomerPortal, getBillingStatus } from "@
 export const Route = createFileRoute("/_authenticated/app/billing")({
   head: () => ({
     meta: [
-      { title: "Billing | Quill" },
-      { name: "description", content: "Manage your Quill plan and billing." },
+      { title: "Billing | Carrot Mails" },
+      { name: "description", content: "Manage your Carrot Mails plan and billing." },
     ],
   }),
   component: BillingPage,
@@ -110,7 +110,7 @@ function BillingPage() {
 
           {!status?.checkoutConfigured && <p className="mt-5 border border-border bg-muted p-4 text-sm text-muted-foreground">Checkout will activate after the Dodo payment credentials and product IDs are connected.</p>}
           {error && <p className="mt-5 text-sm text-destructive">{error}</p>}
-          <p className="mt-6 text-xs leading-5 text-muted-foreground">Prices are in USD. Taxes may be added at checkout. Lifetime access covers Quill product features, not third-party email delivery or usage costs.</p>
+          <p className="mt-6 text-xs leading-5 text-muted-foreground">Prices are in USD. Taxes may be added at checkout. Lifetime access covers Carrot Mails product features, not third-party email delivery or usage costs.</p>
         </>
       )}
     </AppPage>

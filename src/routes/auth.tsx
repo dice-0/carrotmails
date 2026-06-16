@@ -7,8 +7,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in | Quill" },
-      { name: "description", content: "Sign in to Quill, the sharpest mass-mail tool." },
+      { title: "Sign in | Carrot Mails" },
+      { name: "description", content: "Sign in to Carrot Mails, the sharpest mass-mail tool." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -71,7 +71,7 @@ function AuthPage() {
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
         <Link to="/" className="mb-10 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
-          ← Quill
+          ← Carrot Mails
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Sign in" : "Create your account"}

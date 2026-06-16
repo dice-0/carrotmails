@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { deleteContactList, importContactList, listContactLists } from "@/lib/lists.functions";
 
 export const Route = createFileRoute("/_authenticated/app/lists")({
-  head: () => ({ meta: [{ title: "Lists | Quill" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Lists | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
   component: ListsPage,
 });
 
