@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { sendBulk, getGmailProfile } from "@/lib/bulk-send.functions";
 import { RichEditor } from "@/components/RichEditor";
 import { Button } from "@/components/ui/button";
+import { CarrotLogo } from "@/components/CarrotLogo";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -164,8 +165,8 @@ function Index() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <header className="mb-10 flex items-end justify-between border-b border-border pb-6">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Carrot Mails</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <CarrotLogo size={32} />
+            <p className="mt-2 text-sm text-muted-foreground">
               Bulk mail. Personalized. From your own inbox.
             </p>
           </div>
