@@ -223,7 +223,7 @@ async function hasPaidAccess(supabase: any, userId: string) {
 export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const mailbox = await loadUserMailbox(context.supabase);
+    const mailbox = await loadUserMailbox(context.userId);
     const paid = await hasPaidAccess(context.supabase, context.userId);
     const used = await getUsage(context.supabase);
     return {
