@@ -163,27 +163,23 @@ async function refreshAccessToken(refreshToken: string) {
   return (await res.json()) as { access_token: string; expires_in: number };
 }
 
-async function getActiveAccessToken(
-  supabase: any,
-  mailbox: GmailMailbox,
-): Promise<string> {
+async function getActiveAccessToken(mailbox: GmailMailbox): Promise<string> {
   const expMs = mailbox.expires_at ? new Date(mailbox.expires_at).getTime() : 0;
   // Refresh 60s before expiry
   if (expMs - 60_000 > Date.now()) return mailbox.access_token;
   if (!mailbox.refresh_token) throw new Error("Mailbox needs to be reconnected");
   const refreshed = await refreshAccessToken(mailbox.refresh_token);
   const newExpiry = new Date(Date.now() + refreshed.expires_in * 1000).toISOString();
-  await supabase
-    .from("mailbox_connections")
-    .update({ access_token: refreshed.access_token, expires_at: newExpiry })
-    .eq("id", mailbox.id);
+  await updateMailboxToken(mailbox.id, refreshed.access_token, newExpiry);
   return refreshed.access_token;
 }
 
-async function loadUserMailbox(supabase: any): Promise<GmailMailbox | null> {
-  const { data, error } = await supabase
+async function loadUserMailbox(userId: string): Promise<GmailMailbox | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
     .from("mailbox_connections")
     .select("id, email, access_token, refresh_token, expires_at, status, provider")
+    .eq("user_id", userId)
     .eq("provider", "gmail")
     .eq("status", "active")
     .order("created_at", { ascending: true })
@@ -191,6 +187,14 @@ async function loadUserMailbox(supabase: any): Promise<GmailMailbox | null> {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return (data as GmailMailbox | null) ?? null;
+}
+
+async function updateMailboxToken(mailboxId: string, accessToken: string, expiresAt: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin
+    .from("mailbox_connections")
+    .update({ access_token: accessToken, expires_at: expiresAt })
+    .eq("id", mailboxId);
 }
 
 async function getUsage(supabase: any) {
@@ -219,7 +223,7 @@ async function hasPaidAccess(supabase: any, userId: string) {
 export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const mailbox = await loadUserMailbox(context.supabase);
+    const mailbox = await loadUserMailbox(context.userId);
     const paid = await hasPaidAccess(context.supabase, context.userId);
     const used = await getUsage(context.supabase);
     return {
@@ -235,7 +239,7 @@ export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const mailbox = await loadUserMailbox(context.supabase);
+    const mailbox = await loadUserMailbox(context.userId);
     if (!mailbox) throw new Error("Connect a Gmail mailbox before sending");
 
     const paid = await hasPaidAccess(context.supabase, context.userId);
@@ -255,7 +259,7 @@ export const sendBulk = createServerFn({ method: "POST" })
 
     let accessToken: string;
     try {
-      accessToken = await getActiveAccessToken(context.supabase, mailbox);
+      accessToken = await getActiveAccessToken(mailbox);
     } catch (e) {
       throw new Error((e as Error).message);
     }
@@ -285,13 +289,11 @@ export const sendBulk = createServerFn({ method: "POST" })
             try {
               const refreshed = await refreshAccessToken(mailbox.refresh_token);
               accessToken = refreshed.access_token;
-              await context.supabase
-                .from("mailbox_connections")
-                .update({
-                  access_token: refreshed.access_token,
-                  expires_at: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
-                })
-                .eq("id", mailbox.id);
+              await updateMailboxToken(
+                mailbox.id,
+                refreshed.access_token,
+                new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
+              );
               const retry = await fetch(url, {
                 method: "POST",
                 headers: {
