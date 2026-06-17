@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
@@ -6,6 +6,7 @@ import { sendBulk, getGmailProfile } from "@/lib/bulk-send.functions";
 import { RichEditor } from "@/components/RichEditor";
 import { Button } from "@/components/ui/button";
 import { CarrotLogo } from "@/components/CarrotLogo";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
