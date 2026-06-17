@@ -239,7 +239,7 @@ export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const mailbox = await loadUserMailbox(context.supabase);
+    const mailbox = await loadUserMailbox(context.userId);
     if (!mailbox) throw new Error("Connect a Gmail mailbox before sending");
 
     const paid = await hasPaidAccess(context.supabase, context.userId);
