@@ -414,6 +414,38 @@ export type Database = {
           },
         ]
       }
+      email_send_events: {
+        Row: {
+          id: string
+          mailbox_id: string | null
+          recipient_email: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          mailbox_id?: string | null
+          recipient_email: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          mailbox_id?: string | null
+          recipient_email?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_send_events_mailbox_id_fkey"
+            columns: ["mailbox_id"]
+            isOneToOne: false
+            referencedRelation: "mailbox_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mailbox_connections: {
         Row: {
           access_token: string | null

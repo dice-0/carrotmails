@@ -175,9 +175,16 @@ function Index() {
               <>
                 <div className="text-foreground">{profile.email}</div>
                 <div>gmail · connected</div>
+                {profile.paid ? (
+                  <div className="mt-1 text-[10px] uppercase tracking-widest text-primary">pro · unlimited</div>
+                ) : (
+                  <div className="mt-1 text-[10px] uppercase tracking-widest">
+                    free · {Math.max(0, (profile.freeLimit ?? 20) - (profile.freeUsed ?? 0))}/{profile.freeLimit ?? 20} left · resets every {profile.freeWindowDays ?? 3}d
+                  </div>
+                )}
               </>
             ) : (
-              <div>connect gmail to begin</div>
+              <div>connect gmail to begin · sign in with your own Google account</div>
             )}
           </div>
         </header>
