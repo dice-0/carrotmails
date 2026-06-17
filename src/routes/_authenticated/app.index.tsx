@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
@@ -6,6 +6,7 @@ import { sendBulk, getGmailProfile } from "@/lib/bulk-send.functions";
 import { RichEditor } from "@/components/RichEditor";
 import { Button } from "@/components/ui/button";
 import { CarrotLogo } from "@/components/CarrotLogo";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -92,12 +93,13 @@ function Index() {
     staleTime: 60_000,
   });
 
-  const [fromName, setFromName] = useState("");
-  const [subject, setSubject] = useState("Quick hello, {{name}}");
-  const [bodyHtml, setBodyHtml] = useState(
+  const [fromName, setFromName] = usePersistentState("cm:compose:fromName", "");
+  const [subject, setSubject] = usePersistentState("cm:compose:subject", "Quick hello, {{name}}");
+  const [bodyHtml, setBodyHtml] = usePersistentState(
+    "cm:compose:bodyHtml",
     '<p>Hi {{name}},</p><p>I wanted to share something with you. Take a look <a href="https://example.com" target="_blank" rel="noopener">here</a>.</p><p>Best,<br/>Me</p>',
   );
-  const [raw, setRaw] = useState("email,name\n");
+  const [raw, setRaw] = usePersistentState("cm:compose:recipients", "email,name\n");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
@@ -188,6 +190,23 @@ function Index() {
             )}
           </div>
         </header>
+
+        {!profile?.email && (
+          <div className="mb-8 flex flex-col items-start justify-between gap-3 border border-primary/40 bg-primary/5 px-5 py-4 sm:flex-row sm:items-center">
+            <div>
+              <div className="text-sm font-medium text-foreground">Connect your Gmail to start sending</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                Mail is sent from <em>your</em> inbox, never ours. 20 free sends every 3 days included.
+              </div>
+            </div>
+            <Link to="/app/mailboxes" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">
+              connect gmail →
+            </Link>
+          </div>
+        )}
+        {profile?.email && !profile.paid && (
+          <QuotaBar used={profile.freeUsed ?? 0} limit={profile.freeLimit ?? 20} windowDays={profile.freeWindowDays ?? 3} />
+        )}
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* LEFT: compose */}
@@ -354,6 +373,34 @@ function Field({
         {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
       </div>
       {children}
+    </div>
+  );
+}
+
+function QuotaBar({ used, limit, windowDays }: { used: number; limit: number; windowDays: number }) {
+  const left = Math.max(0, limit - used);
+  const pct = Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
+  const low = left <= Math.max(1, Math.floor(limit * 0.2));
+  return (
+    <div className="mb-8 border border-border px-5 py-4">
+      <div className="flex items-baseline justify-between">
+        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Free quota</div>
+        <div className={`font-mono text-xs ${low ? "text-destructive" : "text-foreground"}`}>
+          {left}/{limit} left · resets every {windowDays}d
+        </div>
+      </div>
+      <div className="mt-2 h-1.5 w-full bg-muted">
+        <div
+          className={`h-full ${low ? "bg-destructive" : "bg-primary"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {low && (
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Running low. Upgrade for unlimited sending.</span>
+          <Link to="/app/billing" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">upgrade →</Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { AppPage } from "@/components/AppPage";
 import { Button } from "@/components/ui/button";
+import { usePersistentState } from "@/hooks/usePersistentState";
 import { deleteContactList, importContactList, listContactLists } from "@/lib/lists.functions";
 
 export const Route = createFileRoute("/_authenticated/app/lists")({
@@ -55,10 +56,10 @@ function ListsPage() {
   const list = useServerFn(listContactLists);
   const importList = useServerFn(importContactList);
   const remove = useServerFn(deleteContactList);
-  const [name, setName] = useState("");
-  const [fileName, setFileName] = useState("");
-  const [raw, setRaw] = useState("");
-  const [showImport, setShowImport] = useState(false);
+  const [name, setName] = usePersistentState("cm:lists:name", "");
+  const [fileName, setFileName] = usePersistentState("cm:lists:fileName", "");
+  const [raw, setRaw] = usePersistentState("cm:lists:raw", "");
+  const [showImport, setShowImport] = usePersistentState("cm:lists:showImport", false);
   const parsed = useMemo(() => parseCsv(raw), [raw]);
   const { data: lists = [], isLoading } = useQuery({ queryKey: ["contact-lists"], queryFn: () => list() });
   const importMutation = useMutation({
