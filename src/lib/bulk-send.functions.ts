@@ -259,7 +259,7 @@ export const sendBulk = createServerFn({ method: "POST" })
 
     let accessToken: string;
     try {
-      accessToken = await getActiveAccessToken(context.supabase, mailbox);
+      accessToken = await getActiveAccessToken(mailbox);
     } catch (e) {
       throw new Error((e as Error).message);
     }
