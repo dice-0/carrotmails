@@ -34,7 +34,7 @@ function PreviewDashboard() {
       {/* App-shell preview, deliberately styled to match /app */}
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border p-6 md:flex">
-          <CarrotLogo size={26} className="mb-10" />
+          <CarrotLogo size={40} className="mb-10" />
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n, i) => (
               <span key={n} className={`px-2 py-1.5 ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{n}</span>

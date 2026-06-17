@@ -165,7 +165,7 @@ function Index() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <header className="mb-10 flex items-end justify-between border-b border-border pb-6">
           <div>
-            <CarrotLogo size={32} />
+            <CarrotLogo size={48} />
             <p className="mt-2 text-sm text-muted-foreground">
               Bulk mail. Personalized. From your own inbox.
             </p>
