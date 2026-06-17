@@ -180,10 +180,12 @@ async function getActiveAccessToken(
   return refreshed.access_token;
 }
 
-async function loadUserMailbox(supabase: any): Promise<GmailMailbox | null> {
-  const { data, error } = await supabase
+async function loadUserMailbox(userId: string): Promise<GmailMailbox | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
     .from("mailbox_connections")
     .select("id, email, access_token, refresh_token, expires_at, status, provider")
+    .eq("user_id", userId)
     .eq("provider", "gmail")
     .eq("status", "active")
     .order("created_at", { ascending: true })
@@ -191,6 +193,14 @@ async function loadUserMailbox(supabase: any): Promise<GmailMailbox | null> {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return (data as GmailMailbox | null) ?? null;
+}
+
+async function updateMailboxToken(mailboxId: string, accessToken: string, expiresAt: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin
+    .from("mailbox_connections")
+    .update({ access_token: accessToken, expires_at: expiresAt })
+    .eq("id", mailboxId);
 }
 
 async function getUsage(supabase: any) {
