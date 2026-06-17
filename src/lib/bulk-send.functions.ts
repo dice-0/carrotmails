@@ -10,7 +10,7 @@ const recipientSchema = z.object({
 const attachmentSchema = z.object({
   filename: z.string().min(1).max(255),
   contentType: z.string().min(1).max(200),
-  dataBase64: z.string().min(1).max(20_000_000), // ~15MB raw
+  dataBase64: z.string().min(1).max(20_000_000),
 });
 
 const payloadSchema = z.object({
@@ -21,9 +21,12 @@ const payloadSchema = z.object({
   attachments: z.array(attachmentSchema).max(10).default([]),
 });
 
-type Payload = z.infer<typeof payloadSchema>;
 type Recipient = z.infer<typeof recipientSchema>;
 type Attachment = z.infer<typeof attachmentSchema>;
+
+// Free quota: 20 recipient sends per rolling 3 days for users without a paid plan.
+export const FREE_QUOTA = 20;
+export const FREE_WINDOW_DAYS = 3;
 
 function applyVars(template: string, r: Recipient) {
   const vars: Record<string, string> = { email: r.email, ...r.vars };
@@ -96,7 +99,7 @@ function buildRawMime(
       `To: ${to}`,
       `Subject: ${subjectEncoded}`,
       "MIME-Version: 1.0",
-      altPart.split("\r\n")[0], // Content-Type line
+      altPart.split("\r\n")[0],
     ].join("\r\n");
     const body = altPart.split("\r\n").slice(1).join("\r\n");
     return b64url(headers + "\r\n\r\n" + body);
@@ -132,32 +135,132 @@ function totalAttachmentBytes(atts: Attachment[]) {
   return atts.reduce((n, a) => n + Math.floor((a.dataBase64.length * 3) / 4), 0);
 }
 
+type GmailMailbox = {
+  id: string;
+  email: string;
+  access_token: string;
+  refresh_token: string | null;
+  expires_at: string | null;
+};
+
+async function refreshAccessToken(refreshToken: string) {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  if (!clientId || !clientSecret) throw new Error("Google OAuth is not configured");
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to refresh Gmail token: ${await res.text()}`);
+  }
+  return (await res.json()) as { access_token: string; expires_in: number };
+}
+
+async function getActiveAccessToken(
+  supabase: any,
+  mailbox: GmailMailbox,
+): Promise<string> {
+  const expMs = mailbox.expires_at ? new Date(mailbox.expires_at).getTime() : 0;
+  // Refresh 60s before expiry
+  if (expMs - 60_000 > Date.now()) return mailbox.access_token;
+  if (!mailbox.refresh_token) throw new Error("Mailbox needs to be reconnected");
+  const refreshed = await refreshAccessToken(mailbox.refresh_token);
+  const newExpiry = new Date(Date.now() + refreshed.expires_in * 1000).toISOString();
+  await supabase
+    .from("mailbox_connections")
+    .update({ access_token: refreshed.access_token, expires_at: newExpiry })
+    .eq("id", mailbox.id);
+  return refreshed.access_token;
+}
+
+async function loadUserMailbox(supabase: any): Promise<GmailMailbox | null> {
+  const { data, error } = await supabase
+    .from("mailbox_connections")
+    .select("id, email, access_token, refresh_token, expires_at, status, provider")
+    .eq("provider", "gmail")
+    .eq("status", "active")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return (data as GmailMailbox | null) ?? null;
+}
+
+async function getUsage(supabase: any) {
+  const since = new Date(Date.now() - FREE_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await supabase
+    .from("email_send_events")
+    .select("id", { count: "exact", head: true })
+    .gte("sent_at", since);
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
+async function hasPaidAccess(supabase: any, userId: string) {
+  const { data, error } = await supabase
+    .from("billing_entitlements")
+    .select("active, expires_at")
+    .eq("user_id", userId)
+    .eq("active", true);
+  if (error) throw new Error("Unable to verify paid access");
+  return (data ?? []).some(
+    (i: { active: boolean; expires_at: string | null }) =>
+      i.active && (!i.expires_at || new Date(i.expires_at).getTime() > Date.now()),
+  );
+}
+
+export const getGmailProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const mailbox = await loadUserMailbox(context.supabase);
+    const paid = await hasPaidAccess(context.supabase, context.userId);
+    const used = await getUsage(context.supabase);
+    return {
+      email: mailbox?.email ?? null,
+      paid,
+      freeUsed: used,
+      freeLimit: FREE_QUOTA,
+      freeWindowDays: FREE_WINDOW_DAYS,
+    };
+  });
+
 export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: entitlements, error: entitlementError } = await context.supabase
-      .from("billing_entitlements")
-      .select("active, expires_at")
-      .eq("user_id", context.userId)
-      .eq("active", true);
-    if (entitlementError) throw new Error("Unable to verify paid access");
-    const hasPaidAccess = (entitlements ?? []).some(
-      (item: { active: boolean; expires_at: string | null }) => item.active && (!item.expires_at || new Date(item.expires_at).getTime() > Date.now()),
-    );
-    if (!hasPaidAccess) throw new Error("Choose a paid plan before sending email");
+    const mailbox = await loadUserMailbox(context.supabase);
+    if (!mailbox) throw new Error("Connect a Gmail mailbox before sending");
 
-    const lovableKey = process.env.LOVABLE_API_KEY;
-    const gmailKey = process.env.GOOGLE_MAIL_API_KEY;
-    if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
-    if (!gmailKey) throw new Error("GOOGLE_MAIL_API_KEY is not configured (connect Gmail)");
+    const paid = await hasPaidAccess(context.supabase, context.userId);
+    if (!paid) {
+      const used = await getUsage(context.supabase);
+      const remaining = Math.max(0, FREE_QUOTA - used);
+      if (data.recipients.length > remaining) {
+        throw new Error(
+          `Free plan limit: ${FREE_QUOTA} emails per ${FREE_WINDOW_DAYS} days. You have ${remaining} left. Upgrade to send more.`,
+        );
+      }
+    }
 
     if (totalAttachmentBytes(data.attachments) > 20 * 1024 * 1024) {
       throw new Error("Total attachment size exceeds 20MB");
     }
 
-    const url =
-      "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send";
+    let accessToken: string;
+    try {
+      accessToken = await getActiveAccessToken(context.supabase, mailbox);
+    } catch (e) {
+      throw new Error((e as Error).message);
+    }
+
+    const url = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send";
     const results: { email: string; ok: boolean; error?: string }[] = [];
 
     for (const r of data.recipients) {
@@ -171,16 +274,56 @@ export const sendBulk = createServerFn({ method: "POST" })
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${lovableKey}`,
-            "X-Connection-Api-Key": gmailKey,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({ raw }),
         });
         if (!resp.ok) {
           const txt = await resp.text();
+          // Token may have expired mid-batch (rare). Refresh once and retry this recipient.
+          if (resp.status === 401 && mailbox.refresh_token) {
+            try {
+              const refreshed = await refreshAccessToken(mailbox.refresh_token);
+              accessToken = refreshed.access_token;
+              await context.supabase
+                .from("mailbox_connections")
+                .update({
+                  access_token: refreshed.access_token,
+                  expires_at: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
+                })
+                .eq("id", mailbox.id);
+              const retry = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ raw }),
+              });
+              if (!retry.ok) {
+                results.push({ email: r.email, ok: false, error: `${retry.status} ${(await retry.text()).slice(0, 200)}` });
+              } else {
+                results.push({ email: r.email, ok: true });
+                await context.supabase.from("email_send_events").insert({
+                  user_id: context.userId,
+                  mailbox_id: mailbox.id,
+                  recipient_email: r.email,
+                });
+              }
+              continue;
+            } catch (re) {
+              results.push({ email: r.email, ok: false, error: (re as Error).message });
+              continue;
+            }
+          }
           results.push({ email: r.email, ok: false, error: `${resp.status} ${txt.slice(0, 200)}` });
         } else {
           results.push({ email: r.email, ok: true });
+          await context.supabase.from("email_send_events").insert({
+            user_id: context.userId,
+            mailbox_id: mailbox.id,
+            recipient_email: r.email,
+          });
         }
       } catch (e) {
         results.push({ email: r.email, ok: false, error: (e as Error).message });
@@ -191,21 +334,3 @@ export const sendBulk = createServerFn({ method: "POST" })
     const sent = results.filter((r) => r.ok).length;
     return { sent, failed: results.length - sent, results };
   });
-
-export const getGmailProfile = createServerFn({ method: "GET" }).handler(async () => {
-  const lovableKey = process.env.LOVABLE_API_KEY;
-  const gmailKey = process.env.GOOGLE_MAIL_API_KEY;
-  if (!lovableKey || !gmailKey) return { email: null as string | null };
-  const resp = await fetch(
-    "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/profile",
-    {
-      headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": gmailKey,
-      },
-    },
-  );
-  if (!resp.ok) return { email: null };
-  const json = (await resp.json()) as { emailAddress?: string };
-  return { email: json.emailAddress ?? null };
-});
