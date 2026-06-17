@@ -191,6 +191,23 @@ function Index() {
           </div>
         </header>
 
+        {!profile?.email && (
+          <div className="mb-8 flex flex-col items-start justify-between gap-3 border border-primary/40 bg-primary/5 px-5 py-4 sm:flex-row sm:items-center">
+            <div>
+              <div className="text-sm font-medium text-foreground">Connect your Gmail to start sending</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                Mail is sent from <em>your</em> inbox, never ours. 20 free sends every 3 days included.
+              </div>
+            </div>
+            <Link to="/app/mailboxes" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">
+              connect gmail →
+            </Link>
+          </div>
+        )}
+        {profile?.email && !profile.paid && (
+          <QuotaBar used={profile.freeUsed ?? 0} limit={profile.freeLimit ?? 20} windowDays={profile.freeWindowDays ?? 3} />
+        )}
+
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* LEFT: compose */}
           <section className="space-y-5">
