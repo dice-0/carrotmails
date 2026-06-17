@@ -376,3 +376,31 @@ function Field({
     </div>
   );
 }
+
+function QuotaBar({ used, limit, windowDays }: { used: number; limit: number; windowDays: number }) {
+  const left = Math.max(0, limit - used);
+  const pct = Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
+  const low = left <= Math.max(1, Math.floor(limit * 0.2));
+  return (
+    <div className="mb-8 border border-border px-5 py-4">
+      <div className="flex items-baseline justify-between">
+        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Free quota</div>
+        <div className={`font-mono text-xs ${low ? "text-destructive" : "text-foreground"}`}>
+          {left}/{limit} left · resets every {windowDays}d
+        </div>
+      </div>
+      <div className="mt-2 h-1.5 w-full bg-muted">
+        <div
+          className={`h-full ${low ? "bg-destructive" : "bg-primary"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {low && (
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Running low. Upgrade for unlimited sending.</span>
+          <Link to="/app/billing" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">upgrade →</Link>
+        </div>
+      )}
+    </div>
+  );
+}
