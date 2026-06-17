@@ -49,11 +49,16 @@ export function CarrotMark({ className, size = 32 }: { className?: string; size?
 }
 
 export function CarrotLogo({ className, withWordmark = true, size = 28, invertWord = false }: Props) {
+  // Wordmark scales with the mark for a more confident, prominent brand presence.
+  const wordSize = Math.round(size * 0.72);
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
       <CarrotMark size={size} />
       {withWordmark && (
-        <span className="font-semibold tracking-tight leading-none">
+        <span
+          className="font-semibold tracking-tight leading-none"
+          style={{ fontSize: `${wordSize}px` }}
+        >
           <span style={{ color: "var(--carrot)" }}>carrot</span>{" "}
           <span className={invertWord ? "text-current" : "text-foreground"}>mails</span>
         </span>

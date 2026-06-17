@@ -34,7 +34,7 @@ function PreviewDashboard() {
       {/* App-shell preview, deliberately styled to match /app */}
       <div className="mx-auto flex max-w-7xl">
         <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-border p-6 md:flex">
-          <CarrotLogo size={26} className="mb-10" />
+          <CarrotLogo size={40} className="mb-10" />
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n, i) => (
               <span key={n} className={`px-2 py-1.5 ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>{n}</span>
@@ -134,6 +134,23 @@ grace@hey.com,Grace,USN`}</pre>
                   <p className="mt-2 text-sm text-muted-foreground">No mailbox connected. After sign‑in, connect your Gmail or Outlook in one click. Carrot Mails never stores your password.</p>
                   <Link to="/auth" className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2 text-sm hover:bg-muted">
                     Continue with Google →
+                  </Link>
+                </div>
+
+                <div className="border border-primary/40 bg-background p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="font-mono text-[11px] uppercase tracking-widest text-accent">Launch pricing</div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">limited</div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-semibold text-foreground">$1</span>
+                    <span className="text-sm text-muted-foreground">/ month to start</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Or pay <span className="font-medium text-foreground">$9.99 once</span> for lifetime feature access. First 100 buyers only, price scales up over time.
+                  </p>
+                  <Link to="/auth" className="mt-4 inline-flex items-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+                    Claim launch price →
                   </Link>
                 </div>
               </section>

@@ -77,7 +77,8 @@ function BillingPage() {
             <section className="flex min-h-96 flex-col bg-background p-7">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Recurring</p>
               <h2 className="mt-5 text-2xl font-semibold">Pro</h2>
-              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$19</span><span className="pb-1 text-sm text-muted-foreground">/ month</span></div>
+              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$1</span><span className="pb-1 text-sm text-muted-foreground">/ month</span></div>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-accent">Introductory price · increases over time</p>
               <ul className="mt-8 space-y-3 text-sm">
                 <li>All current product features</li>
                 <li>Future Pro feature updates</li>
