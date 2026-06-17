@@ -93,12 +93,13 @@ function Index() {
     staleTime: 60_000,
   });
 
-  const [fromName, setFromName] = useState("");
-  const [subject, setSubject] = useState("Quick hello, {{name}}");
-  const [bodyHtml, setBodyHtml] = useState(
+  const [fromName, setFromName] = usePersistentState("cm:compose:fromName", "");
+  const [subject, setSubject] = usePersistentState("cm:compose:subject", "Quick hello, {{name}}");
+  const [bodyHtml, setBodyHtml] = usePersistentState(
+    "cm:compose:bodyHtml",
     '<p>Hi {{name}},</p><p>I wanted to share something with you. Take a look <a href="https://example.com" target="_blank" rel="noopener">here</a>.</p><p>Best,<br/>Me</p>',
   );
-  const [raw, setRaw] = useState("email,name\n");
+  const [raw, setRaw] = usePersistentState("cm:compose:recipients", "email,name\n");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
