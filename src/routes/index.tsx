@@ -136,6 +136,23 @@ grace@hey.com,Grace,USN`}</pre>
                     Continue with Google →
                   </Link>
                 </div>
+
+                <div className="border border-primary/40 bg-background p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="font-mono text-[11px] uppercase tracking-widest text-accent">Launch pricing</div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">limited</div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-semibold text-foreground">$1</span>
+                    <span className="text-sm text-muted-foreground">/ month to start</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Or pay <span className="font-medium text-foreground">$9.99 once</span> for lifetime feature access. First 100 buyers only, price scales up over time.
+                  </p>
+                  <Link to="/auth" className="mt-4 inline-flex items-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+                    Claim launch price →
+                  </Link>
+                </div>
               </section>
             </div>
 
