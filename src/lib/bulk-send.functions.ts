@@ -289,13 +289,11 @@ export const sendBulk = createServerFn({ method: "POST" })
             try {
               const refreshed = await refreshAccessToken(mailbox.refresh_token);
               accessToken = refreshed.access_token;
-              await context.supabase
-                .from("mailbox_connections")
-                .update({
-                  access_token: refreshed.access_token,
-                  expires_at: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
-                })
-                .eq("id", mailbox.id);
+              await updateMailboxToken(
+                mailbox.id,
+                refreshed.access_token,
+                new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
+              );
               const retry = await fetch(url, {
                 method: "POST",
                 headers: {
