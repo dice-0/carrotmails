@@ -73,7 +73,7 @@ function AuthPage() {
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
         <Link to="/" className="mb-10 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground" aria-label="Back to Carrot Mails home">
           <span className="font-mono text-xs uppercase tracking-widest">←</span>
-          <CarrotLogo size={22} />
+          <CarrotLogo size={34} />
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Sign in" : "Create your account"}
