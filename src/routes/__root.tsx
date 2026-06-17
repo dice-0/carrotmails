@@ -85,14 +85,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Carrot Mails" },
       { name: "theme-color", content: "#F58220" },
       { property: "og:title", content: "Carrot Mails - bulk email, delivered fresh" },
-      { property: "og:description", content: "Send personalized bulk emails from your own inbox. Fresh, fast, friendly." },
+      { property: "og:description", content: "Send personalized bulk emails from your own Gmail or Outlook. Fresh, fast, friendly." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@CarrotMails" },
       { name: "twitter:title", content: "Carrot Mails - bulk email, delivered fresh" },
-      { name: "twitter:description", content: "Send personalized bulk emails from your own inbox. Fresh, fast, friendly." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/RwT1XMa5U0OFNNTSoE3j9s1yCez1/social-images/social-1781459247323-ChatGPT_Image_Jun_14,_2026,_11_17_17_PM.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/RwT1XMa5U0OFNNTSoE3j9s1yCez1/social-images/social-1781459247323-ChatGPT_Image_Jun_14,_2026,_11_17_17_PM.webp" },
+      { name: "twitter:description", content: "Send personalized bulk emails from your own Gmail or Outlook. Fresh, fast, friendly." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cbdb7b89-623f-4bfb-9977-c5071a0b63d9/id-preview-f349f1fd--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app-1781685610916.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cbdb7b89-623f-4bfb-9977-c5071a0b63d9/id-preview-f349f1fd--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app-1781685610916.png" },
     ],
     links: [
       {
