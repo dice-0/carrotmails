@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { AppPage } from "@/components/AppPage";
 import { Button } from "@/components/ui/button";
+import { usePersistentState } from "@/hooks/usePersistentState";
 import { deleteContactList, importContactList, listContactLists } from "@/lib/lists.functions";
 
 export const Route = createFileRoute("/_authenticated/app/lists")({
