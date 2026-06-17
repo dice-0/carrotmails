@@ -80,7 +80,8 @@ export const createBillingCheckout = createServerFn({ method: "POST" })
     if (!apiKey || !productId) throw new Error("Payments are not configured yet");
 
     if (data.plan === "lifetime") {
-      const { data: offer, error } = await context.supabase
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: offer, error } = await supabaseAdmin
         .from("billing_offers")
         .select("active, max_redemptions, redemption_count")
         .eq("code", "lifetime-launch")
