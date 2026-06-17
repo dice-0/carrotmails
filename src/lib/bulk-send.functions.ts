@@ -163,20 +163,14 @@ async function refreshAccessToken(refreshToken: string) {
   return (await res.json()) as { access_token: string; expires_in: number };
 }
 
-async function getActiveAccessToken(
-  supabase: any,
-  mailbox: GmailMailbox,
-): Promise<string> {
+async function getActiveAccessToken(mailbox: GmailMailbox): Promise<string> {
   const expMs = mailbox.expires_at ? new Date(mailbox.expires_at).getTime() : 0;
   // Refresh 60s before expiry
   if (expMs - 60_000 > Date.now()) return mailbox.access_token;
   if (!mailbox.refresh_token) throw new Error("Mailbox needs to be reconnected");
   const refreshed = await refreshAccessToken(mailbox.refresh_token);
   const newExpiry = new Date(Date.now() + refreshed.expires_in * 1000).toISOString();
-  await supabase
-    .from("mailbox_connections")
-    .update({ access_token: refreshed.access_token, expires_at: newExpiry })
-    .eq("id", mailbox.id);
+  await updateMailboxToken(mailbox.id, refreshed.access_token, newExpiry);
   return refreshed.access_token;
 }
 
