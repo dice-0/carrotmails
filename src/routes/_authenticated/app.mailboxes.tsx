@@ -12,7 +12,13 @@ export const Route = createFileRoute("/_authenticated/app/mailboxes")({
     connected: typeof s.connected === "string" ? s.connected : undefined,
     error: typeof s.error === "string" ? s.error : undefined,
   }),
-  head: () => ({ meta: [{ title: "Mailboxes | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Mailboxes | Carrot Mails" },
+    { name: "description", content: "Connect and manage the Gmail and Outlook mailboxes Carrot Mails uses to send your personalized campaigns." },
+    { property: "og:title", content: "Mailboxes | Carrot Mails" },
+    { property: "og:description", content: "Connect and manage the Gmail and Outlook mailboxes used to send your campaigns." },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: MailboxesPage,
 });
 

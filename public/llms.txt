@@ -1,0 +1,18 @@
+# Carrot Mails
+
+> Carrot Mails sends personalized bulk email from your own Gmail or Outlook inbox, with smart variables, reply detection, list hygiene, and built-in deliverability.
+
+Carrot Mails is a lightweight mail-merge and cold-email platform for founders, recruiters, and small teams. Connect a Gmail or Outlook mailbox in one click, import a CSV, write a templated message with `{{variables}}`, and send personalized one-to-one emails at scale, without spam-flag risk. Replies are detected automatically and future sends to that recipient pause. Bounces and unsubscribes flow into a global suppression list so the same address is never contacted twice by accident.
+
+The product includes a campaign engine with throttling and daily caps, reusable HTML templates, contact lists, embeddable signup forms, and unsubscribe handling. Pricing is $3.50/month for the Pro plan (5,000 sends/month) or $49.50 once for lifetime access with unlimited sending.
+
+## Pages
+
+- [Home](/): Product overview, live composer preview, and launch pricing.
+- [Sign in](/auth): Sign in or create a Carrot Mails account.
+- [Privacy Policy](/privacy): How Carrot Mails collects, uses, and protects user data, including Google user data accessed via Gmail OAuth.
+- [Terms of Service](/terms): Terms governing use of Carrot Mails, including acceptable use, billing, and account termination.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Machine-readable list of public URLs.

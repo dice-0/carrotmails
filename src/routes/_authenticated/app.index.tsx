@@ -11,10 +11,11 @@ import { usePersistentState } from "@/hooks/usePersistentState";
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Carrot Mails | bulk mail, sharp and simple" },
-      { name: "description", content: "Personalized bulk email from your own inbox. No clutter." },
-      { property: "og:title", content: "Carrot Mails | bulk mail, sharp and simple" },
-      { property: "og:description", content: "Personalized bulk email from your own inbox." },
+      { title: "Compose | Carrot Mails" },
+      { name: "description", content: "Your Carrot Mails workspace: compose a personalized broadcast, pick a list, and send from your connected Gmail or Outlook inbox." },
+      { property: "og:title", content: "Compose | Carrot Mails" },
+      { property: "og:description", content: "Compose and send a personalized broadcast from your connected mailbox." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: Index,

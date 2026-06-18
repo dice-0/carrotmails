@@ -10,10 +10,33 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Carrot Mails | mass mail, from your own inbox" },
-      { name: "description", content: "Personalized bulk email from your Gmail or Outlook. Smart variables, reply detection, deliverability built-in." },
-      { property: "og:title", content: "Carrot Mails | mass mail, sharp and simple" },
-      { property: "og:description", content: "Personalized bulk email from your own inbox." },
+      { title: "Carrot Mails: mass mail from your own inbox" },
+      { name: "description", content: "Send personalized bulk email from your Gmail or Outlook inbox. Smart variables, reply detection, suppression, and deliverability built in. From $3.50/mo." },
+      { name: "keywords", content: "bulk email, mass email, mail merge, cold email, Gmail mass mail, Outlook mail merge, email campaigns, personalized email, sales outreach" },
+      { property: "og:title", content: "Carrot Mails: mass mail from your own inbox" },
+      { property: "og:description", content: "Personalized bulk email from your Gmail or Outlook inbox. Smart variables, reply detection, deliverability built in." },
+      { property: "og:url", content: "https://carrotmails.work/" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cbdb7b89-623f-4bfb-9977-c5071a0b63d9/id-preview-f349f1fd--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app-1781685610916.png" },
+      { name: "twitter:title", content: "Carrot Mails: mass mail from your own inbox" },
+      { name: "twitter:description", content: "Personalized bulk email from your Gmail or Outlook. Smart variables, reply detection, deliverability built in." },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cbdb7b89-623f-4bfb-9977-c5071a0b63d9/id-preview-f349f1fd--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app-1781685610916.png" },
+    ],
+    links: [{ rel: "canonical", href: "https://carrotmails.work/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "What is Carrot Mails?", acceptedAnswer: { "@type": "Answer", text: "Carrot Mails sends personalized bulk email from your own Gmail or Outlook inbox, with smart variables, reply detection, and built-in deliverability." } },
+            { "@type": "Question", name: "How much does Carrot Mails cost?", acceptedAnswer: { "@type": "Answer", text: "The Pro plan is $3.50 per month and includes 5,000 sends. Lifetime access with unlimited sending is a one-time $49.50 payment, limited to the first 100 buyers." } },
+            { "@type": "Question", name: "Which mailboxes are supported?", acceptedAnswer: { "@type": "Answer", text: "Carrot Mails connects to Gmail and Outlook via OAuth. Carrot Mails never stores your password." } },
+            { "@type": "Question", name: "Does Carrot Mails handle replies and unsubscribes?", acceptedAnswer: { "@type": "Answer", text: "Yes. Replies are detected automatically and future sends to that recipient pause. Bounces and unsubscribes flow into a global suppression list." } },
+          ],
+        }),
+      },
     ],
   }),
   component: PreviewDashboard,
@@ -78,7 +101,8 @@ function PreviewDashboard() {
 
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
               {/* LEFT: a faux composer that mirrors /app */}
-              <section className="space-y-5">
+              <section className="space-y-5" aria-labelledby="composer-heading">
+                <h2 id="composer-heading" className="sr-only">Compose your message</h2>
                 <FauxField label="From">
                   <div className="border-b border-border py-2 text-sm text-muted-foreground">you@your-inbox.com</div>
                 </FauxField>
@@ -88,7 +112,7 @@ function PreviewDashboard() {
                 <FauxField label="Body" hint="Paste from Word keeps tables & formatting.">
                   <div className="space-y-2 border border-border bg-card p-4 text-[15px] leading-relaxed">
                     <p>Hi {"{{name}}"},</p>
-                    <p>I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.</p>
+                    <p>I wanted to share something with you. Take a look at this short demo.</p>
                     <p>Best,<br/>Me</p>
                   </div>
                 </FauxField>
@@ -110,12 +134,13 @@ grace@hey.com,Grace,USN`}</pre>
               </section>
 
               {/* RIGHT: marketing copy as "empty states" inside the dashboard */}
-              <section className="space-y-6 lg:sticky lg:top-10 lg:self-start">
+              <section className="space-y-6 lg:sticky lg:top-10 lg:self-start" aria-labelledby="features-heading">
+                <h2 id="features-heading" className="sr-only">Powerful features</h2>
                 <div className="border border-border bg-card p-6">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Preview</div>
                   <div className="mt-3 text-base font-medium">Quick hello, Ada</div>
                   <p className="mt-3 text-[15px] leading-relaxed text-foreground">
-                    Hi Ada, I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.
+                    Hi Ada, I wanted to share something with you. Take a look at this short demo.
                   </p>
                   <p className="mt-2 text-[15px] leading-relaxed">Best,<br/>Me</p>
                 </div>
