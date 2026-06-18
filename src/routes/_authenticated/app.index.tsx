@@ -216,7 +216,7 @@ function Index() {
                 value={fromName}
                 onChange={(e) => setFromName(e.target.value)}
                 placeholder="Your name"
-                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -224,11 +224,11 @@ function Index() {
               <input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-base outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
-            <Field label="Body" hint="Paste from Word keeps tables & formatting. Use {{vars}} for per-recipient values.">
+            <Field label="Body" hint="Paste from Word or import HTML. Use {{vars}} for per-recipient values.">
               <RichEditor value={bodyHtml} onChange={setBodyHtml} />
             </Field>
 
@@ -275,20 +275,20 @@ function Index() {
                 onChange={(e) => setRaw(e.target.value)}
                 rows={8}
                 placeholder={"email,name,company\nada@hey.com,Ada,Analytica\ngrace@hey.com,Grace,USN"}
-                className="w-full resize-none border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-foreground"
+                className="w-full resize-none rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
             <div className="flex items-center justify-between pt-2">
-              <div className="font-mono text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {parsed.rows.length} recipient{parsed.rows.length === 1 ? "" : "s"} ready
               </div>
               <Button
                 onClick={handleSend}
                 disabled={sending || !profile?.email || parsed.rows.length === 0 || !subject.trim() || !bodyHtml.replace(/<[^>]+>/g, "").trim()}
-                className="px-6 py-2.5 tracking-wide"
+                className="rounded-md px-6 py-2.5"
               >
-                {sending ? "sending…" : `send → ${parsed.rows.length}`}
+                {sending ? "Sending…" : `Send to ${parsed.rows.length}`}
               </Button>
             </div>
           </section>
@@ -296,16 +296,16 @@ function Index() {
           {/* RIGHT: preview */}
           <section className="lg:sticky lg:top-10 lg:self-start">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <h2 className="text-sm font-semibold text-foreground">
                 Preview
               </h2>
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {sample.email}
               </span>
             </div>
-            <div className="border border-border bg-card p-6 shadow-[0_1px_0_0_var(--color-border)]">
+            <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
               <div className="mb-4 border-b border-border pb-3">
-                <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Subject
                 </div>
                 <div className="mt-1 text-base font-medium">
@@ -366,11 +366,11 @@ function Field({
 }) {
   return (
     <div>
-      <div className="mb-1 flex items-baseline justify-between">
-        <label className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+      <div className="mb-1.5 flex items-baseline justify-between gap-3">
+        <label className="text-sm font-medium text-foreground">
           {label}
         </label>
-        {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
     </div>

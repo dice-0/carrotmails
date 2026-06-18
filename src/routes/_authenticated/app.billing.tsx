@@ -77,7 +77,7 @@ function BillingPage() {
             <section className="flex min-h-96 flex-col bg-background p-7">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Recurring</p>
               <h2 className="mt-5 text-2xl font-semibold">Pro</h2>
-              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$3.89</span><span className="pb-1 text-sm text-muted-foreground">/ month</span></div>
+              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$3.50</span><span className="pb-1 text-sm text-muted-foreground">/ month</span></div>
               <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-accent">Introductory price · increases over time</p>
               <ul className="mt-8 space-y-3 text-sm">
                 <li><span className="font-medium">5,000 emails / month</span> from your own inbox</li>
@@ -97,7 +97,7 @@ function BillingPage() {
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{remaining} left</span>
               </div>
               <h2 className="mt-5 text-2xl font-semibold">Lifetime</h2>
-              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$79.90</span><span className="pb-1 text-sm text-muted-foreground">once</span></div>
+              <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$49.50</span><span className="pb-1 text-sm text-muted-foreground">once</span></div>
               <ul className="mt-8 space-y-3 text-sm">
                 <li><span className="font-medium">Unlimited emails</span>, forever</li>
                 <li>Everything in Pro, plus every future Pro feature</li>
