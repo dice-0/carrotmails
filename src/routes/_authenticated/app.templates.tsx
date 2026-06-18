@@ -40,10 +40,23 @@ const starterTemplates: Draft[] = [
 
 function TemplatesPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const list = useServerFn(listTemplates);
   const save = useServerFn(saveTemplate);
   const remove = useServerFn(deleteTemplate);
   const [draft, setDraft] = useState<Draft | null>(null);
+
+  function useInCompose(t: { name: string; subject: string; bodyHtml: string }) {
+    try {
+      window.localStorage.setItem("cm:compose:subject", JSON.stringify(t.subject));
+      window.localStorage.setItem("cm:compose:bodyHtml", JSON.stringify(t.bodyHtml));
+    } catch {
+      // ignore
+    }
+    toast.success(`Loaded "${t.name}" into the composer`);
+    navigate({ to: "/app" });
+  }
+
   const { data: templates = [], isLoading } = useQuery({ queryKey: ["templates"], queryFn: () => list() });
   const saveMutation = useMutation({
     mutationFn: (value: Draft) => save({ data: value }),
