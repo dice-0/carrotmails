@@ -296,16 +296,16 @@ function Index() {
           {/* RIGHT: preview */}
           <section className="lg:sticky lg:top-10 lg:self-start">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <h2 className="text-sm font-semibold text-foreground">
                 Preview
               </h2>
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {sample.email}
               </span>
             </div>
-            <div className="border border-border bg-card p-6 shadow-[0_1px_0_0_var(--color-border)]">
+            <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
               <div className="mb-4 border-b border-border pb-3">
-                <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Subject
                 </div>
                 <div className="mt-1 text-base font-medium">
