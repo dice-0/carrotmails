@@ -153,6 +153,7 @@ function TemplatesPage() {
                     </Button>
                     <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       <span>{new Date(template.updated_at).toLocaleDateString()}</span>
+                      <Button variant="ghost" size="sm" onClick={() => useInCompose({ name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Use</Button>
                       <Button variant="ghost" size="sm" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Edit</Button>
                       <Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${template.name}?`) && deleteMutation.mutate(template.id)}>Delete</Button>
                     </div>
