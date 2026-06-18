@@ -216,7 +216,7 @@ function Index() {
                 value={fromName}
                 onChange={(e) => setFromName(e.target.value)}
                 placeholder="Your name"
-                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -224,11 +224,11 @@ function Index() {
               <input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-base outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
-            <Field label="Body" hint="Paste from Word keeps tables & formatting. Use {{vars}} for per-recipient values.">
+            <Field label="Body" hint="Paste from Word or import HTML. Use {{vars}} for per-recipient values.">
               <RichEditor value={bodyHtml} onChange={setBodyHtml} />
             </Field>
 
