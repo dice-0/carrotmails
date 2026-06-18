@@ -54,6 +54,15 @@ function chunk76(s: string) {
   return s.match(/.{1,76}/g)?.join("\r\n") ?? s;
 }
 
+const ALLOWED_ATTACHMENT_CT = /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/;
+function sanitizeHeader(v: string) {
+  return String(v).replace(/[\r\n]+/g, " ").trim();
+}
+function safeContentType(ct: string) {
+  const cleaned = String(ct).replace(/[\r\n;].*$/s, "").trim();
+  return ALLOWED_ATTACHMENT_CT.test(cleaned) ? cleaned : "application/octet-stream";
+}
+
 export function buildRawMime(
   from: string,
   to: string,
@@ -62,6 +71,9 @@ export function buildRawMime(
   text: string,
   attachments: Attachment[],
 ) {
+  const safeFrom = sanitizeHeader(from);
+  const safeTo = sanitizeHeader(to);
+  const safeSubject = sanitizeHeader(subject);
   const altBoundary = "alt_" + Math.random().toString(36).slice(2);
   const altPart = [
     `Content-Type: multipart/alternative; boundary="${altBoundary}"`,
@@ -79,12 +91,12 @@ export function buildRawMime(
     `--${altBoundary}--`,
   ].join("\r\n");
 
-  const subjectEncoded = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
+  const subjectEncoded = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(safeSubject)))}?=`;
 
   if (!attachments || attachments.length === 0) {
     const headers = [
-      `From: ${from}`,
-      `To: ${to}`,
+      `From: ${safeFrom}`,
+      `To: ${safeTo}`,
       `Subject: ${subjectEncoded}`,
       "MIME-Version: 1.0",
       altPart.split("\r\n")[0],
@@ -95,8 +107,8 @@ export function buildRawMime(
 
   const mixedBoundary = "mix_" + Math.random().toString(36).slice(2);
   const parts: string[] = [
-    `From: ${from}`,
-    `To: ${to}`,
+    `From: ${safeFrom}`,
+    `To: ${safeTo}`,
     `Subject: ${subjectEncoded}`,
     "MIME-Version: 1.0",
     `Content-Type: multipart/mixed; boundary="${mixedBoundary}"`,
@@ -105,10 +117,11 @@ export function buildRawMime(
     altPart,
   ];
   for (const a of attachments) {
-    const safeName = a.filename.replace(/[\r\n"]/g, "_");
+    const safeName = String(a.filename).replace(/[\r\n"]/g, "_");
+    const safeCt = safeContentType(a.contentType);
     parts.push(
       `--${mixedBoundary}`,
-      `Content-Type: ${a.contentType}; name="${safeName}"`,
+      `Content-Type: ${safeCt}; name="${safeName}"`,
       `Content-Disposition: attachment; filename="${safeName}"`,
       "Content-Transfer-Encoding: base64",
       "",
@@ -118,6 +131,7 @@ export function buildRawMime(
   parts.push(`--${mixedBoundary}--`, "");
   return b64url(parts.join("\r\n"));
 }
+
 
 export async function refreshAccessToken(refreshToken: string) {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
