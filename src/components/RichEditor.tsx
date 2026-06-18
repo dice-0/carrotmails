@@ -117,8 +117,11 @@ export function RichEditor({ value, onChange, spellcheck = true }: Props) {
 }
 
 function Toolbar({ editor, spell, setSpell }: { editor: Editor; spell: boolean; setSpell: (b: boolean) => void }) {
+  const [importOpen, setImportOpen] = useState(false);
+  const [importHtml, setImportHtml] = useState("");
+
   const btn =
-    "px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-foreground transition";
+    "rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition";
   const active = "bg-foreground text-background hover:bg-foreground hover:text-background";
 
   function addLink() {
@@ -169,85 +172,176 @@ function Toolbar({ editor, spell, setSpell }: { editor: Editor; spell: boolean; 
   function insertSpacer() {
     editor.chain().focus().insertContent('<div style="height:24px"></div><p></p>').run();
   }
+  function doImportHtml(replace: boolean) {
+    const cleaned = sanitizeEmailHtml(importHtml);
+    if (!cleaned.trim()) return;
+    if (replace) {
+      editor.chain().focus().setContent(cleaned, { emitUpdate: true }).run();
+    } else {
+      editor.chain().focus().insertContent(cleaned).run();
+    }
+    setImportOpen(false);
+    setImportHtml("");
+  }
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-muted/30 px-2 py-1">
-      <select
-        aria-label="Font family"
-        className="bg-transparent px-1 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
-        onChange={(e) => e.target.value && editor.chain().focus().setFontFamily(e.target.value).run()}
-        defaultValue=""
-      >
-        <option value="">Font</option>
-        {FONTS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-      </select>
-      <select
-        aria-label="Font size"
-        className="bg-transparent px-1 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
-        onChange={(e) => e.target.value && editor.chain().focus().setMark("textStyle", { fontSize: e.target.value }).run()}
-        defaultValue=""
-      >
-        <option value="">Size</option>
-        {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
-      </select>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className={`${btn} ${editor.isActive("bold") ? active : ""}`}>B</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className={`${btn} italic ${editor.isActive("italic") ? active : ""}`}>I</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleUnderline().run()} className={`${btn} underline ${editor.isActive("underline") ? active : ""}`}>U</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleStrike().run()} className={`${btn} line-through ${editor.isActive("strike") ? active : ""}`}>S</button>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <input
-        type="color"
-        aria-label="Text color"
-        title="Text color"
-        className="h-6 w-6 cursor-pointer border-0 bg-transparent p-0"
-        onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-      />
-      <div className="hidden items-center gap-0.5 sm:flex">
-        {COLORS.slice(0, 4).map((c) => (
-          <button key={c} type="button" title={c} aria-label={`Color ${c}`} onClick={() => editor.chain().focus().setColor(c).run()} className="h-4 w-4 border border-border" style={{ background: c }} />
-        ))}
+    <>
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-muted/30 px-2 py-1.5">
+        <select
+          aria-label="Font family"
+          className="rounded bg-transparent px-1.5 py-1 text-xs text-muted-foreground hover:text-foreground"
+          onChange={(e) => e.target.value && editor.chain().focus().setFontFamily(e.target.value).run()}
+          defaultValue=""
+        >
+          <option value="">Font</option>
+          {FONTS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+        </select>
+        <select
+          aria-label="Font size"
+          className="rounded bg-transparent px-1.5 py-1 text-xs text-muted-foreground hover:text-foreground"
+          onChange={(e) => e.target.value && editor.chain().focus().setMark("textStyle", { fontSize: e.target.value }).run()}
+          defaultValue=""
+        >
+          <option value="">Size</option>
+          {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className={`${btn} font-semibold ${editor.isActive("bold") ? active : ""}`}>B</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className={`${btn} italic ${editor.isActive("italic") ? active : ""}`}>I</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleUnderline().run()} className={`${btn} underline ${editor.isActive("underline") ? active : ""}`}>U</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleStrike().run()} className={`${btn} line-through ${editor.isActive("strike") ? active : ""}`}>S</button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <input
+          type="color"
+          aria-label="Text color"
+          title="Text color"
+          className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+        />
+        <div className="hidden items-center gap-0.5 sm:flex">
+          {COLORS.slice(0, 4).map((c) => (
+            <button key={c} type="button" title={c} aria-label={`Color ${c}`} onClick={() => editor.chain().focus().setColor(c).run()} className="h-4 w-4 rounded-sm border border-border" style={{ background: c }} />
+          ))}
+        </div>
+        <button type="button" title="Highlight" onClick={() => editor.chain().focus().toggleHighlight({ color: "#fef3c7" }).run()} className={`${btn} ${editor.isActive("highlight") ? active : ""}`}>Mark</button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`${btn} ${editor.isActive("heading", { level: 2 }) ? active : ""}`}>H2</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`${btn} ${editor.isActive("bulletList") ? active : ""}`}>• List</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`${btn} ${editor.isActive("orderedList") ? active : ""}`}>1. List</button>
+        <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`${btn} ${editor.isActive("blockquote") ? active : ""}`}>Quote</button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button type="button" title="Align left" onClick={() => editor.chain().focus().setTextAlign("left").run()} className={`${btn} ${editor.isActive({ textAlign: "left" }) ? active : ""}`}>⬅</button>
+        <button type="button" title="Align center" onClick={() => editor.chain().focus().setTextAlign("center").run()} className={`${btn} ${editor.isActive({ textAlign: "center" }) ? active : ""}`}>⬌</button>
+        <button type="button" title="Align right" onClick={() => editor.chain().focus().setTextAlign("right").run()} className={`${btn} ${editor.isActive({ textAlign: "right" }) ? active : ""}`}>➡</button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button type="button" onClick={addLink} className={`${btn} ${editor.isActive("link") ? active : ""}`}>Link</button>
+        <button type="button" onClick={insertImage} className={btn}>Image</button>
+        <button type="button" onClick={insertButton} className={btn}>Button</button>
+        <button type="button" onClick={insertCardRow} className={btn}>2-col</button>
+        <button type="button" onClick={insertDivider} className={btn}>Divider</button>
+        <button type="button" onClick={insertSpacer} className={btn}>Spacer</button>
+        <button type="button" onClick={insertTable} className={btn}>Table</button>
+        {editor.isActive("table") && (
+          <>
+            <span className="mx-1 h-4 w-px bg-border" />
+            <button type="button" onClick={() => editor.chain().focus().addRowAfter().run()} className={btn}>+ Row</button>
+            <button type="button" onClick={() => editor.chain().focus().addColumnAfter().run()} className={btn}>+ Col</button>
+            <button type="button" onClick={() => editor.chain().focus().deleteTable().run()} className={btn}>× Table</button>
+          </>
+        )}
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button
+          type="button"
+          onClick={() => setImportOpen(true)}
+          className={`${btn} bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary`}
+          title="Paste HTML from any email and convert to blocks"
+        >
+          Import HTML
+        </button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button type="button" onClick={() => editor.chain().focus().undo().run()} className={btn}>Undo</button>
+        <button type="button" onClick={() => editor.chain().focus().redo().run()} className={btn}>Redo</button>
+        <span className="mx-1 h-4 w-px bg-border" />
+        <button
+          type="button"
+          onClick={() => setSpell(!spell)}
+          title="Toggle spellcheck"
+          className={`${btn} ${spell ? active : ""}`}
+        >
+          Spell
+        </button>
       </div>
-      <button type="button" title="Highlight" onClick={() => editor.chain().focus().toggleHighlight({ color: "#fef3c7" }).run()} className={`${btn} ${editor.isActive("highlight") ? active : ""}`}>HL</button>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`${btn} ${editor.isActive("heading", { level: 2 }) ? active : ""}`}>H</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`${btn} ${editor.isActive("bulletList") ? active : ""}`}>• list</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`${btn} ${editor.isActive("orderedList") ? active : ""}`}>1. list</button>
-      <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`${btn} ${editor.isActive("blockquote") ? active : ""}`}>quote</button>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button type="button" title="Align left" onClick={() => editor.chain().focus().setTextAlign("left").run()} className={`${btn} ${editor.isActive({ textAlign: "left" }) ? active : ""}`}>L</button>
-      <button type="button" title="Align center" onClick={() => editor.chain().focus().setTextAlign("center").run()} className={`${btn} ${editor.isActive({ textAlign: "center" }) ? active : ""}`}>C</button>
-      <button type="button" title="Align right" onClick={() => editor.chain().focus().setTextAlign("right").run()} className={`${btn} ${editor.isActive({ textAlign: "right" }) ? active : ""}`}>R</button>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button type="button" onClick={addLink} className={`${btn} ${editor.isActive("link") ? active : ""}`}>link</button>
-      <button type="button" onClick={insertImage} className={btn}>img</button>
-      <button type="button" onClick={insertButton} className={btn}>button</button>
-      <button type="button" onClick={insertCardRow} className={btn}>2-col</button>
-      <button type="button" onClick={insertDivider} className={btn}>—</button>
-      <button type="button" onClick={insertSpacer} className={btn}>⎵</button>
-      <button type="button" onClick={insertTable} className={btn}>table</button>
-      {editor.isActive("table") && (
-        <>
-          <span className="mx-1 h-4 w-px bg-border" />
-          <button type="button" onClick={() => editor.chain().focus().addRowAfter().run()} className={btn}>+row</button>
-          <button type="button" onClick={() => editor.chain().focus().addColumnAfter().run()} className={btn}>+col</button>
-          <button type="button" onClick={() => editor.chain().focus().deleteTable().run()} className={btn}>×table</button>
-        </>
+
+      {importOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setImportOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-lg border border-border bg-background p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-1 text-base font-semibold">Import email HTML</div>
+            <p className="mb-3 text-sm text-muted-foreground">
+              Paste the HTML source from any email (e.g. "View source" or a saved .html file). We'll strip scripts and dangerous attributes, then convert it into editable blocks.
+            </p>
+            <textarea
+              value={importHtml}
+              onChange={(e) => setImportHtml(e.target.value)}
+              rows={12}
+              placeholder="<table>...your email html...</table>"
+              className="w-full resize-none rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-foreground focus:ring-2 focus:ring-primary/20"
+            />
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => { setImportOpen(false); setImportHtml(""); }}
+                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => doImportHtml(false)}
+                disabled={!importHtml.trim()}
+                className="rounded-md border border-border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50"
+              >
+                Insert at cursor
+              </button>
+              <button
+                type="button"
+                onClick={() => doImportHtml(true)}
+                disabled={!importHtml.trim()}
+                className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              >
+                Replace body
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button type="button" onClick={() => editor.chain().focus().undo().run()} className={btn}>undo</button>
-      <button type="button" onClick={() => editor.chain().focus().redo().run()} className={btn}>redo</button>
-      <span className="mx-1 h-4 w-px bg-border" />
-      <button
-        type="button"
-        onClick={() => setSpell(!spell)}
-        title="Toggle spellcheck"
-        className={`${btn} ${spell ? active : ""}`}
-      >
-        spell
-      </button>
-    </div>
+    </>
   );
+}
+
+function sanitizeEmailHtml(input: string): string {
+  if (!input) return "";
+  let html = input;
+  // Extract <body> when a full document is pasted
+  const bodyMatch = html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+  if (bodyMatch) html = bodyMatch[1];
+  // Strip scripts, styles, comments, meta, link, head
+  html = html.replace(/<!--[\s\S]*?-->/g, "");
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+  html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+  html = html.replace(/<(meta|link|head|title|base)\b[^>]*>/gi, "");
+  // Drop event handlers (onclick, onload, etc.) and javascript: hrefs
+  html = html.replace(/\s+on[a-z]+\s*=\s*"[^"]*"/gi, "");
+  html = html.replace(/\s+on[a-z]+\s*=\s*'[^']*'/gi, "");
+  html = html.replace(/\s+on[a-z]+\s*=\s*[^\s>]+/gi, "");
+  html = html.replace(/href\s*=\s*"(\s*javascript:[^"]*)"/gi, 'href="#"');
+  html = html.replace(/href\s*=\s*'(\s*javascript:[^']*)'/gi, "href='#'");
+  return html.trim();
 }
 
 function escapeHtml(s: string) {
