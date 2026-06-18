@@ -275,20 +275,20 @@ function Index() {
                 onChange={(e) => setRaw(e.target.value)}
                 rows={8}
                 placeholder={"email,name,company\nada@hey.com,Ada,Analytica\ngrace@hey.com,Grace,USN"}
-                className="w-full resize-none border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-foreground"
+                className="w-full resize-none rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none transition focus:border-foreground focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
             <div className="flex items-center justify-between pt-2">
-              <div className="font-mono text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {parsed.rows.length} recipient{parsed.rows.length === 1 ? "" : "s"} ready
               </div>
               <Button
                 onClick={handleSend}
                 disabled={sending || !profile?.email || parsed.rows.length === 0 || !subject.trim() || !bodyHtml.replace(/<[^>]+>/g, "").trim()}
-                className="px-6 py-2.5 tracking-wide"
+                className="rounded-md px-6 py-2.5"
               >
-                {sending ? "sending…" : `send → ${parsed.rows.length}`}
+                {sending ? "Sending…" : `Send to ${parsed.rows.length}`}
               </Button>
             </div>
           </section>
