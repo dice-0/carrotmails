@@ -10,7 +10,10 @@ export const Route = createFileRoute("/_authenticated/app/billing")({
   head: () => ({
     meta: [
       { title: "Billing | Carrot Mails" },
-      { name: "description", content: "Manage your Carrot Mails plan and billing." },
+      { name: "description", content: "View your current Carrot Mails plan, upgrade to Pro or Lifetime, and manage payment and subscription details." },
+      { property: "og:title", content: "Billing | Carrot Mails" },
+      { property: "og:description", content: "View your current plan, upgrade to Pro or Lifetime, and manage subscription details." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: BillingPage,
