@@ -123,7 +123,10 @@ function TemplatesPage() {
                 <article key={template.name} className="flex min-h-40 flex-col bg-background p-5">
                   <h3 className="font-medium">{template.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{template.subject}</p>
-                  <Button variant="outline" size="sm" className="mt-auto self-start" onClick={() => setDraft({ ...template })}>Use template</Button>
+                  <div className="mt-auto flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => useInCompose(template)}>Use in composer</Button>
+                    <Button variant="outline" size="sm" onClick={() => setDraft({ ...template })}>Edit & save</Button>
+                  </div>
                 </article>
               ))}
             </div>
