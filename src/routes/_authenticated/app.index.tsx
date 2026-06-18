@@ -366,11 +366,11 @@ function Field({
 }) {
   return (
     <div>
-      <div className="mb-1 flex items-baseline justify-between">
-        <label className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+      <div className="mb-1.5 flex items-baseline justify-between gap-3">
+        <label className="text-sm font-medium text-foreground">
           {label}
         </label>
-        {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
     </div>
