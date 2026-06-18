@@ -18,7 +18,13 @@ import { listContactLists } from "@/lib/lists.functions";
 import { listTemplates } from "@/lib/templates.functions";
 
 export const Route = createFileRoute("/_authenticated/app/campaigns")({
-  head: () => ({ meta: [{ title: "Campaigns | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Campaigns | Carrot Mails" },
+    { name: "description", content: "Plan, schedule, and dispatch personalized email campaigns to your contact lists with throttling and live progress." },
+    { property: "og:title", content: "Campaigns | Carrot Mails" },
+    { property: "og:description", content: "Plan, schedule, and dispatch personalized email campaigns with throttling and live progress." },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: CampaignsPage,
 });
 

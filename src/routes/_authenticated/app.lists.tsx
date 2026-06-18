@@ -9,7 +9,13 @@ import { usePersistentState } from "@/hooks/usePersistentState";
 import { deleteContactList, importContactList, listContactLists } from "@/lib/lists.functions";
 
 export const Route = createFileRoute("/_authenticated/app/lists")({
-  head: () => ({ meta: [{ title: "Lists | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Lists | Carrot Mails" },
+    { name: "description", content: "Import, dedupe, and manage contact lists from CSV for your Carrot Mails campaigns and broadcasts." },
+    { property: "og:title", content: "Lists | Carrot Mails" },
+    { property: "og:description", content: "Import, dedupe, and manage contact lists from CSV." },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: ListsPage,
 });
 

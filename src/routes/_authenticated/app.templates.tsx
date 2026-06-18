@@ -9,7 +9,13 @@ import { Button } from "@/components/ui/button";
 import { deleteTemplate, listTemplates, saveTemplate } from "@/lib/templates.functions";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
-  head: () => ({ meta: [{ title: "Templates | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Templates | Carrot Mails" },
+    { name: "description", content: "Create, edit, and reuse rich HTML email templates with variables for your Carrot Mails campaigns." },
+    { property: "og:title", content: "Templates | Carrot Mails" },
+    { property: "og:description", content: "Create, edit, and reuse rich HTML email templates with variables." },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: TemplatesPage,
 });
 

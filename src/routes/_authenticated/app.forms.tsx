@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { deleteForm, listForms, saveForm } from "@/lib/forms.functions";
 
 export const Route = createFileRoute("/_authenticated/app/forms")({
-  head: () => ({ meta: [{ title: "Forms | Carrot Mails" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Forms | Carrot Mails" },
+    { name: "description", content: "Build embeddable signup and lead-capture forms that feed your Carrot Mails contact lists." },
+    { property: "og:title", content: "Forms | Carrot Mails" },
+    { property: "og:description", content: "Build embeddable signup and lead-capture forms that feed your contact lists." },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: FormsPage,
 });
 
