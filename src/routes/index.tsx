@@ -156,9 +156,13 @@ grace@hey.com,Grace,USN`}</pre>
               </section>
             </div>
 
-            <footer className="mt-16 flex items-center justify-between border-t border-border pt-6 font-mono text-xs text-muted-foreground">
+            <footer className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 font-mono text-xs text-muted-foreground md:flex-row md:items-center">
               <span>© Carrot Mails</span>
-              <span>Built sharp.</span>
+              <div className="flex items-center gap-4">
+                <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+                <Link to="/terms" className="hover:text-foreground">Terms</Link>
+                <a href="mailto:work.josephraj@gmail.com" className="hover:text-foreground">Contact</a>
+              </div>
             </footer>
           </div>
         </main>
