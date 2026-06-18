@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UTokenRouteImport } from './routes/u.$token'
 import { Route as FSlugRouteImport } from './routes/f.$slug'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
@@ -54,6 +55,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UTokenRoute = UTokenRouteImport.update({
+  id: '/u/$token',
+  path: '/u/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FSlugRoute = FSlugRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/f/$slug': typeof FSlugRoute
+  '/u/$token': typeof UTokenRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/f/$slug': typeof FSlugRoute
+  '/u/$token': typeof UTokenRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/f/$slug': typeof FSlugRoute
+  '/u/$token': typeof UTokenRoute
   '/_authenticated/app/billing': typeof AuthenticatedAppBillingRoute
   '/_authenticated/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/_authenticated/app/forms': typeof AuthenticatedAppFormsRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app'
     | '/f/$slug'
+    | '/u/$token'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/f/$slug'
+    | '/u/$token'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/app'
     | '/f/$slug'
+    | '/u/$token'
     | '/_authenticated/app/billing'
     | '/_authenticated/app/campaigns'
     | '/_authenticated/app/forms'
@@ -236,6 +248,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   FSlugRoute: typeof FSlugRoute
+  UTokenRoute: typeof UTokenRoute
   ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
   ApiPublicOauthGoogleCallbackRoute: typeof ApiPublicOauthGoogleCallbackRoute
 }
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$token': {
+      id: '/u/$token'
+      path: '/u/$token'
+      fullPath: '/u/$token'
+      preLoaderRoute: typeof UTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/f/$slug': {
@@ -406,6 +426,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   FSlugRoute: FSlugRoute,
+  UTokenRoute: UTokenRoute,
   ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
   ApiPublicOauthGoogleCallbackRoute: ApiPublicOauthGoogleCallbackRoute,
 }
