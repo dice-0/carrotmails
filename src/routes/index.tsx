@@ -101,7 +101,8 @@ function PreviewDashboard() {
 
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
               {/* LEFT: a faux composer that mirrors /app */}
-              <section className="space-y-5">
+              <section className="space-y-5" aria-labelledby="composer-heading">
+                <h2 id="composer-heading" className="sr-only">Compose your message</h2>
                 <FauxField label="From">
                   <div className="border-b border-border py-2 text-sm text-muted-foreground">you@your-inbox.com</div>
                 </FauxField>
@@ -111,7 +112,7 @@ function PreviewDashboard() {
                 <FauxField label="Body" hint="Paste from Word keeps tables & formatting.">
                   <div className="space-y-2 border border-border bg-card p-4 text-[15px] leading-relaxed">
                     <p>Hi {"{{name}}"},</p>
-                    <p>I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.</p>
+                    <p>I wanted to share something with you. Take a look at this short demo.</p>
                     <p>Best,<br/>Me</p>
                   </div>
                 </FauxField>
@@ -133,12 +134,13 @@ grace@hey.com,Grace,USN`}</pre>
               </section>
 
               {/* RIGHT: marketing copy as "empty states" inside the dashboard */}
-              <section className="space-y-6 lg:sticky lg:top-10 lg:self-start">
+              <section className="space-y-6 lg:sticky lg:top-10 lg:self-start" aria-labelledby="features-heading">
+                <h2 id="features-heading" className="sr-only">Powerful features</h2>
                 <div className="border border-border bg-card p-6">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Preview</div>
                   <div className="mt-3 text-base font-medium">Quick hello, Ada</div>
                   <p className="mt-3 text-[15px] leading-relaxed text-foreground">
-                    Hi Ada, I wanted to share something with you. Take a look <span className="text-accent underline">here</span>.
+                    Hi Ada, I wanted to share something with you. Take a look at this short demo.
                   </p>
                   <p className="mt-2 text-[15px] leading-relaxed">Best,<br/>Me</p>
                 </div>

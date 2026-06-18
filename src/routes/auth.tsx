@@ -9,9 +9,13 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in | Carrot Mails" },
-      { name: "description", content: "Sign in to Carrot Mails, the sharpest mass-mail tool." },
+      { name: "description", content: "Sign in or create your Carrot Mails account to access campaigns, templates, lists, mailboxes, and signup forms." },
       { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Sign in | Carrot Mails" },
+      { property: "og:description", content: "Sign in or create your Carrot Mails account to access campaigns, templates, lists, and mailboxes." },
+      { property: "og:url", content: "https://carrotmails.work/auth" },
     ],
+    links: [{ rel: "canonical", href: "https://carrotmails.work/auth" }],
   }),
   component: AuthPage,
 });
@@ -97,30 +101,48 @@ function AuthPage() {
 
         <form onSubmit={handleEmail} className="space-y-4">
           {mode === "signup" && (
+            <div>
+              <label htmlFor="name" className="sr-only">Your name</label>
+              <input
+                id="name"
+                name="name"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+              />
+            </div>
+          )}
+          <div>
+            <label htmlFor="email" className="sr-only">Email address</label>
             <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
             />
-          )}
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
-          />
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (8+ chars)"
-            className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
-          />
+          </div>
+          <div>
+            <label htmlFor="password" className="sr-only">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (8+ chars)"
+              className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+            />
+          </div>
           <button
             type="submit"
             disabled={busy}

@@ -8,6 +8,8 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy Policy | Carrot Mails" },
       { name: "description", content: "How Carrot Mails collects, uses, stores, and protects your data, including Google user data accessed via Gmail OAuth." },
       { property: "og:title", content: "Privacy Policy | Carrot Mails" },
+      { property: "og:description", content: "How Carrot Mails collects, uses, and protects user data, including Google user data accessed via Gmail OAuth." },
+      { property: "og:type", content: "article" },
       { property: "og:url", content: "https://carrotmails.work/privacy" },
     ],
     links: [{ rel: "canonical", href: "https://carrotmails.work/privacy" }],

@@ -8,6 +8,8 @@ export const Route = createFileRoute("/terms")({
       { title: "Terms of Service | Carrot Mails" },
       { name: "description", content: "The terms that govern your use of Carrot Mails, including acceptable use, billing, and account termination." },
       { property: "og:title", content: "Terms of Service | Carrot Mails" },
+      { property: "og:description", content: "Terms that govern use of Carrot Mails, including acceptable use, billing, and account termination." },
+      { property: "og:type", content: "article" },
       { property: "og:url", content: "https://carrotmails.work/terms" },
     ],
     links: [{ rel: "canonical", href: "https://carrotmails.work/terms" }],
