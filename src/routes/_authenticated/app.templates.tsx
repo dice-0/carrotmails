@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -40,10 +40,23 @@ const starterTemplates: Draft[] = [
 
 function TemplatesPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const list = useServerFn(listTemplates);
   const save = useServerFn(saveTemplate);
   const remove = useServerFn(deleteTemplate);
   const [draft, setDraft] = useState<Draft | null>(null);
+
+  function useInCompose(t: { name: string; subject: string; bodyHtml: string }) {
+    try {
+      window.localStorage.setItem("cm:compose:subject", JSON.stringify(t.subject));
+      window.localStorage.setItem("cm:compose:bodyHtml", JSON.stringify(t.bodyHtml));
+    } catch {
+      // ignore
+    }
+    toast.success(`Loaded "${t.name}" into the composer`);
+    navigate({ to: "/app" });
+  }
+
   const { data: templates = [], isLoading } = useQuery({ queryKey: ["templates"], queryFn: () => list() });
   const saveMutation = useMutation({
     mutationFn: (value: Draft) => save({ data: value }),
@@ -110,7 +123,10 @@ function TemplatesPage() {
                 <article key={template.name} className="flex min-h-40 flex-col bg-background p-5">
                   <h3 className="font-medium">{template.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{template.subject}</p>
-                  <Button variant="outline" size="sm" className="mt-auto self-start" onClick={() => setDraft({ ...template })}>Use template</Button>
+                  <div className="mt-auto flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => useInCompose(template)}>Use in composer</Button>
+                    <Button variant="outline" size="sm" onClick={() => setDraft({ ...template })}>Edit & save</Button>
+                  </div>
                 </article>
               ))}
             </div>
@@ -137,6 +153,7 @@ function TemplatesPage() {
                     </Button>
                     <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       <span>{new Date(template.updated_at).toLocaleDateString()}</span>
+                      <Button variant="ghost" size="sm" onClick={() => useInCompose({ name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Use</Button>
                       <Button variant="ghost" size="sm" onClick={() => setDraft({ id: template.id, name: template.name, subject: template.subject, bodyHtml: template.body_html })}>Edit</Button>
                       <Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${template.name}?`) && deleteMutation.mutate(template.id)}>Delete</Button>
                     </div>

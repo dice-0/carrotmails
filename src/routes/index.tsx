@@ -143,11 +143,11 @@ grace@hey.com,Grace,USN`}</pre>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">limited</div>
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-semibold text-foreground">$1</span>
-                    <span className="text-sm text-muted-foreground">/ month to start</span>
+                    <span className="text-3xl font-semibold text-foreground">$3.89</span>
+                    <span className="text-sm text-muted-foreground">/ month, 5,000 sends</span>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Or pay <span className="font-medium text-foreground">$9.99 once</span> for lifetime feature access. First 100 buyers only, price scales up over time.
+                    Or pay <span className="font-medium text-foreground">$79.90 once</span> for lifetime access with unlimited sending. First 100 buyers only, price scales up over time.
                   </p>
                   <Link to="/auth" className="mt-4 inline-flex items-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
                     Claim launch price →
