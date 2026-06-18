@@ -446,6 +446,91 @@ export type Database = {
           },
         ]
       }
+      form_submissions: {
+        Row: {
+          created_at: string
+          data: Json
+          email: string
+          form_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          email: string
+          form_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          email?: string
+          form_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          created_at: string
+          fields: Json
+          id: string
+          list_id: string | null
+          name: string
+          redirect_url: string | null
+          slug: string
+          submission_count: number
+          success_message: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          list_id?: string | null
+          name: string
+          redirect_url?: string | null
+          slug: string
+          submission_count?: number
+          success_message?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          list_id?: string | null
+          name?: string
+          redirect_url?: string | null
+          slug?: string
+          submission_count?: number
+          success_message?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forms_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "contact_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mailbox_connections: {
         Row: {
           access_token: string | null
