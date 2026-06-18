@@ -143,7 +143,7 @@ grace@hey.com,Grace,USN`}</pre>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">limited</div>
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-semibold text-foreground">$3.89</span>
+                    <span className="text-3xl font-semibold text-foreground">$3.50</span>
                     <span className="text-sm text-muted-foreground">/ month, 5,000 sends</span>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
