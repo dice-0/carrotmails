@@ -3,13 +3,16 @@ import { getRequest } from "@tanstack/react-start/server";
 import { createHmac, randomUUID } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// Minimal scopes for send-only mailing.
+// openid/email/profile: identify the connected mailbox (non-sensitive).
+// gmail.send: send mail on the user's behalf (restricted, but lightest review path).
+// Do NOT add gmail.readonly or gmail.modify unless a feature truly needs them;
+// each extra restricted scope expands Google's verification requirements.
 const GOOGLE_SCOPES = [
   "openid",
   "email",
   "profile",
   "https://www.googleapis.com/auth/gmail.send",
-  "https://www.googleapis.com/auth/gmail.readonly",
-  "https://www.googleapis.com/auth/gmail.modify",
 ].join(" ");
 
 function stateSecret() {
