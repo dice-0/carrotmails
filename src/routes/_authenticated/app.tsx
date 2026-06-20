@@ -95,6 +95,7 @@ function AppShell() {
             <div className="flex items-center justify-between"><Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={30} /></Link><Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"}>{dark ? "☀" : "◐"}</Button></div>
             <nav className="mt-3 flex gap-4 overflow-x-auto pb-1 font-mono text-[10px] uppercase tracking-widest">
               {NAV.map((n) => { const active = n.end ? pathname === n.to : pathname.startsWith(n.to); return <Link key={n.to} to={n.to} className={active ? "text-foreground" : "text-muted-foreground"}>{n.label}</Link>; })}
+              {SOON.map((s) => (<span key={s.label} className="whitespace-nowrap text-muted-foreground/60" title="Coming soon for Pro subscribers">{s.label} · Soon</span>))}
             </nav>
           </div>
           <Outlet />
