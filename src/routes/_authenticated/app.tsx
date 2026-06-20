@@ -19,6 +19,10 @@ const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "
   { to: "/app/billing", label: "Billing" },
 ];
 
+const SOON: { label: string; note: string }[] = [
+  { label: "Automation", note: "Pro · Soon" },
+];
+
 function AppShell() {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -69,6 +73,17 @@ function AppShell() {
                 </Link>
               );
             })}
+            {SOON.map((s) => (
+              <div
+                key={s.label}
+                aria-disabled="true"
+                title="Coming soon for Pro subscribers"
+                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground/60"
+              >
+                <span>{s.label}</span>
+                <span className="ml-2 text-[9px] tracking-widest text-muted-foreground/70">{s.note}</span>
+              </div>
+            ))}
           </nav>
           <div className="mt-auto border-t border-border pt-5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             <div className="truncate">{email}</div>
@@ -80,6 +95,7 @@ function AppShell() {
             <div className="flex items-center justify-between"><Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={30} /></Link><Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"}>{dark ? "☀" : "◐"}</Button></div>
             <nav className="mt-3 flex gap-4 overflow-x-auto pb-1 font-mono text-[10px] uppercase tracking-widest">
               {NAV.map((n) => { const active = n.end ? pathname === n.to : pathname.startsWith(n.to); return <Link key={n.to} to={n.to} className={active ? "text-foreground" : "text-muted-foreground"}>{n.label}</Link>; })}
+              {SOON.map((s) => (<span key={s.label} className="whitespace-nowrap text-muted-foreground/60" title="Coming soon for Pro subscribers">{s.label} · Soon</span>))}
             </nav>
           </div>
           <Outlet />
