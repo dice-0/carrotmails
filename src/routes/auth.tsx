@@ -21,11 +21,12 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -37,19 +38,48 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + "/reset-password",
+        });
+        if (error) throw error;
+        toast.success("Password reset link sent if an account exists for this email.");
+      } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin + "/app", data: { full_name: name } },
         });
         if (error) throw error;
-        toast.success("Account created. Check your email if confirmation is required.");
+        setNeedsConfirmation(true);
+        toast.success("Check your email for the confirmation link.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        navigate({ to: "/app" });
       }
-      navigate({ to: "/app" });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resendConfirmation() {
+    if (!email) {
+      toast.error("Enter your email first.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: window.location.origin + "/app" },
+      });
+      if (error) throw error;
+      toast.success("Confirmation link resent if this email is waiting for verification.");
+      setNeedsConfirmation(true);
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -65,10 +95,10 @@ function AuthPage() {
           <CarrotLogo size={34} />
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {mode === "signin" ? "Sign in" : "Create your account"}
+          {mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset your password"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "signin" ? "Welcome back." : "Send personalized mail from your own inbox. You'll connect Gmail after signup."}
+          {mode === "signin" ? "Welcome back." : mode === "signup" ? "Send personalized mail from your own inbox. You'll connect Gmail after signup." : "Enter your email and we'll send a secure reset link."}
         </p>
 
 
@@ -101,7 +131,8 @@ function AuthPage() {
               className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
             />
           </div>
-          <div>
+          {mode !== "forgot" && (
+            <div>
             <label htmlFor="password" className="sr-only">Password</label>
             <input
               id="password"
@@ -115,18 +146,43 @@ function AuthPage() {
               placeholder="Password (8+ chars)"
               className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
             />
-          </div>
+            </div>
+          )}
           <button
             type="submit"
             disabled={busy}
             className="w-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
           >
-            {busy ? "…" : mode === "signin" ? "Sign in" : "Create account"}
+            {busy ? "…" : mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
           </button>
         </form>
 
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={() => setMode("forgot")}
+            className="mt-4 block w-full text-center text-sm text-muted-foreground hover:text-foreground"
+          >
+            Forgot password?
+          </button>
+        )}
+
+        {(needsConfirmation || mode === "signup") && (
+          <button
+            type="button"
+            onClick={resendConfirmation}
+            disabled={busy}
+            className="mt-4 block w-full text-center text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+          >
+            Resend confirmation link
+          </button>
+        )}
+
         <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => {
+            setNeedsConfirmation(false);
+            setMode(mode === "signin" ? "signup" : "signin");
+          }}
           className="mt-6 block w-full text-center text-sm text-muted-foreground hover:text-foreground"
         >
           {mode === "signin" ? "No account? Create one" : "Have an account? Sign in"}
