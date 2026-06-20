@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
   component: PreviewDashboard,
 });
 
-const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes"];
+const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes", "Automation"];
 
 const TILES = [
   { k: "From your inbox", v: "Connect Gmail or Outlook. Sends look personal because they are." },
@@ -152,6 +152,22 @@ grace@hey.com,Grace,USN`}</pre>
                       <p className="mt-2 text-sm leading-relaxed text-foreground">{t.v}</p>
                     </div>
                   ))}
+                </div>
+
+                <div className="border border-primary/30 bg-primary/5 p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="font-mono text-[11px] uppercase tracking-widest text-primary">Automation</div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Coming soon</span>
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-primary">Pro only</span>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-foreground">
+                    Trigger campaigns from form submissions, webhooks, or scheduled timers. Auto-advance recipients through multi-step sequences, branch on opens and replies, and let AI write follow-ups that feel handwritten. Connect to your CRM, Slack, or any API endpoint.
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Early access opens to Pro subscribers first. Join the waitlist after sign-up.
+                  </p>
                 </div>
 
                 <div className="border border-border bg-card p-6">
