@@ -73,6 +73,17 @@ function AppShell() {
                 </Link>
               );
             })}
+            {SOON.map((s) => (
+              <div
+                key={s.label}
+                aria-disabled="true"
+                title="Coming soon for Pro subscribers"
+                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground/60"
+              >
+                <span>{s.label}</span>
+                <span className="ml-2 text-[9px] tracking-widest text-muted-foreground/70">{s.note}</span>
+              </div>
+            ))}
           </nav>
           <div className="mt-auto border-t border-border pt-5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             <div className="truncate">{email}</div>
