@@ -67,9 +67,36 @@ function AuthPage() {
         toast.success("Check your email for the confirmation link.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          const msg = error.message?.toLowerCase() ?? "";
+          if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+            setNeedsConfirmation(true);
+            toast.error("Please confirm your email first. We can resend the link below.");
+            return;
+          }
+          throw error;
+        }
         navigate({ to: "/app" });
       }
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleGoogle() {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/app",
+      });
+      if (result.error) {
+        toast.error(result.error.message ?? "Google sign-in failed.");
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: "/app" });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
