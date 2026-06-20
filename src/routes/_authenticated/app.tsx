@@ -19,6 +19,10 @@ const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "
   { to: "/app/billing", label: "Billing" },
 ];
 
+const SOON: { label: string; note: string }[] = [
+  { label: "Automation", note: "Pro · Soon" },
+];
+
 function AppShell() {
   const navigate = useNavigate();
   const qc = useQueryClient();
