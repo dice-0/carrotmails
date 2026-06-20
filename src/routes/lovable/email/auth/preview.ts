@@ -11,12 +11,12 @@ import { ReauthenticationEmail } from "@/lib/email-templates/reauthentication";
 type EmailTemplateComponent = React.ComponentType<Record<string, unknown>>;
 
 const EMAIL_TEMPLATES: Record<string, EmailTemplateComponent> = {
-  signup: SignupEmail as EmailTemplateComponent,
-  invite: InviteEmail as EmailTemplateComponent,
-  magiclink: MagicLinkEmail as EmailTemplateComponent,
-  recovery: RecoveryEmail as EmailTemplateComponent,
-  email_change: EmailChangeEmail as EmailTemplateComponent,
-  reauthentication: ReauthenticationEmail as EmailTemplateComponent,
+  signup: SignupEmail as unknown as EmailTemplateComponent,
+  invite: InviteEmail as unknown as EmailTemplateComponent,
+  magiclink: MagicLinkEmail as unknown as EmailTemplateComponent,
+  recovery: RecoveryEmail as unknown as EmailTemplateComponent,
+  email_change: EmailChangeEmail as unknown as EmailTemplateComponent,
+  reauthentication: ReauthenticationEmail as unknown as EmailTemplateComponent,
 };
 
 const SITE_NAME = "carrotmails";
