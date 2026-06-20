@@ -1,14 +1,6 @@
 import * as React from "react";
 
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
-} from "@react-email/components";
+import { Body, Container, Head, Heading, Html, Preview, Text } from "@react-email/components";
 
 interface ReauthenticationEmailProps {
   token: string;
