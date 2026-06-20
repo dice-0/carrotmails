@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
   component: PreviewDashboard,
 });
 
-const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes"];
+const NAV = ["Compose", "Campaigns", "Templates", "Lists", "Mailboxes", "Automation"];
 
 const TILES = [
   { k: "From your inbox", v: "Connect Gmail or Outlook. Sends look personal because they are." },
