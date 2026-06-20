@@ -8,10 +8,18 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in | Carrot Mails" },
-      { name: "description", content: "Sign in or create your Carrot Mails account to access campaigns, templates, lists, mailboxes, and signup forms." },
+      {
+        name: "description",
+        content:
+          "Sign in or create your Carrot Mails account to access campaigns, templates, lists, mailboxes, and signup forms.",
+      },
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "Sign in | Carrot Mails" },
-      { property: "og:description", content: "Sign in or create your Carrot Mails account to access campaigns, templates, lists, and mailboxes." },
+      {
+        property: "og:description",
+        content:
+          "Sign in or create your Carrot Mails account to access campaigns, templates, lists, and mailboxes.",
+      },
       { property: "og:url", content: "https://carrotmails.work/auth" },
     ],
     links: [{ rel: "canonical", href: "https://carrotmails.work/auth" }],
@@ -48,7 +56,10 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/app", data: { full_name: name } },
+          options: {
+            emailRedirectTo: window.location.origin + "/app",
+            data: { full_name: name },
+          },
         });
         if (error) throw error;
         setNeedsConfirmation(true);
@@ -90,22 +101,35 @@ function AuthPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-        <Link to="/" className="mb-10 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground" aria-label="Back to Carrot Mails home">
+        <Link
+          to="/"
+          className="mb-10 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          aria-label="Back to Carrot Mails home"
+        >
           <span className="font-mono text-xs uppercase tracking-widest">←</span>
           <CarrotLogo size={34} />
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset your password"}
+          {mode === "signin"
+            ? "Sign in"
+            : mode === "signup"
+              ? "Create your account"
+              : "Reset your password"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "signin" ? "Welcome back." : mode === "signup" ? "Send personalized mail from your own inbox. You'll connect Gmail after signup." : "Enter your email and we'll send a secure reset link."}
+          {mode === "signin"
+            ? "Welcome back."
+            : mode === "signup"
+              ? "Send personalized mail from your own inbox. You'll connect Gmail after signup."
+              : "Enter your email and we'll send a secure reset link."}
         </p>
-
 
         <form onSubmit={handleEmail} className="space-y-4">
           {mode === "signup" && (
             <div>
-              <label htmlFor="name" className="sr-only">Your name</label>
+              <label htmlFor="name" className="sr-only">
+                Your name
+              </label>
               <input
                 id="name"
                 name="name"
@@ -118,7 +142,9 @@ function AuthPage() {
             </div>
           )}
           <div>
-            <label htmlFor="email" className="sr-only">Email address</label>
+            <label htmlFor="email" className="sr-only">
+              Email address
+            </label>
             <input
               id="email"
               name="email"
@@ -133,19 +159,21 @@ function AuthPage() {
           </div>
           {mode !== "forgot" && (
             <div>
-            <label htmlFor="password" className="sr-only">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (8+ chars)"
-              className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
-            />
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password (8+ chars)"
+                className="w-full border-b border-border bg-transparent px-0 py-2 text-base outline-none focus:border-foreground"
+              />
             </div>
           )}
           <button
@@ -153,7 +181,13 @@ function AuthPage() {
             disabled={busy}
             className="w-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
           >
-            {busy ? "…" : mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
+            {busy
+              ? "…"
+              : mode === "signin"
+                ? "Sign in"
+                : mode === "signup"
+                  ? "Create account"
+                  : "Send reset link"}
           </button>
         </form>
 
@@ -190,9 +224,14 @@ function AuthPage() {
 
         <p className="mt-6 text-center font-mono text-[11px] leading-relaxed text-muted-foreground">
           By continuing you agree to our{" "}
-          <Link to="/terms" className="underline hover:text-foreground">Terms</Link>{" "}
+          <Link to="/terms" className="underline hover:text-foreground">
+            Terms
+          </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
+          <Link to="/privacy" className="underline hover:text-foreground">
+            Privacy Policy
+          </Link>
+          .
         </p>
       </div>
     </main>
