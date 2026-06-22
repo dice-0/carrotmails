@@ -66,14 +66,22 @@ function chunk76(s: string) {
   return s.match(/.{1,76}/g)?.join("\r\n") ?? s;
 }
 
+function sanitizeHeader(v: string) {
+  return String(v).replace(/[\r\n]+/g, " ").trim();
+}
+
 function buildRawMime(
-  from: string,
-  to: string,
-  subject: string,
+  fromRaw: string,
+  toRaw: string,
+  subjectRaw: string,
   html: string,
   text: string,
   attachments: Attachment[],
 ) {
+  const from = sanitizeHeader(fromRaw);
+  const to = sanitizeHeader(toRaw);
+  const subject = sanitizeHeader(subjectRaw);
+
   const altBoundary = "alt_" + Math.random().toString(36).slice(2);
   const altPart = [
     `Content-Type: multipart/alternative; boundary="${altBoundary}"`,
