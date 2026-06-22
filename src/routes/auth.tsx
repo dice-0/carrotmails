@@ -38,9 +38,17 @@ function AuthPage() {
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/app" });
+      if (mounted && data.user) navigate({ to: "/app" });
     });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) navigate({ to: "/app" });
+    });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   async function handleEmail(e: React.FormEvent) {
@@ -89,7 +97,7 @@ function AuthPage() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin + "/auth",
         extraParams: { prompt: "select_account" },
       });
       if (result.error) {
