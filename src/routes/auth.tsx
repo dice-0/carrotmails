@@ -43,7 +43,9 @@ function AuthPage() {
       if (mounted && data.user) navigate({ to: "/app" });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user) navigate({ to: "/app" });
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session?.user) {
+        navigate({ to: "/app" });
+      }
     });
     return () => {
       mounted = false;
@@ -66,7 +68,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin + "/app",
+            emailRedirectTo: window.location.origin + "/auth",
             data: { full_name: name },
           },
         });
@@ -123,7 +125,7 @@ function AuthPage() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email,
-        options: { emailRedirectTo: window.location.origin + "/app" },
+        options: { emailRedirectTo: window.location.origin + "/auth" },
       });
       if (error) throw error;
       toast.success("Confirmation link resent if this email is waiting for verification.");
