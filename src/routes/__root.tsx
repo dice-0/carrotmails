@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "google-site-verification", content: "3Cwbc0L9C0P7U5DB9ccne78RaX0J4ZfjPdZfFPW-Sck" },
+      { name: "google-site-verification", content: "zZL6F0gzfC-KR5VwP5ZGRj_0jJ2vs_2x4y6Jw29U7Yk" },
       { title: "Carrot Mails: bulk email from your own inbox" },
       { name: "description", content: "Send personalized bulk emails from your own Gmail or Outlook with smart variables, reply detection, suppression lists, and deliverability built in." },
       { name: "author", content: "Carrot Mails" },
