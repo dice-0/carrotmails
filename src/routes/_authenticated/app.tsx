@@ -4,23 +4,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { CarrotLogo } from "@/components/CarrotLogo";
+import { useBilling, planLabel } from "@/hooks/useEntitlement";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
 });
 
-const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/billing"; label: string; end?: boolean }[] = [
+const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/profile" | "/app/billing"; label: string; end?: boolean }[] = [
   { to: "/app", label: "Compose", end: true },
   { to: "/app/campaigns", label: "Campaigns" },
   { to: "/app/templates", label: "Templates" },
   { to: "/app/lists", label: "Lists" },
   { to: "/app/forms", label: "Forms" },
   { to: "/app/mailboxes", label: "Mailboxes" },
+  { to: "/app/profile", label: "Profile" },
   { to: "/app/billing", label: "Billing" },
 ];
 
 const SOON: { label: string; note: string }[] = [
-  { label: "Automation", note: "Pro · Soon" },
+  { label: "Automation", note: "Soon" },
 ];
 
 function AppShell() {
@@ -29,6 +31,7 @@ function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
+  const { data: billing } = useBilling();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
@@ -52,6 +55,11 @@ function AppShell() {
     navigate({ to: "/auth", replace: true });
   }
 
+  const tier = billing?.tier;
+  const label = planLabel(tier);
+  const isLifetime = tier === "lifetime";
+  const hasPaid = billing?.hasPaidAccess ?? false;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex max-w-[90rem]">
@@ -64,29 +72,37 @@ function AppShell() {
             {NAV.map((n) => {
               const active = n.end ? pathname === n.to : pathname.startsWith(n.to);
               return (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className={`px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                >
+                <Link key={n.to} to={n.to} className={`px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                   {n.label}
                 </Link>
               );
             })}
             {SOON.map((s) => (
-              <div
-                key={s.label}
-                aria-disabled="true"
-                title="Coming soon for Pro subscribers"
-                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground/60"
-              >
+              <div key={s.label} aria-disabled="true" title="Coming soon"
+                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground/60">
                 <span>{s.label}</span>
                 <span className="ml-2 text-[9px] tracking-widest text-muted-foreground/70">{s.note}</span>
               </div>
             ))}
           </nav>
-          <div className="mt-auto border-t border-border pt-5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            <div className="truncate">{email}</div>
+          <div className="mt-auto border-t border-border pt-5">
+            <Link to="/app/billing" className="block">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Plan</div>
+              <div className={`mt-1 text-sm font-medium ${hasPaid ? "text-primary" : "text-foreground"}`}>{label}</div>
+              {hasPaid && !isLifetime && billing && (
+                <>
+                  <div className="mt-1.5 h-1 w-full bg-muted">
+                    <div className="h-full bg-primary" style={{ width: `${Math.min(100, Math.round((billing.sentThisPeriod / Math.max(1, billing.quota)) * 100))}%` }} />
+                  </div>
+                  <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">
+                    {billing.quotaRemaining.toLocaleString()} / {billing.quota.toLocaleString()} left
+                  </div>
+                </>
+              )}
+              {isLifetime && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Unlimited</div>}
+              {!hasPaid && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-primary">Choose a plan →</div>}
+            </Link>
+            <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate">{email}</div>
             <Button variant="ghost" size="sm" onClick={signOut} className="mt-2 -ml-3 h-7 font-mono text-[10px] uppercase tracking-widest">Sign out →</Button>
           </div>
         </aside>
@@ -95,7 +111,6 @@ function AppShell() {
             <div className="flex items-center justify-between"><Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={30} /></Link><Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={dark ? "Use light mode" : "Use dark mode"}>{dark ? "☀" : "◐"}</Button></div>
             <nav className="mt-3 flex gap-4 overflow-x-auto pb-1 font-mono text-[10px] uppercase tracking-widest">
               {NAV.map((n) => { const active = n.end ? pathname === n.to : pathname.startsWith(n.to); return <Link key={n.to} to={n.to} className={active ? "text-foreground" : "text-muted-foreground"}>{n.label}</Link>; })}
-              {SOON.map((s) => (<span key={s.label} className="whitespace-nowrap text-muted-foreground/60" title="Coming soon for Pro subscribers">{s.label} · Soon</span>))}
             </nav>
           </div>
           <Outlet />
