@@ -15,7 +15,7 @@ type Props = {
 export function CarrotMark({ className, size = 32 }: { className?: string; size?: number }) {
   return (
     <img
-      src="/favicon.png"
+      src="/favicon.svg"
       width={size}
       height={size}
       alt=""

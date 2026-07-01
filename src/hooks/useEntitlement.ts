@@ -26,13 +26,15 @@ export function useBilling() {
       const { data } = await supabase.auth.getUser();
       const uid = data.user?.id;
       if (!uid || cancelled) return;
-      channel = supabase
-        .channel(`billing:${uid}`)
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "billing_entitlements", filter: `user_id=eq.${uid}` },
-          () => qc.invalidateQueries({ queryKey: ["billing-status"] }),
-        )
+      // Unique per-mount channel name to avoid re-subscribing an existing channel
+      // (StrictMode double-mount + fast route changes triggered the
+      // "add postgres_changes after subscribe()" error).
+      const ch = supabase.channel(`billing:${uid}:${Math.random().toString(36).slice(2)}`);
+      ch.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "billing_entitlements", filter: `user_id=eq.${uid}` },
+        () => qc.invalidateQueries({ queryKey: ["billing-status"] }),
+      )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "billing_subscriptions", filter: `user_id=eq.${uid}` },
@@ -44,6 +46,11 @@ export function useBilling() {
           () => qc.invalidateQueries({ queryKey: ["billing-status"] }),
         )
         .subscribe();
+      if (cancelled) {
+        supabase.removeChannel(ch);
+        return;
+      }
+      channel = ch;
     })();
     return () => {
       cancelled = true;
