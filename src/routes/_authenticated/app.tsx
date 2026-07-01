@@ -1,7 +1,6 @@
-import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { CarrotLogo } from "@/components/CarrotLogo";
 import { useBilling, planLabel } from "@/hooks/useEntitlement";
@@ -26,8 +25,6 @@ const SOON: { label: string; note: string }[] = [
 ];
 
 function AppShell() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
