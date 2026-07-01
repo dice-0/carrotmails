@@ -48,12 +48,6 @@ function AppShell() {
     setDark(next);
   }
 
-  async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
 
   const tier = billing?.tier;
   const label = planLabel(tier);
@@ -103,7 +97,6 @@ function AppShell() {
               {!hasPaid && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-primary">Choose a plan →</div>}
             </Link>
             <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate">{email}</div>
-            <Button variant="ghost" size="sm" onClick={signOut} className="mt-2 -ml-3 h-7 font-mono text-[10px] uppercase tracking-widest">Sign out →</Button>
           </div>
         </aside>
         <main className="min-h-screen flex-1">
