@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+
 import { CarrotLogo } from "@/components/CarrotLogo";
 import { useBilling, planLabel } from "@/hooks/useEntitlement";
 
