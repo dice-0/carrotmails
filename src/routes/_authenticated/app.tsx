@@ -70,7 +70,7 @@ function AppShell() {
             })}
             {SOON.map((s) => (
               <div key={s.label} aria-disabled="true" title="Coming soon"
-                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground/60">
+                className="flex cursor-not-allowed items-center justify-between px-2 py-1.5 text-muted-foreground">
                 <span>{s.label}</span>
                 <span className="ml-2 text-[9px] tracking-widest text-muted-foreground/70">{s.note}</span>
               </div>
