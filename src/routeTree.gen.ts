@@ -22,6 +22,7 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppMailboxesRouteImport } from './routes/_authenticated/app.mailboxes'
 import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticated/app.lists'
 import { Route as AuthenticatedAppFormsRouteImport } from './routes/_authenticated/app.forms'
@@ -97,6 +98,11 @@ const AuthenticatedAppTemplatesRoute =
     path: '/templates',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppMailboxesRoute =
   AuthenticatedAppMailboxesRouteImport.update({
     id: '/mailboxes',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/app/forms': typeof AuthenticatedAppFormsRoute
   '/app/lists': typeof AuthenticatedAppListsRoute
   '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/app/forms': typeof AuthenticatedAppFormsRoute
   '/app/lists': typeof AuthenticatedAppListsRoute
   '/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/app/forms': typeof AuthenticatedAppFormsRoute
   '/_authenticated/app/lists': typeof AuthenticatedAppListsRoute
   '/_authenticated/app/mailboxes': typeof AuthenticatedAppMailboxesRoute
+  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/app/forms'
     | '/app/lists'
     | '/app/mailboxes'
+    | '/app/profile'
     | '/app/templates'
     | '/api/public/dodo-webhook'
     | '/app/'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/app/forms'
     | '/app/lists'
     | '/app/mailboxes'
+    | '/app/profile'
     | '/app/templates'
     | '/api/public/dodo-webhook'
     | '/app'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/forms'
     | '/_authenticated/app/lists'
     | '/_authenticated/app/mailboxes'
+    | '/_authenticated/app/profile'
     | '/_authenticated/app/templates'
     | '/api/public/dodo-webhook'
     | '/_authenticated/app/'
@@ -399,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/mailboxes': {
       id: '/_authenticated/app/mailboxes'
       path: '/mailboxes'
@@ -471,6 +490,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppFormsRoute: typeof AuthenticatedAppFormsRoute
   AuthenticatedAppListsRoute: typeof AuthenticatedAppListsRoute
   AuthenticatedAppMailboxesRoute: typeof AuthenticatedAppMailboxesRoute
+  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppTemplatesRoute: typeof AuthenticatedAppTemplatesRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
@@ -481,6 +501,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppFormsRoute: AuthenticatedAppFormsRoute,
   AuthenticatedAppListsRoute: AuthenticatedAppListsRoute,
   AuthenticatedAppMailboxesRoute: AuthenticatedAppMailboxesRoute,
+  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppTemplatesRoute: AuthenticatedAppTemplatesRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }

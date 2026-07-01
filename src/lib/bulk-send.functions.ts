@@ -24,9 +24,8 @@ const payloadSchema = z.object({
 type Recipient = z.infer<typeof recipientSchema>;
 type Attachment = z.infer<typeof attachmentSchema>;
 
-// Free quota: 20 recipient sends per rolling 3 days for users without a paid plan.
-export const FREE_QUOTA = 20;
-export const FREE_WINDOW_DAYS = 3;
+// Paid plan quota (Growth). Lifetime bypasses this.
+export const GROWTH_QUOTA = 5000;
 
 function applyVars(template: string, r: Recipient) {
   const vars: Record<string, string> = { email: r.email, ...r.vars };
@@ -173,7 +172,6 @@ async function refreshAccessToken(refreshToken: string) {
 
 async function getActiveAccessToken(mailbox: GmailMailbox): Promise<string> {
   const expMs = mailbox.expires_at ? new Date(mailbox.expires_at).getTime() : 0;
-  // Refresh 60s before expiry
   if (expMs - 60_000 > Date.now()) return mailbox.access_token;
   if (!mailbox.refresh_token) throw new Error("Mailbox needs to be reconnected");
   const refreshed = await refreshAccessToken(mailbox.refresh_token);
@@ -205,41 +203,48 @@ async function updateMailboxToken(mailboxId: string, accessToken: string, expire
     .eq("id", mailboxId);
 }
 
-async function getUsage(supabase: any) {
-  const since = new Date(Date.now() - FREE_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
-  const { count, error } = await supabase
-    .from("email_send_events")
-    .select("id", { count: "exact", head: true })
-    .gte("sent_at", since);
-  if (error) throw new Error(error.message);
-  return count ?? 0;
-}
-
-async function hasPaidAccess(supabase: any, userId: string) {
+async function loadEntitlement(supabase: any, userId: string) {
   const { data, error } = await supabase
     .from("billing_entitlements")
-    .select("active, expires_at")
+    .select("entitlement, active, expires_at")
     .eq("user_id", userId)
     .eq("active", true);
   if (error) throw new Error("Unable to verify paid access");
-  return (data ?? []).some(
-    (i: { active: boolean; expires_at: string | null }) =>
-      i.active && (!i.expires_at || new Date(i.expires_at).getTime() > Date.now()),
+  const now = Date.now();
+  const active = (data ?? []).filter(
+    (i: { active: boolean; expires_at: string | null; entitlement: string }) =>
+      i.active && (!i.expires_at || new Date(i.expires_at).getTime() > now),
   );
+  const isLifetime = active.some((i: any) => i.entitlement === "lifetime");
+  const hasPaid = active.length > 0;
+  return { hasPaid, isLifetime };
+}
+
+async function countSendsThisPeriod(supabase: any, userId: string): Promise<number> {
+  // Approximate: last 30 days.
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await supabase
+    .from("email_send_events")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("sent_at", since);
+  if (error) throw new Error(error.message);
+  return count ?? 0;
 }
 
 export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const mailbox = await loadUserMailbox(context.userId);
-    const paid = await hasPaidAccess(context.supabase, context.userId);
-    const used = await getUsage(context.supabase);
+    const { hasPaid, isLifetime } = await loadEntitlement(context.supabase, context.userId);
+    const sent = hasPaid && !isLifetime ? await countSendsThisPeriod(context.supabase, context.userId) : 0;
     return {
       email: mailbox?.email ?? null,
-      paid,
-      freeUsed: used,
-      freeLimit: FREE_QUOTA,
-      freeWindowDays: FREE_WINDOW_DAYS,
+      paid: hasPaid,
+      lifetime: isLifetime,
+      quota: GROWTH_QUOTA,
+      sentThisPeriod: sent,
+      remaining: isLifetime ? null : Math.max(0, GROWTH_QUOTA - sent),
     };
   });
 
@@ -247,16 +252,20 @@ export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
+    const { hasPaid, isLifetime } = await loadEntitlement(context.supabase, context.userId);
+    if (!hasPaid) {
+      throw new Error("A paid plan is required to send. Choose Growth or Lifetime on the Billing page.");
+    }
+
     const mailbox = await loadUserMailbox(context.userId);
     if (!mailbox) throw new Error("Connect a Gmail mailbox before sending");
 
-    const paid = await hasPaidAccess(context.supabase, context.userId);
-    if (!paid) {
-      const used = await getUsage(context.supabase);
-      const remaining = Math.max(0, FREE_QUOTA - used);
+    if (!isLifetime) {
+      const sent = await countSendsThisPeriod(context.supabase, context.userId);
+      const remaining = Math.max(0, GROWTH_QUOTA - sent);
       if (data.recipients.length > remaining) {
         throw new Error(
-          `Free plan limit: ${FREE_QUOTA} emails per ${FREE_WINDOW_DAYS} days. You have ${remaining} left. Upgrade to send more.`,
+          `Growth quota: ${GROWTH_QUOTA} emails / period. You have ${remaining} left. Upgrade to Lifetime for unlimited.`,
         );
       }
     }
@@ -292,7 +301,6 @@ export const sendBulk = createServerFn({ method: "POST" })
         });
         if (!resp.ok) {
           const txt = await resp.text();
-          // Token may have expired mid-batch (rare). Refresh once and retry this recipient.
           if (resp.status === 401 && mailbox.refresh_token) {
             try {
               const refreshed = await refreshAccessToken(mailbox.refresh_token);
