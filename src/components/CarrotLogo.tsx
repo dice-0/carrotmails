@@ -27,16 +27,14 @@ export function CarrotMark({ className, size = 32 }: { className?: string; size?
 }
 
 export function CarrotLogo({ className, withWordmark = true, size = 28, invertWord = false }: Props) {
-  // The mark renders a bit larger than the cap height so it visually matches
-  // the wordmark beside it instead of looking like a tiny icon.
-  const markSize = Math.round(size * 1.6);
+  const markSize = Math.round(size * 2);
   const wordSize = size;
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
+    <span className={cn("inline-flex items-center gap-2", className)}>
       <CarrotMark size={markSize} />
       {withWordmark && (
         <span
-          className="font-semibold tracking-tight leading-none"
+          className="font-semibold tracking-tight leading-[0.95]"
           style={{ fontSize: `${wordSize}px` }}
         >
           <span style={{ color: "var(--carrot)" }}>carrot</span>{" "}
