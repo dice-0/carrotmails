@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import { CarrotLogo } from "@/components/CarrotLogo";
+
 
 export const Route = createFileRoute("/")({
   ssr: false,
