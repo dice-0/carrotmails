@@ -63,6 +63,6 @@ export function useBilling() {
 
 export function planLabel(tier: string | undefined) {
   if (tier === "lifetime") return "Lifetime";
-  if (tier === "growth" || tier === "pro") return "Growth";
+  if (tier === "growth" || tier === "pro" || tier === "premium") return "Premium";
   return "No plan";
 }

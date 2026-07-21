@@ -106,6 +106,8 @@ function Index() {
   );
   const [raw, setRaw] = usePersistentState("cm:compose:recipients", "email,name\n");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [consent, setConsent] = usePersistentState("cm:compose:consent", false);
+  const [consentSource, setConsentSource] = usePersistentState("cm:compose:consentSource", "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<null | { sent: number; failed: number; results: { email: string; ok: boolean; error?: string }[] }>(null);
@@ -125,12 +127,14 @@ function Index() {
   const hasMailbox = Boolean(profile?.email);
   const isLifetime = billing?.tier === "lifetime";
   const remaining = billing?.quotaRemaining ?? 0;
+  const consentReady = consent && consentSource.trim().length >= 3;
 
   function attemptSend() {
     if (!profileComplete && !hasPaid) return setBlockReason("profile-and-plan");
     if (!profileComplete) return setBlockReason("profile");
     if (!hasPaid) return setBlockReason("plan");
     if (!hasMailbox) return setBlockReason("mailbox");
+    if (!consentReady) return setBlockReason("consent");
     if (!isLifetime && parsed.rows.length > remaining) return setBlockReason("quota");
     void handleSend();
   }
@@ -147,6 +151,9 @@ function Index() {
           bodyHtml,
           recipients: parsed.rows,
           attachments: attachments.map(({ filename, contentType, dataBase64 }) => ({ filename, contentType, dataBase64 })),
+          consentConfirmed: true as const,
+          consentSource: consentSource.trim(),
+          senderName: fromName.trim() || undefined,
         },
       });
       setResult(r);
@@ -273,6 +280,25 @@ function Index() {
                 placeholder={"email,name,company\nada@hey.com,Ada,Analytica\ngrace@hey.com,Grace,USN"}
                 className="w-full resize-none rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-foreground focus:ring-2 focus:ring-primary/20" />
             </Field>
+
+            <div className="rounded-md border border-border bg-muted/30 p-4">
+              <label className="flex items-start gap-3 text-sm">
+                <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-4 w-4" />
+                <span>
+                  <span className="font-medium">I confirm every recipient in this list explicitly opted in</span> to receive email from me, and I can produce proof of consent on request. Carrot Mails is permission-based only, cold outreach is not allowed.
+                </span>
+              </label>
+              <div className="mt-3">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">How did they opt in?</label>
+                <input
+                  type="text"
+                  value={consentSource}
+                  onChange={(e) => setConsentSource(e.target.value)}
+                  placeholder="e.g. Signed up via my website form on 2025-04-12"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
 
             <div className="flex items-center justify-between pt-2">
               <div className="text-sm text-muted-foreground">

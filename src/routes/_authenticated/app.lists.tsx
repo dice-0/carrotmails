@@ -66,13 +66,15 @@ function ListsPage() {
   const [fileName, setFileName] = usePersistentState("cm:lists:fileName", "");
   const [raw, setRaw] = usePersistentState("cm:lists:raw", "");
   const [showImport, setShowImport] = usePersistentState("cm:lists:showImport", false);
+  const [consent, setConsent] = usePersistentState("cm:lists:consent", false);
+  const [consentSource, setConsentSource] = usePersistentState("cm:lists:consentSource", "");
   const parsed = useMemo(() => parseCsv(raw), [raw]);
   const { data: lists = [], isLoading } = useQuery({ queryKey: ["contact-lists"], queryFn: () => list() });
   const importMutation = useMutation({
-    mutationFn: () => importList({ data: { name, contacts: parsed.contacts } }),
+    mutationFn: () => importList({ data: { name, contacts: parsed.contacts, consentConfirmed: true as const, consentSource: consentSource.trim() } }),
     onSuccess: async (result) => {
       await qc.invalidateQueries({ queryKey: ["contact-lists"] });
-      setShowImport(false); setRaw(""); setName(""); setFileName("");
+      setShowImport(false); setRaw(""); setName(""); setFileName(""); setConsent(false); setConsentSource("");
       toast.success(`Imported ${result.report.imported} clean contacts`);
     },
     onError: (error: Error) => toast.error(error.message),
@@ -104,7 +106,17 @@ function ListsPage() {
               </div>
               {raw && <div className="grid grid-cols-3 divide-x divide-border border-y border-border py-4 text-center"><Metric value={parsed.contacts.length} label="clean" /><Metric value={parsed.duplicates} label="duplicates" /><Metric value={parsed.invalid} label="invalid" /></div>}
               {parsed.error && <p className="text-sm text-destructive">{parsed.error}</p>}
-              <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setShowImport(false)}>Cancel</Button><Button disabled={!name.trim() || parsed.contacts.length === 0 || importMutation.isPending} onClick={() => importMutation.mutate()}>{importMutation.isPending ? "Running hygiene…" : `Import ${parsed.contacts.length}`}</Button></div>
+              <div className="rounded-md border border-border bg-muted/30 p-4">
+                <label className="flex items-start gap-3 text-sm">
+                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-4 w-4" />
+                  <span><span className="font-medium">Every contact in this file explicitly opted in</span> to receive email from me, and I can produce proof of consent on request.</span>
+                </label>
+                <div className="mt-3">
+                  <label className="mb-1 block text-xs font-medium text-muted-foreground">How did they opt in?</label>
+                  <input type="text" value={consentSource} onChange={(e) => setConsentSource(e.target.value)} placeholder="e.g. Newsletter signup form on carrotmails.work, 2025-04" className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground focus:ring-2 focus:ring-primary/20" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setShowImport(false)}>Cancel</Button><Button disabled={!name.trim() || parsed.contacts.length === 0 || !consent || consentSource.trim().length < 3 || importMutation.isPending} onClick={() => importMutation.mutate()}>{importMutation.isPending ? "Running hygiene…" : `Import ${parsed.contacts.length}`}</Button></div>
             </div>
             <aside className="border-l border-border pl-6">
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Hygiene pipeline</p>

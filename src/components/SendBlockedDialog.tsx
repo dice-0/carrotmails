@@ -14,28 +14,33 @@ export type SendBlockReason =
   | "plan"
   | "mailbox"
   | "quota"
+  | "consent"
   | "profile-and-plan";
 
 const COPY: Record<SendBlockReason, { title: string; body: string }> = {
   profile: {
-    title: "Hold your horses, carrot cadet 🥕",
-    body: "Your profile is still greener than a garden. Fill it in so we know where to send the good news (and the receipts).",
+    title: "One quick step first",
+    body: "Add your name and business email in Profile so recipients know exactly who is contacting them. It also anchors your account and receipts.",
   },
   plan: {
-    title: "Whoa, cowboy. This carrot isn't ripe yet.",
-    body: "Sending is a paid superpower. Grab a plan and we'll unleash your outreach on the world.",
+    title: "Carrot Mails is a paid tool",
+    body: "Sending is available on Premium or Lifetime. Pick a plan to unlock consent-based campaigns to your opted-in contacts.",
   },
   "profile-and-plan": {
-    title: "Almost there, launcher!",
-    body: "Finish your profile and pick a plan. Two tiny steps between you and 5,000 gloriously personalized emails.",
+    title: "Two small steps to launch",
+    body: "Finish your profile and choose a plan. Both are one-time setups, and then your opted-in campaigns are ready to send.",
   },
   mailbox: {
-    title: "No mailbox, no missiles.",
-    body: "Connect your Gmail (or Outlook, soon) so we can send from your inbox, not ours.",
+    title: "Connect your mailbox",
+    body: "Carrot Mails sends from your own inbox, not ours. Connect Gmail so your recipients see your address in their inbox.",
   },
   quota: {
-    title: "You emptied the tank 🚀",
+    title: "You've reached this period's cap",
     body: "You've used every send in this billing period. It refills next cycle, or upgrade to Lifetime for unlimited.",
+  },
+  consent: {
+    title: "Confirm recipient consent",
+    body: "Carrot Mails only supports permission-based sending. Confirm that every recipient explicitly opted in to hear from you before we can dispatch this message.",
   },
 };
 
@@ -73,6 +78,9 @@ export function SendBlockedDialog({
             <Button asChild>
               <Link to="/app/mailboxes" onClick={() => onOpenChange(false)}>Connect mailbox</Link>
             </Button>
+          )}
+          {reason === "consent" && (
+            <Button onClick={() => onOpenChange(false)}>Got it</Button>
           )}
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  complianceFooterHtml,
+  complianceFooterText,
+  listUnsubscribeHeaders,
+  unsubscribeUrl,
+} from "./compliance-footer";
 
 const recipientSchema = z.object({
   email: z.string().email().max(320),
@@ -19,12 +25,18 @@ const payloadSchema = z.object({
   bodyHtml: z.string().min(1).max(500_000),
   recipients: z.array(recipientSchema).min(1).max(500),
   attachments: z.array(attachmentSchema).max(10).default([]),
+  // Compliance: caller must confirm recipients have opted in.
+  consentConfirmed: z.literal(true, {
+    message: "Consent confirmation is required before sending.",
+  }),
+  consentSource: z.string().trim().min(3).max(500),
+  senderName: z.string().trim().max(160).optional(),
 });
 
 type Recipient = z.infer<typeof recipientSchema>;
 type Attachment = z.infer<typeof attachmentSchema>;
 
-// Paid plan quota (Growth). Lifetime bypasses this.
+// Paid plan quota (Premium). Lifetime bypasses this.
 export const GROWTH_QUOTA = 5000;
 
 function applyVars(template: string, r: Recipient) {
@@ -50,8 +62,8 @@ function htmlToPlain(html: string) {
     .trim();
 }
 
-function wrapHtml(inner: string) {
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}</div></body></html>`;
+function wrapHtml(inner: string, footer: string) {
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#888">${footer}</div></div></body></html>`;
 }
 
 function b64url(s: string) {
@@ -76,6 +88,7 @@ function buildRawMime(
   html: string,
   text: string,
   attachments: Attachment[],
+  extraHeaders: string[] = [],
 ) {
   const from = sanitizeHeader(fromRaw);
   const to = sanitizeHeader(toRaw);
@@ -99,6 +112,7 @@ function buildRawMime(
   ].join("\r\n");
 
   const subjectEncoded = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
+  const safeExtra = extraHeaders.map(sanitizeHeader).filter(Boolean);
 
   if (attachments.length === 0) {
     const headers = [
@@ -106,6 +120,7 @@ function buildRawMime(
       `To: ${to}`,
       `Subject: ${subjectEncoded}`,
       "MIME-Version: 1.0",
+      ...safeExtra,
       altPart.split("\r\n")[0],
     ].join("\r\n");
     const body = altPart.split("\r\n").slice(1).join("\r\n");
@@ -118,6 +133,7 @@ function buildRawMime(
     `To: ${to}`,
     `Subject: ${subjectEncoded}`,
     "MIME-Version: 1.0",
+    ...safeExtra,
     `Content-Type: multipart/mixed; boundary="${mixedBoundary}"`,
     "",
     `--${mixedBoundary}`,
@@ -232,6 +248,28 @@ async function countSendsThisPeriod(supabase: any, userId: string): Promise<numb
   return count ?? 0;
 }
 
+function randToken() {
+  const a = new Uint8Array(18);
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 24);
+}
+
+async function ensureUnsubToken(email: string): Promise<string> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const normalized = email.toLowerCase();
+  const { data: existing } = await supabaseAdmin
+    .from("email_unsubscribe_tokens")
+    .select("token")
+    .eq("email", normalized)
+    .maybeSingle();
+  if (existing?.token) return existing.token;
+  const token = randToken();
+  await supabaseAdmin
+    .from("email_unsubscribe_tokens")
+    .insert({ email: normalized, token });
+  return token;
+}
+
 export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -254,7 +292,7 @@ export const sendBulk = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { hasPaid, isLifetime } = await loadEntitlement(context.supabase, context.userId);
     if (!hasPaid) {
-      throw new Error("A paid plan is required to send. Choose Growth or Lifetime on the Billing page.");
+      throw new Error("A paid plan is required to send. Choose Premium or Lifetime on the Billing page.");
     }
 
     const mailbox = await loadUserMailbox(context.userId);
@@ -265,13 +303,31 @@ export const sendBulk = createServerFn({ method: "POST" })
       const remaining = Math.max(0, GROWTH_QUOTA - sent);
       if (data.recipients.length > remaining) {
         throw new Error(
-          `Growth quota: ${GROWTH_QUOTA} emails / period. You have ${remaining} left. Upgrade to Lifetime for unlimited.`,
+          `Premium quota: ${GROWTH_QUOTA} emails / period. You have ${remaining} left. Upgrade to Lifetime for unlimited.`,
         );
       }
     }
 
     if (totalAttachmentBytes(data.attachments) > 20 * 1024 * 1024) {
       throw new Error("Total attachment size exceeds 20MB");
+    }
+
+    // Audit trail: record the consent attestation for this send.
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("email_send_log").insert({
+        recipient_email: `bulk:${data.recipients.length}`,
+        status: "consent_attested",
+        template_name: "bulk_send",
+        metadata: {
+          user_id: context.userId,
+          source: data.consentSource,
+          recipient_count: data.recipients.length,
+          at: new Date().toISOString(),
+        } as any,
+      });
+    } catch {
+      // Non-fatal: continue send even if audit insert fails.
     }
 
     let accessToken: string;
@@ -287,9 +343,30 @@ export const sendBulk = createServerFn({ method: "POST" })
     for (const r of data.recipients) {
       try {
         const subject = applyVars(data.subject, r);
-        const htmlBody = wrapHtml(applyVars(data.bodyHtml, r));
-        const textBody = htmlToPlain(applyVars(data.bodyHtml, r));
-        const raw = buildRawMime(data.from, r.email, subject, htmlBody, textBody, data.attachments);
+        const inner = applyVars(data.bodyHtml, r);
+        const token = await ensureUnsubToken(r.email);
+        const unsubUrl = unsubscribeUrl(token);
+        const footerHtml = complianceFooterHtml({
+          senderName: data.senderName ?? null,
+          senderEmail: mailbox.email,
+          unsubUrl,
+        });
+        const footerText = complianceFooterText({
+          senderName: data.senderName ?? null,
+          senderEmail: mailbox.email,
+          unsubUrl,
+        });
+        const htmlBody = wrapHtml(inner, footerHtml);
+        const textBody = htmlToPlain(inner) + footerText;
+        const raw = buildRawMime(
+          data.from,
+          r.email,
+          subject,
+          htmlBody,
+          textBody,
+          data.attachments,
+          listUnsubscribeHeaders(unsubUrl),
+        );
 
         const resp = await fetch(url, {
           method: "POST",

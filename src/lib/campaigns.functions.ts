@@ -11,6 +11,7 @@ import {
   sendGmailRaw,
   wrapHtml,
 } from "./gmail-send.server";
+import { listUnsubscribeHeaders } from "./compliance-footer";
 
 const createInput = z.object({
   name: z.string().trim().min(1).max(160),
@@ -69,6 +70,18 @@ export const createCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => createInput.parse(i))
   .handler(async ({ data, context }) => {
+    // Consent gate: list must be marked as opt-in.
+    const { data: listRow, error: listErr } = await context.supabase
+      .from("contact_lists")
+      .select("id, consent_confirmed, consent_source")
+      .eq("id", data.listId)
+      .maybeSingle();
+    if (listErr) throw new Error(listErr.message);
+    if (!listRow) throw new Error("Selected list not found");
+    if (!listRow.consent_confirmed) {
+      throw new Error("This list is not marked as opt-in. Open Lists, edit the list, and confirm every recipient consented.");
+    }
+
     // pull contacts for the list
     const { data: contacts, error: cErr } = await context.supabase
       .from("contacts")
@@ -105,6 +118,9 @@ export const createCampaign = createServerFn({ method: "POST" })
         daily_cap: data.dailyCap,
         total_count: clean.length,
         status: "draft",
+        consent_confirmed: true,
+        consent_source: listRow.consent_source,
+        consent_confirmed_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -178,7 +194,7 @@ export const dispatchCampaign = createServerFn({ method: "POST" })
         i.active && (!i.expires_at || new Date(i.expires_at).getTime() > Date.now()),
     );
     if (!paid) {
-      throw new Error("Campaigns require a Pro or Lifetime plan. Upgrade in Billing to launch.");
+      throw new Error("Campaigns require a Premium or Lifetime plan. Upgrade in Billing to launch.");
     }
 
     const mailbox = await loadUserMailbox(context.userId);
@@ -219,7 +235,7 @@ export const dispatchCampaign = createServerFn({ method: "POST" })
       const footer = `You're receiving this because you opted in. <a href="${unsubUrl}" style="color:#888">Unsubscribe</a>.`;
       const html = wrapHtml(inner, footer);
       const text = `${htmlToPlain(inner)}\n\n— Unsubscribe: ${unsubUrl}`;
-      const raw = buildRawMime(fromHeader, r.email, subject, html, text, []);
+      const raw = buildRawMime(fromHeader, r.email, subject, html, text, [], listUnsubscribeHeaders(unsubUrl));
 
       let resp = await sendGmailRaw(accessToken, raw);
       if (resp.status === 401 && mailbox.refresh_token) {

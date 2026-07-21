@@ -1,80 +1,82 @@
+# Consent-Based Paid Email Platform Refactor
 
-## Goal
+Reframe Carrot Mails as a permission-based CRM email tool. Remove all cold-outreach framing, enforce consent everywhere, fix the payment-unlock bug, and make the product review-ready for Google Workspace API verification.
 
-Turn Carrot Mails into a fully paid product with zero free sending. Landing goes straight into the app in a "playground" state, and account + payment are handled silently later. Fix the broken payment unlock so a completed purchase immediately reflects in the UI.
+## 1. Product positioning & copy
 
-## 1. Open, anonymous-first entry
+- Rewrite landing / index (`src/routes/index.tsx`), auth page, sidebar taglines, empty states, feature tiles.
+- Ban words: "cold email", "prospecting", "scrape", "outreach to strangers", "mass mailing", "unsolicited", "20 free sends".
+- Use: "opt-in campaigns", "customer communication", "newsletters to your contacts", "CRM-friendly sending".
+- Add a short compliance blurb ("You may only send to contacts who have consented") on landing, Compose, Lists, and Billing.
+- Update `public/llms.txt`, README, and JSON-LD in `__root.tsx` accordingly.
 
-- Route `/` becomes the app itself (compose + campaigns + templates + lists + forms + mailboxes visible), not the marketing/auth page.
-- No redirect to `/auth` on first load. The `_authenticated` gate stays for anything that reads user-owned data, but the compose UI works fully offline against local state (draft body, subject, recipients, template preview).
-- Everything the user types in the anonymous state is persisted to `localStorage` so it survives the silent signup.
-- `/auth` is kept but only reached through explicit "sign in on another device" from the Profile tab.
+## 2. Anonymous-first entry, silent account
 
-## 2. Silent account creation
+- `/` no longer forces auth. Open directly into the app shell in explore mode (compose, view lists/templates/campaigns, no send).
+- Anonymous local workspace persisted to `localStorage` (`src/lib/local-workspace.ts`).
+- Silent account creation triggered only when the user (a) completes Profile and (b) clicks a paid plan or Connect Mailbox. Uses Supabase email+random password, then immediately signs them in and migrates local state.
+- Keep `/auth` accessible for "sign in from another device" via Profile tab.
 
-- Trigger: user finishes Profile (email + name) AND clicks a paid plan on Billing.
-- Flow: create Supabase user with the profile email + a generated password, immediately sign them in, migrate the local draft/campaign/list/template state into their account, then hand off to the Dodo checkout with the new user id in metadata.
-- Email + magic-link recovery is the "login from another device" path from the Profile tab.
+## 3. Profile tab
 
-## 3. New Profile tab
+- New route `/app/profile` (already scaffolded — polish it): email, display name, subscription-owner email (defaults to account email), optional company.
+- Completion of Profile is a hard prerequisite for payment and mailbox connect.
 
-- New route `/app/profile` (also reachable pre-signup at `/profile` in the anonymous shell).
-- Fields: account email (required, unique), display name, optional company.
-- Completion state is what unlocks the Billing checkout button and mailbox connect.
-- Profile email is the identity used for account, subscription ownership, recovery, and mailbox linking.
+## 4. Rename Pro → Premium
 
-## 4. Remove the free tier
+- Replace "Pro" everywhere in UI, plan tiles, billing helpers, DB seed offers, JSON-LD, sidebar badges. Keep "Lifetime" untouched.
+- Premium = 5,000 sends / period. Lifetime = unlimited.
 
-- Delete the 20-mail demo path in bulk-send + campaigns + UI copy.
-- No sends are possible without an active paid entitlement. Backend `bulk-send` server fn hard-rejects when the caller has no active entitlement, regardless of quota.
+## 5. Fix payment unlock (top priority)
 
-## 5. Send-blocked modal
+- Audit `src/routes/api/public/dodo-webhook.ts`: signature check, event handling, upsert into `billing_entitlements` keyed on `user_id` from `metadata.user_id`.
+- Ensure Dodo checkout session includes `metadata.user_id` and `metadata.plan`.
+- Client: Realtime subscription on `billing_entitlements`/`billing_subscriptions` (already in `useBilling`) + immediate poll of `getBillingStatus` on return to `/app/billing?checkout=success`.
+- "Restore purchase" button calls `reconcileMyPurchases` (already exists, keep fixed sort so `active` wins).
+- On update: invalidate billing queries, flip plan badge, unlock Send, toast + confirmation card.
 
-- Any Send / Schedule / Test Send button first checks: profile complete AND active paid entitlement AND at least one connected mailbox.
-- If any is missing, open a centered playful modal (shadcn Dialog) with a witty message and two CTAs: "Complete profile" and "Choose a plan". Copy: "Whoa, cowboy. Your carrot isn't ripe yet, finish your profile and grab a plan before you launch this into the world."
-- Same modal (different copy) fires from "Connect Mailbox" when no active plan exists, sending the user to Billing first.
+## 6. Send gate & modal
 
-## 6. Fix payment unlock (top priority)
+- Central `canSend({ profile, entitlement, mailbox, consent })` in `src/lib/send-gate.ts`.
+- Reuse `SendBlockedDialog` with witty-but-professional copy. Reasons: `profile`, `plan`, `mailbox`, `consent`, `quota`.
+- Wired to every Send / Schedule / Test-Send / Connect-Mailbox button in Compose, Campaigns, Mailboxes.
 
-Root cause investigation, then fix:
+## 7. Consent enforcement
 
-- Verify `dodo-webhook` route handler: signature check, event mapping (`subscription.active`, `payment.succeeded`, `subscription.renewed`), and that it writes to `billing_entitlements` + `billing_subscriptions` with the right `user_id` from checkout metadata.
-- Confirm the checkout session includes `metadata.user_id` and `metadata.plan`; if missing, webhook cannot attribute the payment.
-- After webhook success, the client must learn about it. Add:
-  - a Supabase Realtime subscription on `billing_entitlements` for the current user in the app shell, and
-  - a fallback poll of a `getMyEntitlement` server fn immediately after returning from checkout (`/app/billing?checkout=success`).
-- On update: invalidate billing queries, flip the plan badge, unlock Send, show a success toast + confirmation card.
-- Backfill: add a "Restore purchase" button on Billing that calls a `reconcileMyPurchases` server fn which asks Dodo for this customer's active subscriptions and upserts entitlements. This unblocks the user who already paid.
+- DB migration: add `consent_confirmed boolean NOT NULL DEFAULT false`, `consent_source text`, `consent_confirmed_at timestamptz` on `contact_lists` and `campaigns`. Add `consent_confirmed_at timestamptz` on `contacts`.
+- Lists UI: require a checkbox "I confirm every recipient in this list has opted in to receive commercial email from me" + free-text `consent_source` (e.g. "Signup form Feb 2025") before the list can be used.
+- Campaign compose: cannot select a list unless the list is consent-confirmed. Show a consent banner on Campaign detail.
+- Bulk-send server fn (`src/lib/bulk-send.functions.ts`) hard-rejects if list/campaign has no `consent_confirmed`.
+- Recipient import: block CSVs unless the user re-confirms consent at import time. Store `consent_source` on the list.
+- Manual add: single-recipient sends require a per-send consent confirmation.
 
-## 7. Plan rename + quota UI
+## 8. Compliance email footer & unsubscribe
 
-- Rename "Pro" → "Growth" everywhere (UI copy, product config, billing helpers). Keep "Lifetime" name.
-- Persistent plan badge in the sidebar footer: `Growth · 4,213 / 5,000 sends left` or `Lifetime · Unlimited`.
-- Quota bar visible on Billing and on the Compose screen header.
-- Growth quota = 5000 emails / billing period, decremented by `bulk-send` per successful recipient. Lifetime bypasses the counter and shows "Unlimited".
-- Values update instantly via Realtime + query invalidation after each send batch and after the payment webhook fires.
+- Every outgoing email auto-appends an HTML+text footer with sender identity (from Profile: display name, business email) and a `List-Unsubscribe` header + one-click unsubscribe URL using existing `email_unsubscribe_tokens`.
+- `List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click` per Gmail sender guidelines.
+- Footer template stored in a shared helper `src/lib/compliance-footer.ts`.
+
+## 9. Remove free tier
+
+- Delete "20 free sends" logic and copy from `bulk-send.functions.ts`, `campaigns.functions.ts`, Compose, landing.
+- Backend hard-rejects send when caller has no active paid entitlement, regardless of count.
+
+## 10. Verification readiness
+
+- Add a `REVIEWER.md` at repo root with test account credentials, walkthrough steps, and screenshots list.
+- Seed a dedicated reviewer test account (documented) with Premium entitlement pre-provisioned.
+- Ensure the OAuth consent flow only requests `openid email profile gmail.send` (already trimmed).
+- Add an in-app "Compliance" info card on Billing summarizing consent rules and unsubscribe handling.
 
 ## Technical section
 
-- Routes
-  - `src/routes/index.tsx`: replace landing with a lightweight redirect into the anonymous app shell.
-  - New `src/routes/_public_app/` layout mirroring the sidebar but not gated; children reuse the compose/campaigns/templates/lists/forms components in "local mode".
-  - `src/routes/_authenticated/app.profile.tsx` (and public twin) for the Profile tab.
-- State
-  - `src/lib/local-workspace.ts`: typed `localStorage` shim for anonymous drafts, lists, templates.
-  - On sign-in, `migrateLocalWorkspace()` server fn ingests the JSON blob into the user's tables.
-- Billing
-  - `src/lib/billing.functions.ts`: add `getMyEntitlement`, `reconcileMyPurchases`, `consumeQuota`.
-  - `src/routes/api/public/dodo-webhook.ts`: verify signature, upsert into `billing_entitlements` keyed on `user_id`, set `plan='growth'|'lifetime'`, `quota_remaining=5000` for growth, `unlimited=true` for lifetime.
-  - Migration: ensure `billing_entitlements` has `plan text`, `quota_remaining int`, `unlimited bool`, `period_end timestamptz`, unique on `user_id`; add realtime publication.
-  - Realtime hook `useMyEntitlement()` subscribes and feeds the sidebar badge + Send gate.
-- Send gate
-  - `src/lib/send-gate.ts`: `canSend({ profile, entitlement, mailboxes })` returns `{ ok, reason }`.
-  - `<SendBlockedDialog />` shared component wired into every Send/Connect Mailbox button.
-- Cleanup
-  - Remove free-tier branches from `bulk-send.functions.ts`, `campaigns.functions.ts`, and any "20 free" copy in UI.
-  - Replace all "Pro" strings with "Growth".
+- **Routes/UI:** `src/routes/index.tsx` (explore-mode redirect), polish `_authenticated/app.profile.tsx`, Compose + Campaign forms gain consent step, Lists gain consent modal.
+- **DB migration:** columns above + backfill existing rows to `consent_confirmed=false` and force re-confirmation. Realtime already on billing tables.
+- **Server fns:** update `lists.functions.ts`, `campaigns.functions.ts`, `bulk-send.functions.ts`, `mailboxes.functions.ts` for consent+plan gates. Confirm `billing.functions.ts` webhook + reconcile logic.
+- **Local workspace:** `src/lib/local-workspace.ts` + `migrateLocalWorkspace` server fn called on first sign-in.
+- **Copy sweep:** grep-and-replace across `src/routes/**`, `src/components/**` for banned terms; regenerate `public/llms.txt`.
+- **Send helper:** `src/lib/compliance-footer.ts` injects footer + `List-Unsubscribe` headers into `gmail-send.server.ts`.
 
-## Out of scope for this pass
+## Out of scope
 
-- Team seats, per-mailbox quotas, annual vs monthly pricing changes, marketing site redesign.
+- New pricing tiers, team seats, non-Gmail providers, marketing site redesign, custom Google OAuth branding (already deferred).
