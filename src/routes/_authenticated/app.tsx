@@ -1,9 +1,11 @@
 import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { CarrotLogo } from "@/components/CarrotLogo";
 import { useBilling, planLabel } from "@/hooks/useEntitlement";
+import { useTheme } from "@/hooks/useTheme";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
@@ -28,6 +30,7 @@ function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string | null>(null);
   const { data: billing } = useBilling();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
@@ -44,6 +47,14 @@ function AppShell() {
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border px-6 py-7 md:flex">
           <div className="mb-10 flex items-center justify-between">
             <Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={38} /></Link>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="rounded-md p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </div>
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n) => {
