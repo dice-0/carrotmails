@@ -10,6 +10,10 @@ const contactInput = z.object({
 const importInput = z.object({
   name: z.string().trim().min(1).max(120),
   contacts: z.array(contactInput).min(1).max(5000),
+  consentConfirmed: z.literal(true, {
+    message: "You must confirm every contact opted in before importing.",
+  }),
+  consentSource: z.string().trim().min(3).max(500),
 });
 
 export const listContactLists = createServerFn({ method: "GET" })
@@ -17,7 +21,7 @@ export const listContactLists = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("contact_lists")
-      .select("id, name, contact_count, created_at, updated_at")
+      .select("id, name, contact_count, created_at, updated_at, consent_confirmed, consent_source, consent_confirmed_at")
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -58,16 +62,26 @@ export const importContactList = createServerFn({ method: "POST" })
 
     const { data: list, error: listError } = await context.supabase
       .from("contact_lists")
-      .insert({ name: data.name, user_id: context.userId, contact_count: clean.length })
-      .select("id, name, contact_count, created_at, updated_at")
+      .insert({
+        name: data.name,
+        user_id: context.userId,
+        contact_count: clean.length,
+        consent_confirmed: true,
+        consent_source: data.consentSource,
+        consent_confirmed_at: new Date().toISOString(),
+      })
+      .select("id, name, contact_count, created_at, updated_at, consent_confirmed, consent_source, consent_confirmed_at")
       .single();
     if (listError) throw new Error(listError.message);
 
+    const nowIso = new Date().toISOString();
     const rows = clean.map((email) => ({
       list_id: list.id,
       user_id: context.userId,
       email,
       vars: unique.get(email) ?? {},
+      consent_source: data.consentSource,
+      consent_confirmed_at: nowIso,
     }));
     for (let i = 0; i < rows.length; i += 500) {
       const { error } = await context.supabase.from("contacts").insert(rows.slice(i, i + 500));
