@@ -1,9 +1,11 @@
 import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { CarrotLogo } from "@/components/CarrotLogo";
 import { useBilling, planLabel } from "@/hooks/useEntitlement";
+import { useTheme } from "@/hooks/useTheme";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
