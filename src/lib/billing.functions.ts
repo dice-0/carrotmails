@@ -243,7 +243,16 @@ export const reconcileMyPurchases = createServerFn({ method: "POST" })
           data?: Array<any>;
         };
         const items = subsBody.items ?? subsBody.data ?? [];
-        for (const s of items) {
+        // Prefer the most recently created active/trialing subscription so that
+        // an older failed/cancelled sub can't overwrite the entitlement row.
+        const sorted = [...items].sort((a, b) => {
+          const ax = ACTIVE_SUBSCRIPTION_STATUSES.includes(a.status ?? "") ? 1 : 0;
+          const bx = ACTIVE_SUBSCRIPTION_STATUSES.includes(b.status ?? "") ? 1 : 0;
+          if (ax !== bx) return bx - ax;
+          return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
+        });
+        let entitlementWritten = false;
+        for (const s of sorted) {
           const status: string = s.status ?? "active";
           const productId: string | undefined = s.product_id ?? s.product?.product_id;
           const subId: string | undefined = s.subscription_id ?? s.id;
@@ -262,16 +271,19 @@ export const reconcileMyPurchases = createServerFn({ method: "POST" })
               { onConflict: "provider_subscription_id" },
             );
             const active = ACTIVE_SUBSCRIPTION_STATUSES.includes(status);
-            await supabaseAdmin.from("billing_entitlements").upsert(
-              {
-                user_id: userId,
-                entitlement: "pro",
-                source_id: subId,
-                active,
-                expires_at: s.next_billing_date ?? null,
-              },
-              { onConflict: "user_id,entitlement" },
-            );
+            if (!entitlementWritten && active) {
+              await supabaseAdmin.from("billing_entitlements").upsert(
+                {
+                  user_id: userId,
+                  entitlement: "pro",
+                  source_id: subId,
+                  active: true,
+                  expires_at: s.next_billing_date ?? null,
+                },
+                { onConflict: "user_id,entitlement" },
+              );
+              entitlementWritten = true;
+            }
             changed = true;
           }
         }
