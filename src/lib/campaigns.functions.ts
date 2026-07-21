@@ -69,6 +69,18 @@ export const createCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => createInput.parse(i))
   .handler(async ({ data, context }) => {
+    // Consent gate: list must be marked as opt-in.
+    const { data: listRow, error: listErr } = await context.supabase
+      .from("contact_lists")
+      .select("id, consent_confirmed, consent_source")
+      .eq("id", data.listId)
+      .maybeSingle();
+    if (listErr) throw new Error(listErr.message);
+    if (!listRow) throw new Error("Selected list not found");
+    if (!listRow.consent_confirmed) {
+      throw new Error("This list is not marked as opt-in. Open Lists, edit the list, and confirm every recipient consented.");
+    }
+
     // pull contacts for the list
     const { data: contacts, error: cErr } = await context.supabase
       .from("contacts")
@@ -105,6 +117,9 @@ export const createCampaign = createServerFn({ method: "POST" })
         daily_cap: data.dailyCap,
         total_count: clean.length,
         status: "draft",
+        consent_confirmed: true,
+        consent_source: listRow.consent_source,
+        consent_confirmed_at: new Date().toISOString(),
       })
       .select()
       .single();
