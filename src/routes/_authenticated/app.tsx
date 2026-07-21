@@ -30,6 +30,7 @@ function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string | null>(null);
   const { data: billing } = useBilling();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
