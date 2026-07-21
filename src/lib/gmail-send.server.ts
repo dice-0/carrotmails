@@ -70,10 +70,12 @@ export function buildRawMime(
   html: string,
   text: string,
   attachments: Attachment[],
+  extraHeaders: string[] = [],
 ) {
   const safeFrom = sanitizeHeader(from);
   const safeTo = sanitizeHeader(to);
   const safeSubject = sanitizeHeader(subject);
+  const safeExtra = (extraHeaders ?? []).map(sanitizeHeader).filter(Boolean);
   const altBoundary = "alt_" + Math.random().toString(36).slice(2);
   const altPart = [
     `Content-Type: multipart/alternative; boundary="${altBoundary}"`,
@@ -99,6 +101,7 @@ export function buildRawMime(
       `To: ${safeTo}`,
       `Subject: ${subjectEncoded}`,
       "MIME-Version: 1.0",
+      ...safeExtra,
       altPart.split("\r\n")[0],
     ].join("\r\n");
     const body = altPart.split("\r\n").slice(1).join("\r\n");
@@ -111,6 +114,7 @@ export function buildRawMime(
     `To: ${safeTo}`,
     `Subject: ${subjectEncoded}`,
     "MIME-Version: 1.0",
+    ...safeExtra,
     `Content-Type: multipart/mixed; boundary="${mixedBoundary}"`,
     "",
     `--${mixedBoundary}`,

@@ -107,7 +107,7 @@ function BillingPage() {
     <AppPage
       eyebrow="Account"
       title="Plans and billing"
-      description="Growth is a monthly plan with 5,000 sends. Lifetime is a one-time payment with unlimited sending, capped to the first 100 buyers."
+      description="Premium is a monthly plan with 5,000 opt-in sends. Lifetime is a one-time payment with unlimited sending, capped to the first 100 buyers. Carrot Mails is permission-based only, every recipient must have opted in."
       action={
         tier !== "none" ? (
           <Button variant="outline" onClick={portal} disabled={pending !== null}>{pending === "portal" ? "Opening…" : "Manage billing"}</Button>
@@ -190,7 +190,7 @@ function BillingPage() {
               <div className="mt-3 flex items-end gap-2"><span className="text-4xl font-semibold">$49.50</span><span className="pb-1 text-sm text-muted-foreground">once</span></div>
               <ul className="mt-8 space-y-3 text-sm">
                 <li><span className="font-medium">Unlimited emails</span>, forever</li>
-                <li>Everything in Growth, plus every future feature</li>
+                <li>Everything in Premium, plus every future feature</li>
                 <li>No recurring software fee</li>
                 <li>Available to the first 100 buyers only</li>
               </ul>

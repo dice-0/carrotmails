@@ -11,6 +11,7 @@ import {
   sendGmailRaw,
   wrapHtml,
 } from "./gmail-send.server";
+import { listUnsubscribeHeaders } from "./compliance-footer";
 
 const createInput = z.object({
   name: z.string().trim().min(1).max(160),
@@ -193,7 +194,7 @@ export const dispatchCampaign = createServerFn({ method: "POST" })
         i.active && (!i.expires_at || new Date(i.expires_at).getTime() > Date.now()),
     );
     if (!paid) {
-      throw new Error("Campaigns require a Pro or Lifetime plan. Upgrade in Billing to launch.");
+      throw new Error("Campaigns require a Premium or Lifetime plan. Upgrade in Billing to launch.");
     }
 
     const mailbox = await loadUserMailbox(context.userId);
@@ -234,7 +235,7 @@ export const dispatchCampaign = createServerFn({ method: "POST" })
       const footer = `You're receiving this because you opted in. <a href="${unsubUrl}" style="color:#888">Unsubscribe</a>.`;
       const html = wrapHtml(inner, footer);
       const text = `${htmlToPlain(inner)}\n\n— Unsubscribe: ${unsubUrl}`;
-      const raw = buildRawMime(fromHeader, r.email, subject, html, text, []);
+      const raw = buildRawMime(fromHeader, r.email, subject, html, text, [], listUnsubscribeHeaders(unsubUrl));
 
       let resp = await sendGmailRaw(accessToken, raw);
       if (resp.status === 401 && mailbox.refresh_token) {
