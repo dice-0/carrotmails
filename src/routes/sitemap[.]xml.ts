@@ -17,6 +17,13 @@ export const Route = createFileRoute("/sitemap.xml")({
         const today = new Date().toISOString().slice(0, 10);
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0", lastmod: today },
+          { path: "/consent-based-email-marketing", changefreq: "monthly", priority: "0.9", lastmod: today },
+          { path: "/gmail-bulk-email-sender", changefreq: "monthly", priority: "0.9", lastmod: today },
+          { path: "/one-click-unsubscribe-email", changefreq: "monthly", priority: "0.9", lastmod: today },
+          { path: "/blog", changefreq: "weekly", priority: "0.8", lastmod: today },
+          { path: "/blog/gmail-bulk-sender-rules-2024", changefreq: "monthly", priority: "0.7", lastmod: today },
+          { path: "/blog/how-to-capture-email-consent", changefreq: "monthly", priority: "0.7", lastmod: today },
+          { path: "/blog/why-cold-email-is-dying", changefreq: "monthly", priority: "0.7", lastmod: today },
           { path: "/auth", changefreq: "monthly", priority: "0.5", lastmod: today },
           { path: "/privacy", changefreq: "yearly", priority: "0.3", lastmod: today },
           { path: "/terms", changefreq: "yearly", priority: "0.3", lastmod: today },
