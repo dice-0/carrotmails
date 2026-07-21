@@ -47,6 +47,14 @@ function AppShell() {
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border px-6 py-7 md:flex">
           <div className="mb-10 flex items-center justify-between">
             <Link to="/app" aria-label="Carrot Mails home"><CarrotLogo size={38} /></Link>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="rounded-md p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </div>
           <nav className="flex flex-col gap-1 font-mono text-xs uppercase tracking-widest">
             {NAV.map((n) => {
