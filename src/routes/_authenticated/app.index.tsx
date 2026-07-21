@@ -106,6 +106,8 @@ function Index() {
   );
   const [raw, setRaw] = usePersistentState("cm:compose:recipients", "email,name\n");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [consent, setConsent] = usePersistentState("cm:compose:consent", false);
+  const [consentSource, setConsentSource] = usePersistentState("cm:compose:consentSource", "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<null | { sent: number; failed: number; results: { email: string; ok: boolean; error?: string }[] }>(null);
@@ -125,12 +127,14 @@ function Index() {
   const hasMailbox = Boolean(profile?.email);
   const isLifetime = billing?.tier === "lifetime";
   const remaining = billing?.quotaRemaining ?? 0;
+  const consentReady = consent && consentSource.trim().length >= 3;
 
   function attemptSend() {
     if (!profileComplete && !hasPaid) return setBlockReason("profile-and-plan");
     if (!profileComplete) return setBlockReason("profile");
     if (!hasPaid) return setBlockReason("plan");
     if (!hasMailbox) return setBlockReason("mailbox");
+    if (!consentReady) return setBlockReason("consent");
     if (!isLifetime && parsed.rows.length > remaining) return setBlockReason("quota");
     void handleSend();
   }
@@ -147,6 +151,9 @@ function Index() {
           bodyHtml,
           recipients: parsed.rows,
           attachments: attachments.map(({ filename, contentType, dataBase64 }) => ({ filename, contentType, dataBase64 })),
+          consentConfirmed: true as const,
+          consentSource: consentSource.trim(),
+          senderName: fromName.trim() || undefined,
         },
       });
       setResult(r);
