@@ -271,6 +271,9 @@ export type Database = {
       campaigns: {
         Row: {
           body_html: string
+          consent_confirmed: boolean
+          consent_confirmed_at: string | null
+          consent_source: string | null
           created_at: string
           daily_cap: number
           failed_count: number
@@ -293,6 +296,9 @@ export type Database = {
         }
         Insert: {
           body_html?: string
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           created_at?: string
           daily_cap?: number
           failed_count?: number
@@ -315,6 +321,9 @@ export type Database = {
         }
         Update: {
           body_html?: string
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           created_at?: string
           daily_cap?: number
           failed_count?: number
@@ -354,6 +363,9 @@ export type Database = {
       }
       contact_lists: {
         Row: {
+          consent_confirmed: boolean
+          consent_confirmed_at: string | null
+          consent_source: string | null
           contact_count: number
           created_at: string
           id: string
@@ -362,6 +374,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           contact_count?: number
           created_at?: string
           id?: string
@@ -370,6 +385,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           contact_count?: number
           created_at?: string
           id?: string
@@ -381,6 +399,8 @@ export type Database = {
       }
       contacts: {
         Row: {
+          consent_confirmed_at: string | null
+          consent_source: string | null
           created_at: string
           email: string
           id: string
@@ -389,6 +409,8 @@ export type Database = {
           vars: Json
         }
         Insert: {
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           created_at?: string
           email: string
           id?: string
@@ -397,6 +419,8 @@ export type Database = {
           vars?: Json
         }
         Update: {
+          consent_confirmed_at?: string | null
+          consent_source?: string | null
           created_at?: string
           email?: string
           id?: string
