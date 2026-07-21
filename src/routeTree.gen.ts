@@ -13,11 +13,18 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OneClickUnsubscribeEmailRouteImport } from './routes/one-click-unsubscribe-email'
+import { Route as GmailBulkEmailSenderRouteImport } from './routes/gmail-bulk-email-sender'
+import { Route as ConsentBasedEmailMarketingRouteImport } from './routes/consent-based-email-marketing'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UTokenRouteImport } from './routes/u.$token'
 import { Route as FSlugRouteImport } from './routes/f.$slug'
+import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-cold-email-is-dying'
+import { Route as BlogHowToCaptureEmailConsentRouteImport } from './routes/blog.how-to-capture-email-consent'
+import { Route as BlogGmailBulkSenderRules2024RouteImport } from './routes/blog.gmail-bulk-sender-rules-2024'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
@@ -53,6 +60,28 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OneClickUnsubscribeEmailRoute =
+  OneClickUnsubscribeEmailRouteImport.update({
+    id: '/one-click-unsubscribe-email',
+    path: '/one-click-unsubscribe-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GmailBulkEmailSenderRoute = GmailBulkEmailSenderRouteImport.update({
+  id: '/gmail-bulk-email-sender',
+  path: '/gmail-bulk-email-sender',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsentBasedEmailMarketingRoute =
+  ConsentBasedEmailMarketingRouteImport.update({
+    id: '/consent-based-email-marketing',
+    path: '/consent-based-email-marketing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -77,6 +106,23 @@ const FSlugRoute = FSlugRouteImport.update({
   path: '/f/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogWhyColdEmailIsDyingRoute = BlogWhyColdEmailIsDyingRouteImport.update({
+  id: '/why-cold-email-is-dying',
+  path: '/why-cold-email-is-dying',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogHowToCaptureEmailConsentRoute =
+  BlogHowToCaptureEmailConsentRouteImport.update({
+    id: '/how-to-capture-email-consent',
+    path: '/how-to-capture-email-consent',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogGmailBulkSenderRules2024Route =
+  BlogGmailBulkSenderRules2024RouteImport.update({
+    id: '/gmail-bulk-sender-rules-2024',
+    path: '/gmail-bulk-sender-rules-2024',
+    getParentRoute: () => BlogRoute,
+  } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -156,11 +202,18 @@ const ApiPublicOauthGoogleCallbackRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRouteWithChildren
+  '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
+  '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
+  '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
+  '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
@@ -180,10 +233,17 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRouteWithChildren
+  '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
+  '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
+  '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
+  '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
@@ -205,11 +265,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRouteWithChildren
+  '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
+  '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
+  '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
+  '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
   '/_authenticated/app/billing': typeof AuthenticatedAppBillingRoute
@@ -231,11 +298,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/blog'
+    | '/consent-based-email-marketing'
+    | '/gmail-bulk-email-sender'
+    | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
     | '/app'
+    | '/blog/gmail-bulk-sender-rules-2024'
+    | '/blog/how-to-capture-email-consent'
+    | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
     | '/app/billing'
@@ -255,10 +329,17 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/blog'
+    | '/consent-based-email-marketing'
+    | '/gmail-bulk-email-sender'
+    | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/blog/gmail-bulk-sender-rules-2024'
+    | '/blog/how-to-capture-email-consent'
+    | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
     | '/app/billing'
@@ -279,11 +360,18 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/blog'
+    | '/consent-based-email-marketing'
+    | '/gmail-bulk-email-sender'
+    | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/app'
+    | '/blog/gmail-bulk-sender-rules-2024'
+    | '/blog/how-to-capture-email-consent'
+    | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
     | '/_authenticated/app/billing'
@@ -305,6 +393,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BlogRoute: typeof BlogRouteWithChildren
+  ConsentBasedEmailMarketingRoute: typeof ConsentBasedEmailMarketingRoute
+  GmailBulkEmailSenderRoute: typeof GmailBulkEmailSenderRoute
+  OneClickUnsubscribeEmailRoute: typeof OneClickUnsubscribeEmailRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -348,6 +440,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/one-click-unsubscribe-email': {
+      id: '/one-click-unsubscribe-email'
+      path: '/one-click-unsubscribe-email'
+      fullPath: '/one-click-unsubscribe-email'
+      preLoaderRoute: typeof OneClickUnsubscribeEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gmail-bulk-email-sender': {
+      id: '/gmail-bulk-email-sender'
+      path: '/gmail-bulk-email-sender'
+      fullPath: '/gmail-bulk-email-sender'
+      preLoaderRoute: typeof GmailBulkEmailSenderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consent-based-email-marketing': {
+      id: '/consent-based-email-marketing'
+      path: '/consent-based-email-marketing'
+      fullPath: '/consent-based-email-marketing'
+      preLoaderRoute: typeof ConsentBasedEmailMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -382,6 +502,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/f/$slug'
       preLoaderRoute: typeof FSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/why-cold-email-is-dying': {
+      id: '/blog/why-cold-email-is-dying'
+      path: '/why-cold-email-is-dying'
+      fullPath: '/blog/why-cold-email-is-dying'
+      preLoaderRoute: typeof BlogWhyColdEmailIsDyingRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/how-to-capture-email-consent': {
+      id: '/blog/how-to-capture-email-consent'
+      path: '/how-to-capture-email-consent'
+      fullPath: '/blog/how-to-capture-email-consent'
+      preLoaderRoute: typeof BlogHowToCaptureEmailConsentRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/gmail-bulk-sender-rules-2024': {
+      id: '/blog/gmail-bulk-sender-rules-2024'
+      path: '/gmail-bulk-sender-rules-2024'
+      fullPath: '/blog/gmail-bulk-sender-rules-2024'
+      preLoaderRoute: typeof BlogGmailBulkSenderRules2024RouteImport
+      parentRoute: typeof BlogRoute
     }
     '/_authenticated/app': {
       id: '/_authenticated/app'
@@ -520,10 +661,28 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface BlogRouteChildren {
+  BlogGmailBulkSenderRules2024Route: typeof BlogGmailBulkSenderRules2024Route
+  BlogHowToCaptureEmailConsentRoute: typeof BlogHowToCaptureEmailConsentRoute
+  BlogWhyColdEmailIsDyingRoute: typeof BlogWhyColdEmailIsDyingRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogGmailBulkSenderRules2024Route: BlogGmailBulkSenderRules2024Route,
+  BlogHowToCaptureEmailConsentRoute: BlogHowToCaptureEmailConsentRoute,
+  BlogWhyColdEmailIsDyingRoute: BlogWhyColdEmailIsDyingRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  BlogRoute: BlogRouteWithChildren,
+  ConsentBasedEmailMarketingRoute: ConsentBasedEmailMarketingRoute,
+  GmailBulkEmailSenderRoute: GmailBulkEmailSenderRoute,
+  OneClickUnsubscribeEmailRoute: OneClickUnsubscribeEmailRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
