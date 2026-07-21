@@ -254,20 +254,19 @@ function randToken() {
   return Array.from(a, (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 24);
 }
 
-async function ensureUnsubToken(userId: string, email: string): Promise<string> {
+async function ensureUnsubToken(email: string): Promise<string> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const normalized = email.toLowerCase();
   const { data: existing } = await supabaseAdmin
     .from("email_unsubscribe_tokens")
     .select("token")
-    .eq("user_id", userId)
     .eq("email", normalized)
     .maybeSingle();
   if (existing?.token) return existing.token;
   const token = randToken();
   await supabaseAdmin
     .from("email_unsubscribe_tokens")
-    .insert({ user_id: userId, email: normalized, token });
+    .insert({ email: normalized, token });
   return token;
 }
 
