@@ -316,15 +316,16 @@ export const sendBulk = createServerFn({ method: "POST" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("email_send_log").insert({
-        user_id: context.userId,
-        event: "consent_attested",
-        message_id: null,
-        details: {
+        recipient_email: `bulk:${data.recipients.length}`,
+        status: "consent_attested",
+        template_name: "bulk_send",
+        metadata: {
+          user_id: context.userId,
           source: data.consentSource,
           recipient_count: data.recipients.length,
           at: new Date().toISOString(),
         } as any,
-      }).select().maybeSingle();
+      });
     } catch {
       // Non-fatal: continue send even if audit insert fails.
     }
@@ -343,7 +344,7 @@ export const sendBulk = createServerFn({ method: "POST" })
       try {
         const subject = applyVars(data.subject, r);
         const inner = applyVars(data.bodyHtml, r);
-        const token = await ensureUnsubToken(context.userId, r.email);
+        const token = await ensureUnsubToken(r.email);
         const unsubUrl = unsubscribeUrl(token);
         const footerHtml = complianceFooterHtml({
           senderName: data.senderName ?? null,
