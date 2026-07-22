@@ -41,15 +41,23 @@ function AuthPage() {
     let mounted = true;
     const isRealUser = (u: { is_anonymous?: boolean } | null | undefined) =>
       !!u && !u.is_anonymous;
+    const consumeRedirect = (): string => {
+      try {
+        const v = sessionStorage.getItem("post_signin_redirect");
+        if (v) sessionStorage.removeItem("post_signin_redirect");
+        if (v && v.startsWith("/") && !v.startsWith("//")) return v;
+      } catch { /* ignore */ }
+      return "/app";
+    };
     supabase.auth.getUser().then(({ data }) => {
-      if (mounted && isRealUser(data.user)) navigate({ to: "/app" });
+      if (mounted && isRealUser(data.user)) navigate({ to: consumeRedirect() });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (
         (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED") &&
         isRealUser(session?.user)
       ) {
-        navigate({ to: "/app" });
+        navigate({ to: consumeRedirect() });
       }
     });
     return () => {
