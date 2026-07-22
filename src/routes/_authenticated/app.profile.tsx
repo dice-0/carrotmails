@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { AppPage } from "@/components/AppPage";
 import { Button } from "@/components/ui/button";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
+
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
   head: () => ({
