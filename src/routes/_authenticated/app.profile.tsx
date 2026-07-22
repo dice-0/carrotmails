@@ -29,6 +29,10 @@ function ProfilePage() {
 
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [isAnon, setIsAnon] = useState(false);
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
+  const [googleBusy, setGoogleBusy] = useState(false);
+  const [verifyBusy, setVerifyBusy] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -36,6 +40,53 @@ function ProfilePage() {
       setDisplayName(data.display_name ?? "");
     }
   }, [data]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAnon(!!data.user?.is_anonymous);
+      setAuthEmail(data.user?.email ?? null);
+    });
+  }, []);
+
+  async function handleGoogle() {
+    setGoogleBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/auth",
+        extraParams: { prompt: "select_account" },
+      });
+      if (result.error) toast.error(result.error.message ?? "Google sign-in failed.");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setGoogleBusy(false);
+    }
+  }
+
+  async function handleVerify() {
+    const target = email.trim();
+    if (!target) {
+      toast.error("Enter your email first.");
+      return;
+    }
+    setVerifyBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: target,
+        options: { emailRedirectTo: window.location.origin + "/auth" },
+      });
+      if (error) throw error;
+      toast.success("Verification link sent. Check your inbox.");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setVerifyBusy(false);
+    }
+  }
+
+  const needsLink = isAnon || !authEmail;
+  const emailVerified = !!authEmail && authEmail.toLowerCase() === email.trim().toLowerCase();
+
 
   const save = useMutation({
     mutationFn: () => update({ data: { email: email.trim(), display_name: displayName.trim() } }),
