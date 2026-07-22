@@ -88,10 +88,13 @@ function ProfilePage() {
       // account created on another device), the link signs you INTO that
       // account — which is what "verify this is me" should do. If none exists,
       // Supabase creates one.
+      // Always send magic links to the production origin so the link never
+      // lands on a Lovable preview URL (which is behind Lovable's auth wall).
+      const APP_ORIGIN = "https://carrotmails.work";
       const { error } = await supabase.auth.signInWithOtp({
         email: target,
         options: {
-          emailRedirectTo: window.location.origin + "/auth",
+          emailRedirectTo: APP_ORIGIN + "/auth",
           shouldCreateUser: true,
         },
       });
