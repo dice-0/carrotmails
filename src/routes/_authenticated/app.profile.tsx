@@ -52,7 +52,7 @@ function ProfilePage() {
     setGoogleBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/auth",
+        redirect_uri: window.location.origin + "/app/profile",
         extraParams: { prompt: "select_account" },
       });
       if (result.error) toast.error(result.error.message ?? "Google sign-in failed.");
@@ -71,18 +71,32 @@ function ProfilePage() {
     }
     setVerifyBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: target,
-        options: { emailRedirectTo: window.location.origin + "/auth" },
-      });
+      // If the user is anonymous or has no auth email yet, attach this email to
+      // the account. Supabase sends a confirmation link to the address; clicking
+      // it verifies ownership and links it to the current user.
+      if (isAnon || !authEmail) {
+        const { error } = await supabase.auth.updateUser(
+          { email: target },
+          { emailRedirectTo: window.location.origin + "/app/profile" },
+        );
+        if (error) throw error;
+        toast.success("Verification link sent. Open it from your inbox to confirm.");
+        return;
+      }
+      // Signed-in user changing their email: same updateUser flow.
+      const { error } = await supabase.auth.updateUser(
+        { email: target },
+        { emailRedirectTo: window.location.origin + "/app/profile" },
+      );
       if (error) throw error;
-      toast.success("Verification link sent. Check your inbox.");
+      toast.success("Confirmation link sent to the new address.");
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
       setVerifyBusy(false);
     }
   }
+
 
   const needsLink = isAnon || !authEmail;
   const emailVerified = !!authEmail && authEmail.toLowerCase() === email.trim().toLowerCase();
