@@ -39,11 +39,16 @@ function AuthPage() {
 
   useEffect(() => {
     let mounted = true;
+    const isRealUser = (u: { is_anonymous?: boolean } | null | undefined) =>
+      !!u && !u.is_anonymous;
     supabase.auth.getUser().then(({ data }) => {
-      if (mounted && data.user) navigate({ to: "/app" });
+      if (mounted && isRealUser(data.user)) navigate({ to: "/app" });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session?.user) {
+      if (
+        (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED") &&
+        isRealUser(session?.user)
+      ) {
         navigate({ to: "/app" });
       }
     });
@@ -52,6 +57,7 @@ function AuthPage() {
       subscription.unsubscribe();
     };
   }, [navigate]);
+
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
