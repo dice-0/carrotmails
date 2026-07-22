@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OneClickUnsubscribeEmailRouteImport } from './routes/one-click-unsubscribe-email'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as GmailBulkEmailSenderRouteImport } from './routes/gmail-bulk-email-sender'
 import { Route as ConsentBasedEmailMarketingRouteImport } from './routes/consent-based-email-marketing'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -26,6 +27,8 @@ import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-c
 import { Route as BlogHowToCaptureEmailConsentRouteImport } from './routes/blog.how-to-capture-email-consent'
 import { Route as BlogGmailBulkSenderRules2024RouteImport } from './routes/blog.gmail-bulk-sender-rules-2024'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
@@ -35,6 +38,7 @@ import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppFormsRouteImport } from './routes/_authenticated/app.forms'
 import { Route as AuthenticatedAppCampaignsRouteImport } from './routes/_authenticated/app.campaigns'
 import { Route as AuthenticatedAppBillingRouteImport } from './routes/_authenticated/app.billing'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -66,6 +70,11 @@ const OneClickUnsubscribeEmailRoute =
     path: '/one-click-unsubscribe-email',
     getParentRoute: () => rootRouteImport,
   } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GmailBulkEmailSenderRoute = GmailBulkEmailSenderRouteImport.update({
   id: '/gmail-bulk-email-sender',
   path: '/gmail-bulk-email-sender',
@@ -128,6 +137,18 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -176,6 +197,12 @@ const AuthenticatedAppBillingRoute = AuthenticatedAppBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -205,17 +232,21 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
   '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/mcp': typeof McpRoute
   '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -236,16 +267,20 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRouteWithChildren
   '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
   '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/mcp': typeof McpRoute
   '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -268,17 +303,21 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/consent-based-email-marketing': typeof ConsentBasedEmailMarketingRoute
   '/gmail-bulk-email-sender': typeof GmailBulkEmailSenderRoute
+  '/mcp': typeof McpRoute
   '/one-click-unsubscribe-email': typeof OneClickUnsubscribeEmailRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/app/billing': typeof AuthenticatedAppBillingRoute
   '/_authenticated/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/_authenticated/app/forms': typeof AuthenticatedAppFormsRoute
@@ -301,17 +340,21 @@ export interface FileRouteTypes {
     | '/blog'
     | '/consent-based-email-marketing'
     | '/gmail-bulk-email-sender'
+    | '/mcp'
     | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/app'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -332,16 +375,20 @@ export interface FileRouteTypes {
     | '/blog'
     | '/consent-based-email-marketing'
     | '/gmail-bulk-email-sender'
+    | '/mcp'
     | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -363,17 +410,21 @@ export interface FileRouteTypes {
     | '/blog'
     | '/consent-based-email-marketing'
     | '/gmail-bulk-email-sender'
+    | '/mcp'
     | '/one-click-unsubscribe-email'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/app'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/app/billing'
     | '/_authenticated/app/campaigns'
     | '/_authenticated/app/forms'
@@ -396,13 +447,17 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   ConsentBasedEmailMarketingRoute: typeof ConsentBasedEmailMarketingRoute
   GmailBulkEmailSenderRoute: typeof GmailBulkEmailSenderRoute
+  McpRoute: typeof McpRoute
   OneClickUnsubscribeEmailRoute: typeof OneClickUnsubscribeEmailRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   FSlugRoute: typeof FSlugRoute
   UTokenRoute: typeof UTokenRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -445,6 +500,13 @@ declare module '@tanstack/react-router' {
       path: '/one-click-unsubscribe-email'
       fullPath: '/one-click-unsubscribe-email'
       preLoaderRoute: typeof OneClickUnsubscribeEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gmail-bulk-email-sender': {
@@ -531,6 +593,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
@@ -593,6 +669,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/billing'
       preLoaderRoute: typeof AuthenticatedAppBillingRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -682,13 +765,18 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   ConsentBasedEmailMarketingRoute: ConsentBasedEmailMarketingRoute,
   GmailBulkEmailSenderRoute: GmailBulkEmailSenderRoute,
+  McpRoute: McpRoute,
   OneClickUnsubscribeEmailRoute: OneClickUnsubscribeEmailRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   FSlugRoute: FSlugRoute,
   UTokenRoute: UTokenRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
