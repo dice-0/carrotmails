@@ -26,6 +26,7 @@ import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-c
 import { Route as BlogHowToCaptureEmailConsentRouteImport } from './routes/blog.how-to-capture-email-consent'
 import { Route as BlogGmailBulkSenderRules2024RouteImport } from './routes/blog.gmail-bulk-sender-rules-2024'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAdmin061106HqFullaccessRouteImport } from './routes/_authenticated/admin-061106-hq-fullaccess'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
@@ -128,6 +129,12 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdmin061106HqFullaccessRoute =
+  AuthenticatedAdmin061106HqFullaccessRouteImport.update({
+    id: '/admin-061106-hq-fullaccess',
+    path: '/admin-061106-hq-fullaccess',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/admin-061106-hq-fullaccess': typeof AuthenticatedAdmin061106HqFullaccessRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
@@ -241,6 +249,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/admin-061106-hq-fullaccess': typeof AuthenticatedAdmin061106HqFullaccessRoute
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
@@ -273,6 +282,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/_authenticated/admin-061106-hq-fullaccess': typeof AuthenticatedAdmin061106HqFullaccessRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/blog/gmail-bulk-sender-rules-2024': typeof BlogGmailBulkSenderRules2024Route
   '/blog/how-to-capture-email-consent': typeof BlogHowToCaptureEmailConsentRoute
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/admin-061106-hq-fullaccess'
     | '/app'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/admin-061106-hq-fullaccess'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
     | '/blog/why-cold-email-is-dying'
@@ -368,6 +380,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/terms'
+    | '/_authenticated/admin-061106-hq-fullaccess'
     | '/_authenticated/app'
     | '/blog/gmail-bulk-sender-rules-2024'
     | '/blog/how-to-capture-email-consent'
@@ -531,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-061106-hq-fullaccess': {
+      id: '/_authenticated/admin-061106-hq-fullaccess'
+      path: '/admin-061106-hq-fullaccess'
+      fullPath: '/admin-061106-hq-fullaccess'
+      preLoaderRoute: typeof AuthenticatedAdmin061106HqFullaccessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
@@ -651,10 +671,13 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdmin061106HqFullaccessRoute: typeof AuthenticatedAdmin061106HqFullaccessRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdmin061106HqFullaccessRoute:
+    AuthenticatedAdmin061106HqFullaccessRoute,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
 }
 
