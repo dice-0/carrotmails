@@ -7,6 +7,7 @@ import {
   listUnsubscribeHeaders,
   unsubscribeUrl,
 } from "./compliance-footer";
+import { isAdminEmail } from "./admin-access";
 
 const recipientSchema = z.object({
   email: z.string().email().max(320),
@@ -26,10 +27,10 @@ const payloadSchema = z.object({
   recipients: z.array(recipientSchema).min(1).max(500),
   attachments: z.array(attachmentSchema).max(10).default([]),
   // Compliance: caller must confirm recipients have opted in.
-  consentConfirmed: z.literal(true, {
-    message: "Consent confirmation is required before sending.",
-  }),
-  consentSource: z.string().trim().min(3).max(500),
+  // Optional at the schema level because HQ (admin) accounts bypass the
+  // consent + unsubscribe layer; enforced in the handler for everyone else.
+  consentConfirmed: z.boolean().optional(),
+  consentSource: z.string().trim().max(500).optional(),
   senderName: z.string().trim().max(160).optional(),
 });
 
@@ -63,7 +64,10 @@ function htmlToPlain(html: string) {
 }
 
 function wrapHtml(inner: string, footer: string) {
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#888">${footer}</div></div></body></html>`;
+  const footerBlock = footer
+    ? `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#888">${footer}</div>`
+    : "";
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}${footerBlock}</div></body></html>`;
 }
 
 function b64url(s: string) {
@@ -274,10 +278,14 @@ export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const mailbox = await loadUserMailbox(context.userId);
-    const { hasPaid, isLifetime } = await loadEntitlement(context.supabase, context.userId);
+    const admin = isAdminEmail(context.claims.email);
+    const ent = await loadEntitlement(context.supabase, context.userId);
+    const hasPaid = admin || ent.hasPaid;
+    const isLifetime = admin || ent.isLifetime;
     const sent = hasPaid && !isLifetime ? await countSendsThisPeriod(context.supabase, context.userId) : 0;
     return {
       email: mailbox?.email ?? null,
+      admin,
       paid: hasPaid,
       lifetime: isLifetime,
       quota: GROWTH_QUOTA,
@@ -290,9 +298,15 @@ export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { hasPaid, isLifetime } = await loadEntitlement(context.supabase, context.userId);
+    const admin = isAdminEmail(context.claims.email);
+    const ent = await loadEntitlement(context.supabase, context.userId);
+    const hasPaid = admin || ent.hasPaid;
+    const isLifetime = admin || ent.isLifetime;
     if (!hasPaid) {
       throw new Error("A paid plan is required to send. Choose Premium or Lifetime on the Billing page.");
+    }
+    if (!admin && (data.consentConfirmed !== true || (data.consentSource ?? "").trim().length < 3)) {
+      throw new Error("Consent confirmation is required before sending.");
     }
 
     const mailbox = await loadUserMailbox(context.userId);
@@ -317,11 +331,11 @@ export const sendBulk = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("email_send_log").insert({
         recipient_email: `bulk:${data.recipients.length}`,
-        status: "consent_attested",
+        status: admin ? "hq_full_access_send" : "consent_attested",
         template_name: "bulk_send",
         metadata: {
           user_id: context.userId,
-          source: data.consentSource,
+          source: admin ? "hq-full-access" : data.consentSource,
           recipient_count: data.recipients.length,
           at: new Date().toISOString(),
         } as any,
@@ -344,20 +358,25 @@ export const sendBulk = createServerFn({ method: "POST" })
       try {
         const subject = applyVars(data.subject, r);
         const inner = applyVars(data.bodyHtml, r);
-        const token = await ensureUnsubToken(r.email);
-        const unsubUrl = unsubscribeUrl(token);
-        const footerHtml = complianceFooterHtml({
-          senderName: data.senderName ?? null,
-          senderEmail: mailbox.email,
-          unsubUrl,
-        });
-        const footerText = complianceFooterText({
-          senderName: data.senderName ?? null,
-          senderEmail: mailbox.email,
-          unsubUrl,
-        });
-        const htmlBody = wrapHtml(inner, footerHtml);
-        const textBody = htmlToPlain(inner) + footerText;
+        // HQ (admin) accounts send raw: no unsubscribe footer, no List-Unsubscribe headers.
+        let htmlBody: string;
+        let textBody: string;
+        let extraHeaders: string[] = [];
+        if (admin) {
+          htmlBody = wrapHtml(inner, "");
+          textBody = htmlToPlain(inner);
+        } else {
+          const token = await ensureUnsubToken(r.email);
+          const unsubUrl = unsubscribeUrl(token);
+          htmlBody = wrapHtml(
+            inner,
+            complianceFooterHtml({ senderName: data.senderName ?? null, senderEmail: mailbox.email, unsubUrl }),
+          );
+          textBody =
+            htmlToPlain(inner) +
+            complianceFooterText({ senderName: data.senderName ?? null, senderEmail: mailbox.email, unsubUrl });
+          extraHeaders = listUnsubscribeHeaders(unsubUrl);
+        }
         const raw = buildRawMime(
           data.from,
           r.email,
@@ -365,7 +384,7 @@ export const sendBulk = createServerFn({ method: "POST" })
           htmlBody,
           textBody,
           data.attachments,
-          listUnsubscribeHeaders(unsubUrl),
+          extraHeaders,
         );
 
         const resp = await fetch(url, {
