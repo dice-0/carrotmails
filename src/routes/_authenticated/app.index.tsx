@@ -314,7 +314,7 @@ function Index() {
                 />
               </div>
             </div>
-            )
+            )}
 
             <div className="flex items-center justify-between pt-2">
               <div className="text-sm text-muted-foreground">
