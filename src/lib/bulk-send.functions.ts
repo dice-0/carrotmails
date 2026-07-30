@@ -64,7 +64,10 @@ function htmlToPlain(html: string) {
 }
 
 function wrapHtml(inner: string, footer: string) {
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#888">${footer}</div></div></body></html>`;
+  const footerBlock = footer
+    ? `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:12px;color:#888">${footer}</div>`
+    : "";
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0"><div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">${inner}${footerBlock}</div></body></html>`;
 }
 
 function b64url(s: string) {

@@ -127,9 +127,15 @@ function Index() {
   const hasMailbox = Boolean(profile?.email);
   const isLifetime = billing?.tier === "lifetime";
   const remaining = billing?.quotaRemaining ?? 0;
-  const consentReady = consent && consentSource.trim().length >= 3;
+  const isAdmin = profile?.admin ?? false;
+  const consentReady = isAdmin || (consent && consentSource.trim().length >= 3);
 
   function attemptSend() {
+    if (isAdmin) {
+      if (!hasMailbox) return setBlockReason("mailbox");
+      void handleSend();
+      return;
+    }
     if (!profileComplete && !hasPaid) return setBlockReason("profile-and-plan");
     if (!profileComplete) return setBlockReason("profile");
     if (!hasPaid) return setBlockReason("plan");
@@ -151,8 +157,8 @@ function Index() {
           bodyHtml,
           recipients: parsed.rows,
           attachments: attachments.map(({ filename, contentType, dataBase64 }) => ({ filename, contentType, dataBase64 })),
-          consentConfirmed: true as const,
-          consentSource: consentSource.trim(),
+          consentConfirmed: isAdmin ? undefined : (true as const),
+          consentSource: isAdmin ? undefined : consentSource.trim(),
           senderName: fromName.trim() || undefined,
         },
       });
@@ -281,6 +287,15 @@ function Index() {
                 className="w-full resize-none rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-foreground focus:ring-2 focus:ring-primary/20" />
             </Field>
 
+            {isAdmin ? (
+              <div className="rounded-md border border-primary/40 bg-primary/5 p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-primary">HQ full access</div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Unlimited sending, no plan check, no consent attestation, and no unsubscribe footer or headers added to
+                  your messages.
+                </p>
+              </div>
+            ) : (
             <div className="rounded-md border border-border bg-muted/30 p-4">
               <label className="flex items-start gap-3 text-sm">
                 <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-4 w-4" />
@@ -299,6 +314,7 @@ function Index() {
                 />
               </div>
             </div>
+            )
 
             <div className="flex items-center justify-between pt-2">
               <div className="text-sm text-muted-foreground">
