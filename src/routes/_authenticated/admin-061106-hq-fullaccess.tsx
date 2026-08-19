@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getAdminAccess } from "@/lib/admin.functions";
+import { claimHqAccess, getAdminAccess } from "@/lib/admin.functions";
+import { HQ_ACCESS_KEY } from "@/lib/admin-access";
 import { CarrotLogo } from "@/components/CarrotLogo";
+
 
 export const Route = createFileRoute("/_authenticated/admin-061106-hq-fullaccess")({
   head: () => ({
