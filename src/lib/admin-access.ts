@@ -8,6 +8,7 @@
 export const ADMIN_EMAILS = [
   "work.josephraj@gmail.com",
   "admin@carrotmails.work",
+  "sharonjacobyt@gmail.com",
 ] as const;
 
 export const ADMIN_HQ_PATH = "/admin-061106-hq-fullaccess";
