@@ -223,6 +223,9 @@ async function updateMailboxToken(mailboxId: string, accessToken: string, expire
     .eq("id", mailboxId);
 }
 
+// Paid plans are temporarily shelved: everything is free/unlimited.
+export const FREE_FOR_ALL = true;
+
 async function loadEntitlement(supabase: any, userId: string) {
   const { data, error } = await supabase
     .from("billing_entitlements")
