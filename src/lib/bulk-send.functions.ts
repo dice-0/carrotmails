@@ -7,7 +7,7 @@ import {
   listUnsubscribeHeaders,
   unsubscribeUrl,
 } from "./compliance-footer";
-import { isAdminEmail } from "./admin-access";
+import { isAdminEmail, HQ_ENTITLEMENT } from "./admin-access";
 
 const recipientSchema = z.object({
   email: z.string().email().max(320),
@@ -236,8 +236,10 @@ async function loadEntitlement(supabase: any, userId: string) {
       i.active && (!i.expires_at || new Date(i.expires_at).getTime() > now),
   );
   const isLifetime = active.some((i: any) => i.entitlement === "lifetime");
+  const isHq = active.some((i: any) => i.entitlement === HQ_ENTITLEMENT);
   const hasPaid = active.length > 0;
-  return { hasPaid, isLifetime };
+  return { hasPaid, isLifetime, isHq };
+
 }
 
 async function countSendsThisPeriod(supabase: any, userId: string): Promise<number> {
@@ -278,8 +280,8 @@ export const getGmailProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const mailbox = await loadUserMailbox(context.userId);
-    const admin = isAdminEmail(context.claims.email);
     const ent = await loadEntitlement(context.supabase, context.userId);
+    const admin = isAdminEmail(context.claims.email) || ent.isHq;
     const hasPaid = admin || ent.hasPaid;
     const isLifetime = admin || ent.isLifetime;
     const sent = hasPaid && !isLifetime ? await countSendsThisPeriod(context.supabase, context.userId) : 0;
@@ -298,8 +300,8 @@ export const sendBulk = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const admin = isAdminEmail(context.claims.email);
     const ent = await loadEntitlement(context.supabase, context.userId);
+    const admin = isAdminEmail(context.claims.email) || ent.isHq;
     const hasPaid = admin || ent.hasPaid;
     const isLifetime = admin || ent.isLifetime;
     if (!hasPaid) {

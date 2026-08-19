@@ -12,6 +12,17 @@ export const ADMIN_EMAILS = [
 
 export const ADMIN_HQ_PATH = "/admin-061106-hq-fullaccess";
 
+/**
+ * Secret handshake key. Anyone who reaches the hidden HQ link and presents this
+ * key gets HQ full access granted to their account (persisted as an entitlement),
+ * no email allowlist required.
+ */
+export const HQ_ACCESS_KEY = "061106-hq-fullaccess";
+
+/** Entitlement name stored in billing_entitlements for HQ full access. */
+export const HQ_ENTITLEMENT = "hq";
+
+
 export function isAdminEmail(email: unknown): boolean {
   if (typeof email !== "string") return false;
   const normalized = email.trim().toLowerCase();
