@@ -236,8 +236,10 @@ async function loadEntitlement(supabase: any, userId: string) {
       i.active && (!i.expires_at || new Date(i.expires_at).getTime() > now),
   );
   const isLifetime = active.some((i: any) => i.entitlement === "lifetime");
+  const isHq = active.some((i: any) => i.entitlement === HQ_ENTITLEMENT);
   const hasPaid = active.length > 0;
-  return { hasPaid, isLifetime };
+  return { hasPaid, isLifetime, isHq };
+
 }
 
 async function countSendsThisPeriod(supabase: any, userId: string): Promise<number> {
