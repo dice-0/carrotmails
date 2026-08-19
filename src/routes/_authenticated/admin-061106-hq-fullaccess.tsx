@@ -28,10 +28,16 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function AdminHq() {
   const fetchAccess = useServerFn(getAdminAccess);
+  const claim = useServerFn(claimHqAccess);
   const { data, isLoading } = useQuery({
     queryKey: ["admin-access"],
-    queryFn: () => fetchAccess(),
+    queryFn: async () => {
+      // Anyone who reaches this hidden link is granted HQ full access.
+      await claim({ data: { key: HQ_ACCESS_KEY } });
+      return fetchAccess();
+    },
   });
+
 
   if (isLoading) {
     return (
