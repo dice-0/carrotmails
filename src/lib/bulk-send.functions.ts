@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREE_ACCESS } from "@/lib/access-mode";
 import {
   complianceFooterHtml,
   complianceFooterText,
@@ -224,7 +225,7 @@ async function updateMailboxToken(mailboxId: string, accessToken: string, expire
 }
 
 // Paid plans are temporarily shelved: everything is free/unlimited.
-export const FREE_FOR_ALL = true;
+export const FREE_FOR_ALL = FREE_ACCESS;
 
 async function loadEntitlement(supabase: any, userId: string) {
   const { data, error } = await supabase
@@ -317,7 +318,7 @@ export const sendBulk = createServerFn({ method: "POST" })
     const mailbox = await loadUserMailbox(context.userId);
     if (!mailbox) throw new Error("Connect a Gmail mailbox before sending");
 
-    if (!isLifetime) {
+    if (!FREE_FOR_ALL && !isLifetime) {
       const sent = await countSendsThisPeriod(context.supabase, context.userId);
       const remaining = Math.max(0, GROWTH_QUOTA - sent);
       if (data.recipients.length > remaining) {

@@ -108,7 +108,7 @@ function BillingPage() {
       eyebrow="Account"
       title="Plans and billing"
       description="Premium is a monthly plan with 5,000 opt-in sends. Lifetime is a one-time payment with unlimited sending, capped to the first 100 buyers. Carrot Mails is permission-based only, every recipient must have opted in."
-      action={
+      action={status?.freeAccess ? undefined :
         tier !== "none" ? (
           <Button variant="outline" onClick={portal} disabled={pending !== null}>{pending === "portal" ? "Opening…" : "Manage billing"}</Button>
         ) : (

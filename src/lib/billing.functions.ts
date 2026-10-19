@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREE_ACCESS } from "@/lib/access-mode";
 
 const checkoutSchema = z.object({ plan: z.enum(["pro", "lifetime"]) });
 
@@ -77,7 +78,7 @@ async function loadBillingSnapshot(supabase: any, userId: string) {
     : subscription && ACTIVE_SUBSCRIPTION_STATUSES.includes(subscription.status)
       ? "growth"
       : "none";
-  const freeAccess = true;
+  const freeAccess = FREE_ACCESS;
   const tier: "free" | "lifetime" | "growth" | "none" = freeAccess ? "free" : paidTier;
 
   let sentThisPeriod = 0;

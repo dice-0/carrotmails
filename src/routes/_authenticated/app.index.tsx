@@ -125,6 +125,7 @@ function Index() {
   const profileComplete = userProfile?.complete ?? false;
   const hasMailbox = Boolean(profile?.email);
   const unlimited = billing?.unlimited ?? billing?.tier === "lifetime";
+  const hasPaid = billing?.hasPaidAccess ?? false;
   const isAdmin = profile?.admin ?? false;
   const consentReady = isAdmin || (consent && consentSource.trim().length >= 3);
 

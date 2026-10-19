@@ -1,0 +1,1 @@
+Keep temporary free-access behavior controlled by `src/lib/access-mode.ts` so billing, mailbox access, and sending stay consistent.

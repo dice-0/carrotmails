@@ -88,7 +88,7 @@ function AppShell() {
                   </div>
                 </>
               )}
-              {isLifetime && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Unlimited</div>}
+              {unlimited && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Unlimited</div>}
               {!hasPaid && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-primary">Choose a plan →</div>}
             </Link>
             <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate">{email}</div>
