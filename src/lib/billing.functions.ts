@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREE_ACCESS } from "@/lib/access-mode";
 
 const checkoutSchema = z.object({ plan: z.enum(["pro", "lifetime"]) });
 
@@ -56,7 +57,7 @@ async function loadBillingSnapshot(supabase: any, userId: string) {
 
   const now = Date.now();
   const entitlements = entitlementsResult.data ?? [];
-  const hasPaidAccess = entitlements.some(
+  const hasExistingPaidAccess = entitlements.some(
     (item: any) => item.active && (!item.expires_at || new Date(item.expires_at).getTime() > now),
   );
   const isLifetime = entitlements.some((i: any) => i.active && i.entitlement === "lifetime");
@@ -72,16 +73,18 @@ async function loadBillingSnapshot(supabase: any, userId: string) {
     periodStart = new Date(new Date(subscription.current_period_end).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
   }
 
-  const tier: "lifetime" | "growth" | "none" = isLifetime
+  const paidTier: "lifetime" | "growth" | "none" = isLifetime
     ? "lifetime"
     : subscription && ACTIVE_SUBSCRIPTION_STATUSES.includes(subscription.status)
       ? "growth"
       : "none";
+  const freeAccess = FREE_ACCESS;
+  const tier: "free" | "lifetime" | "growth" | "none" = freeAccess ? "free" : paidTier;
 
   let sentThisPeriod = 0;
   let quota = 0;
   let quotaRemaining = 0;
-  let unlimited = false;
+  let unlimited = freeAccess;
   if (tier === "growth") {
     sentThisPeriod = await computeSendsThisPeriod(supabase, userId, periodStart);
     quota = GROWTH_QUOTA;
@@ -91,7 +94,8 @@ async function loadBillingSnapshot(supabase: any, userId: string) {
   }
 
   return {
-    hasPaidAccess,
+    hasPaidAccess: freeAccess || hasExistingPaidAccess,
+    freeAccess,
     tier,
     subscription,
     purchase,
