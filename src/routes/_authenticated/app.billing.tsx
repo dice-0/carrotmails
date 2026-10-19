@@ -120,6 +120,13 @@ function BillingPage() {
     >
       {isLoading ? (
         <p className="font-mono text-xs text-muted-foreground">Loading billing status…</p>
+      ) : status?.freeAccess ? (
+        <div className="border border-border px-5 py-4">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Free access</div>
+          <p className="mt-2 text-sm text-foreground">
+            Paid plans are paused for now. Connect inboxes and send without a plan or monthly send quota.
+          </p>
+        </div>
       ) : (
         <>
           {search.checkout === "success" && !status?.hasPaidAccess && (

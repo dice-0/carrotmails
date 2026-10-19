@@ -122,7 +122,6 @@ function Index() {
       : profile.email
     : "";
 
-  const hasPaid = billing?.hasPaidAccess ?? false;
   const profileComplete = userProfile?.complete ?? false;
   const hasMailbox = Boolean(profile?.email);
   const unlimited = billing?.unlimited ?? billing?.tier === "lifetime";
@@ -135,7 +134,6 @@ function Index() {
       void handleSend();
       return;
     }
-    if (!profileComplete && !hasPaid) return setBlockReason("profile-and-plan");
     if (!profileComplete) return setBlockReason("profile");
     if (!hasMailbox) return setBlockReason("mailbox");
     if (!consentReady) return setBlockReason("consent");
