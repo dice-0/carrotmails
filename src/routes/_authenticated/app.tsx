@@ -40,6 +40,7 @@ function AppShell() {
   const label = planLabel(tier);
   const isLifetime = tier === "lifetime";
   const hasPaid = billing?.hasPaidAccess ?? false;
+  const unlimited = billing?.unlimited ?? isLifetime;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -77,7 +78,7 @@ function AppShell() {
             <Link to="/app/billing" className="block">
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Plan</div>
               <div className={`mt-1 text-sm font-medium ${hasPaid ? "text-primary" : "text-foreground"}`}>{label}</div>
-              {hasPaid && !isLifetime && billing && (
+              {hasPaid && !unlimited && billing && (
                 <>
                   <div className="mt-1.5 h-1 w-full bg-muted">
                     <div className="h-full bg-primary" style={{ width: `${Math.min(100, Math.round((billing.sentThisPeriod / Math.max(1, billing.quota)) * 100))}%` }} />

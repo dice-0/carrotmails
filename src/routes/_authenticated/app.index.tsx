@@ -125,8 +125,7 @@ function Index() {
   const hasPaid = billing?.hasPaidAccess ?? false;
   const profileComplete = userProfile?.complete ?? false;
   const hasMailbox = Boolean(profile?.email);
-  const isLifetime = billing?.tier === "lifetime";
-  const remaining = billing?.quotaRemaining ?? 0;
+  const unlimited = billing?.unlimited ?? billing?.tier === "lifetime";
   const isAdmin = profile?.admin ?? false;
   const consentReady = isAdmin || (consent && consentSource.trim().length >= 3);
 
@@ -138,10 +137,8 @@ function Index() {
     }
     if (!profileComplete && !hasPaid) return setBlockReason("profile-and-plan");
     if (!profileComplete) return setBlockReason("profile");
-    if (!hasPaid) return setBlockReason("plan");
     if (!hasMailbox) return setBlockReason("mailbox");
     if (!consentReady) return setBlockReason("consent");
-    if (!isLifetime && parsed.rows.length > remaining) return setBlockReason("quota");
     void handleSend();
   }
 
@@ -209,37 +206,22 @@ function Index() {
               <div>connect gmail to send · your account, your inbox</div>
             )}
             <div className="mt-1 text-[10px] uppercase tracking-widest text-primary">
-              {planLabel(billing?.tier)}{isLifetime ? " · unlimited" : hasPaid ? ` · ${remaining.toLocaleString()} left` : ""}
+              {planLabel(billing?.tier)}{unlimited ? " · unlimited" : ""}
             </div>
           </div>
         </header>
 
-        {!hasPaid && (
-          <div className="mb-8 flex flex-col items-start justify-between gap-3 border border-primary/40 bg-primary/5 px-5 py-4 sm:flex-row sm:items-center">
-            <div>
-              <div className="text-sm font-medium text-foreground">Carrot Mails is a paid tool.</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                Complete your profile and pick Growth ($3.50/mo, 5,000 sends) or Lifetime (unlimited). No free tier, no fluff.
-              </div>
-            </div>
-            <div className="flex gap-3">
-              {!profileComplete && (
-                <Link to="/app/profile" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">
-                  profile →
-                </Link>
-              )}
-              <Link to="/app/billing" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">
-                choose a plan →
-              </Link>
+        {billing?.freeAccess && (
+          <div className="mb-8 border border-border px-5 py-4">
+            <div className="text-sm font-medium text-foreground">Free access is on</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              Connect your inbox and send without a plan or monthly quota.
             </div>
           </div>
         )}
-        {hasPaid && !isLifetime && (
-          <QuotaBar used={billing?.sentThisPeriod ?? 0} limit={billing?.quota ?? 5000} />
-        )}
         {hasPaid && !hasMailbox && (
           <div className="mb-8 flex items-center justify-between border border-border px-5 py-4">
-            <div className="text-sm">Your plan is active. Connect a mailbox to start sending.</div>
+            <div className="text-sm">Connect a mailbox to start sending.</div>
             <Link to="/app/mailboxes" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">connect gmail →</Link>
           </div>
         )}
@@ -389,27 +371,3 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-function QuotaBar({ used, limit }: { used: number; limit: number }) {
-  const left = Math.max(0, limit - used);
-  const pct = Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
-  const low = left <= Math.max(1, Math.floor(limit * 0.1));
-  return (
-    <div className="mb-8 border border-border px-5 py-4">
-      <div className="flex items-baseline justify-between">
-        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Growth · sends this period</div>
-        <div className={`font-mono text-xs ${low ? "text-destructive" : "text-foreground"}`}>
-          {used.toLocaleString()}/{limit.toLocaleString()} used
-        </div>
-      </div>
-      <div className="mt-2 h-1.5 w-full bg-muted">
-        <div className={`h-full ${low ? "bg-destructive" : "bg-primary"}`} style={{ width: `${pct}%` }} />
-      </div>
-      {low && (
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">Running low. Upgrade to Lifetime for unlimited sending.</span>
-          <Link to="/app/billing" className="font-mono text-[11px] uppercase tracking-widest text-primary hover:underline">upgrade →</Link>
-        </div>
-      )}
-    </div>
-  );
-}

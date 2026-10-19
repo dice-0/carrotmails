@@ -285,8 +285,8 @@ export const getGmailProfile = createServerFn({ method: "GET" })
     const mailbox = await loadUserMailbox(context.userId);
     const ent = await loadEntitlement(context.supabase, context.userId);
     const admin = isAdminEmail(context.claims.email) || ent.isHq;
-    const hasPaid = admin || ent.hasPaid;
-    const isLifetime = admin || ent.isLifetime;
+    const hasPaid = FREE_FOR_ALL || admin || ent.hasPaid;
+    const isLifetime = FREE_FOR_ALL || admin || ent.isLifetime;
     const sent = hasPaid && !isLifetime ? await countSendsThisPeriod(context.supabase, context.userId) : 0;
     return {
       email: mailbox?.email ?? null,
@@ -305,8 +305,8 @@ export const sendBulk = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ent = await loadEntitlement(context.supabase, context.userId);
     const admin = isAdminEmail(context.claims.email) || ent.isHq;
-    const hasPaid = admin || ent.hasPaid;
-    const isLifetime = admin || ent.isLifetime;
+    const hasPaid = FREE_FOR_ALL || admin || ent.hasPaid;
+    const isLifetime = FREE_FOR_ALL || admin || ent.isLifetime;
     if (!hasPaid) {
       throw new Error("A paid plan is required to send. Choose Premium or Lifetime on the Billing page.");
     }

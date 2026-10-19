@@ -4,8 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getGoogleAuthUrl, listMailboxes, deleteMailbox } from "@/lib/mailboxes.functions";
-import { useBilling } from "@/hooks/useEntitlement";
-import { SendBlockedDialog } from "@/components/SendBlockedDialog";
 
 type Search = { connected?: string; error?: string };
 
@@ -28,9 +26,6 @@ function MailboxesPage() {
   const list = useServerFn(listMailboxes);
   const getUrl = useServerFn(getGoogleAuthUrl);
   const del = useServerFn(deleteMailbox);
-  const { data: billing } = useBilling();
-  const [blocked, setBlocked] = useState(false);
-  const hasPaid = billing?.hasPaidAccess ?? false;
 
   const { data: mailboxes = [], isLoading } = useQuery({
     queryKey: ["mailboxes"],
@@ -54,11 +49,6 @@ function MailboxesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  function attemptConnect() {
-    if (!hasPaid) return setBlocked(true);
-    connect.mutate();
-  }
-
   return (
     <div className="mx-auto max-w-3xl p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Mailboxes</h1>
@@ -66,15 +56,9 @@ function MailboxesPage() {
         Connect your Gmail account. Carrot Mails never sees your password. Google handles sign-in, and you can revoke access at any time.
       </p>
 
-      {!hasPaid && (
-        <div className="mt-6 border border-primary/40 bg-primary/5 p-4 text-sm">
-          Mailbox connection unlocks after you pick a plan. This keeps things fair for everyone using their own inbox.
-        </div>
-      )}
-
       <div className="mt-8 space-y-3">
         <button
-          onClick={attemptConnect}
+          onClick={() => connect.mutate()}
           disabled={connect.isPending}
           className="flex w-full items-center justify-between border border-border px-4 py-3 text-left text-sm transition hover:bg-muted disabled:opacity-50"
         >
@@ -83,7 +67,7 @@ function MailboxesPage() {
             <span>Connect Gmail</span>
           </span>
           <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            {connect.isPending ? "redirecting…" : hasPaid ? "google oauth" : "plan required"}
+            {connect.isPending ? "redirecting…" : "google oauth"}
           </span>
         </button>
         <button disabled className="flex w-full items-center justify-between border border-border px-4 py-3 text-left text-sm opacity-50">
@@ -127,8 +111,6 @@ function MailboxesPage() {
       <p className="mt-10 text-xs text-muted-foreground">
         Scopes requested: gmail.send, gmail.readonly, gmail.modify. We only read to detect replies on threads you started from Carrot Mails.
       </p>
-
-      <SendBlockedDialog open={blocked} onOpenChange={setBlocked} reason="plan" />
     </div>
   );
 }
