@@ -58,6 +58,29 @@ const ALLOWED_ATTACHMENT_CT = /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/;
 function sanitizeHeader(v: string) {
   return String(v).replace(/[\r\n]+/g, " ").trim();
 }
+
+function b64std(s: string) {
+  const bytes = new TextEncoder().encode(s);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+// RFC 2047: non-ASCII display names (and names with special chars) must be
+// encoded in headers. Raw UTF-8 in headers breaks MIME parsing and is a
+// reliable spam-filter trigger.
+function encodeHeaderValue(v: string) {
+  return /^[\x20-\x7E]*$/.test(v) ? v : `=?UTF-8?B?${b64std(v)}?=`;
+}
+
+function encodeFromHeader(from: string) {
+  const m = from.match(/^(.*)<([^<]+)>$/);
+  if (!m) return encodeHeaderValue(from);
+  const name = m[1].trim();
+  const addr = m[2].trim();
+  if (!name) return addr;
+  return `${encodeHeaderValue(/^".*"$/.test(name) ? name.slice(1, -1) : name)} <${addr}>`;
+}
 function safeContentType(ct: string) {
   const cleaned = String(ct).replace(/[\r\n;].*$/s, "").trim();
   return ALLOWED_ATTACHMENT_CT.test(cleaned) ? cleaned : "application/octet-stream";
@@ -72,7 +95,7 @@ export function buildRawMime(
   attachments: Attachment[],
   extraHeaders: string[] = [],
 ) {
-  const safeFrom = sanitizeHeader(from);
+  const safeFrom = encodeFromHeader(sanitizeHeader(from));
   const safeTo = sanitizeHeader(to);
   const safeSubject = sanitizeHeader(subject);
   const safeExtra = (extraHeaders ?? []).map(sanitizeHeader).filter(Boolean);
@@ -93,7 +116,25 @@ export function buildRawMime(
     `--${altBoundary}--`,
   ].join("\r\n");
 
-  const subjectEncoded = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(safeSubject)))}?=`;
+  // RFC 2047 encoded-words must be <= 75 bytes; chunk long subjects.
+  const encodedWords: string[] = [];
+  const rawBytes = new TextEncoder().encode(safeSubject);
+  if (rawBytes.length <= 60) {
+    encodedWords.push(`=?UTF-8?B?${b64std(safeSubject)}?=`);
+  } else {
+    let buf: number[] = [];
+    const flush = () => {
+      const s = new TextDecoder().decode(new Uint8Array(buf));
+      encodedWords.push(`=?UTF-8?B?${b64std(s)}?=`);
+      buf = [];
+    };
+    for (const b of rawBytes) {
+      buf.push(b);
+      if (buf.length >= 60) flush();
+    }
+    if (buf.length) flush();
+  }
+  const subjectEncoded = encodedWords.join(" ");
 
   if (!attachments || attachments.length === 0) {
     const headers = [

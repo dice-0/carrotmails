@@ -35,7 +35,9 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
           return redirectTo(`/app/mailboxes?error=invalid_state`);
         }
 
-        const redirectUri = `${url.origin}/api/public/oauth/google/callback`;
+        // Must match the redirect_uri used in the auth URL exactly, regardless
+        // of which host served this callback.
+        const redirectUri = `https://carrotmails.work/api/public/oauth/google/callback`;
         const tokRes = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
