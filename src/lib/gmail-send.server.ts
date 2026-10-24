@@ -58,6 +58,22 @@ const ALLOWED_ATTACHMENT_CT = /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/;
 function sanitizeHeader(v: string) {
   return String(v).replace(/[\r\n]+/g, " ").trim();
 }
+
+// RFC 2047: non-ASCII display names (and names with special chars) must be
+// encoded in headers. Raw UTF-8 in headers breaks MIME parsing and is a
+// reliable spam-filter trigger.
+function encodeHeaderValue(v: string) {
+  return /^[\x20-\x7E]*$/.test(v) ? v : `=?UTF-8?B?${b64url(v)}?=`;
+}
+
+function encodeFromHeader(from: string) {
+  const m = from.match(/^(.*)<([^<]+)>$/);
+  if (!m) return encodeHeaderValue(from);
+  const name = m[1].trim();
+  const addr = m[2].trim();
+  if (!name) return addr;
+  return `${encodeHeaderValue(/^".*"$/.test(name) ? name.slice(1, -1) : name)} <${addr}>`;
+}
 function safeContentType(ct: string) {
   const cleaned = String(ct).replace(/[\r\n;].*$/s, "").trim();
   return ALLOWED_ATTACHMENT_CT.test(cleaned) ? cleaned : "application/octet-stream";
