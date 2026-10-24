@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { createHmac, randomUUID } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+// The OAuth redirect URI must exactly match one registered in Google Cloud
+// Console. Deriving it from the request origin breaks wherever the app runs
+// under a different host (preview, localhost), so pin the production origin.
+const APP_ORIGIN = "https://carrotmails.work";
 
 // Minimal scopes for send-only mailing.
 // openid/email/profile: identify the connected mailbox (non-sensitive).
@@ -26,9 +30,7 @@ export const getGoogleAuthUrl = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
     if (!clientId) throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
-    const req = getRequest();
-    const origin = new URL(req.url).origin;
-    const redirectUri = `${origin}/api/public/oauth/google/callback`;
+    const redirectUri = `${APP_ORIGIN}/api/public/oauth/google/callback`;
     const nonce = randomUUID();
     const expires = Date.now() + 10 * 60 * 1000;
     const payload = `${context.userId}.${nonce}.${expires}`;
