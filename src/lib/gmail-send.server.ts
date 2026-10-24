@@ -59,11 +59,18 @@ function sanitizeHeader(v: string) {
   return String(v).replace(/[\r\n]+/g, " ").trim();
 }
 
+function b64std(s: string) {
+  const bytes = new TextEncoder().encode(s);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
 // RFC 2047: non-ASCII display names (and names with special chars) must be
 // encoded in headers. Raw UTF-8 in headers breaks MIME parsing and is a
 // reliable spam-filter trigger.
 function encodeHeaderValue(v: string) {
-  return /^[\x20-\x7E]*$/.test(v) ? v : `=?UTF-8?B?${b64url(v)}?=`;
+  return /^[\x20-\x7E]*$/.test(v) ? v : `=?UTF-8?B?${b64std(v)}?=`;
 }
 
 function encodeFromHeader(from: string) {
@@ -88,7 +95,7 @@ export function buildRawMime(
   attachments: Attachment[],
   extraHeaders: string[] = [],
 ) {
-  const safeFrom = sanitizeHeader(from);
+  const safeFrom = encodeFromHeader(sanitizeHeader(from));
   const safeTo = sanitizeHeader(to);
   const safeSubject = sanitizeHeader(subject);
   const safeExtra = (extraHeaders ?? []).map(sanitizeHeader).filter(Boolean);
