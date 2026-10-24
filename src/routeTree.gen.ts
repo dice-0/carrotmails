@@ -9,66 +9,54 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as OneClickUnsubscribeEmailRouteImport } from './routes/one-click-unsubscribe-email'
-import { Route as GmailBulkEmailSenderRouteImport } from './routes/gmail-bulk-email-sender'
-import { Route as ConsentBasedEmailMarketingRouteImport } from './routes/consent-based-email-marketing'
-import { Route as BlogRouteImport } from './routes/blog'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as UTokenRouteImport } from './routes/u.$token'
-import { Route as FSlugRouteImport } from './routes/f.$slug'
-import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-cold-email-is-dying'
-import { Route as BlogHowToCaptureEmailConsentRouteImport } from './routes/blog.how-to-capture-email-consent'
-import { Route as BlogGmailBulkSenderRules2024RouteImport } from './routes/blog.gmail-bulk-sender-rules-2024'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ConsentBasedEmailMarketingRouteImport } from './routes/consent-based-email-marketing'
+import { Route as GmailBulkEmailSenderRouteImport } from './routes/gmail-bulk-email-sender'
+import { Route as OneClickUnsubscribeEmailRouteImport } from './routes/one-click-unsubscribe-email'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdmin061106HqFullaccessRouteImport } from './routes/_authenticated/admin-061106-hq-fullaccess'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as BlogGmailBulkSenderRules2024RouteImport } from './routes/blog.gmail-bulk-sender-rules-2024'
+import { Route as BlogHowToCaptureEmailConsentRouteImport } from './routes/blog.how-to-capture-email-consent'
+import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-cold-email-is-dying'
+import { Route as FSlugRouteImport } from './routes/f.$slug'
+import { Route as UTokenRouteImport } from './routes/u.$token'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
-import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
-import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
-import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
-import { Route as AuthenticatedAppMailboxesRouteImport } from './routes/_authenticated/app.mailboxes'
-import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticated/app.lists'
-import { Route as AuthenticatedAppFormsRouteImport } from './routes/_authenticated/app.forms'
-import { Route as AuthenticatedAppCampaignsRouteImport } from './routes/_authenticated/app.campaigns'
 import { Route as AuthenticatedAppBillingRouteImport } from './routes/_authenticated/app.billing'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as AuthenticatedAppCampaignsRouteImport } from './routes/_authenticated/app.campaigns'
+import { Route as AuthenticatedAppFormsRouteImport } from './routes/_authenticated/app.forms'
+import { Route as AuthenticatedAppListsRouteImport } from './routes/_authenticated/app.lists'
+import { Route as AuthenticatedAppMailboxesRouteImport } from './routes/_authenticated/app.mailboxes'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
+import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app.templates'
+import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as ApiPublicOauthGoogleCallbackRouteImport } from './routes/api/public/oauth/google/callback'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OneClickUnsubscribeEmailRoute =
-  OneClickUnsubscribeEmailRouteImport.update({
-    id: '/one-click-unsubscribe-email',
-    path: '/one-click-unsubscribe-email',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const GmailBulkEmailSenderRoute = GmailBulkEmailSenderRouteImport.update({
-  id: '/gmail-bulk-email-sender',
-  path: '/gmail-bulk-email-sender',
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsentBasedEmailMarketingRoute =
@@ -77,56 +65,36 @@ const ConsentBasedEmailMarketingRoute =
     path: '/consent-based-email-marketing',
     getParentRoute: () => rootRouteImport,
   } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
+const GmailBulkEmailSenderRoute = GmailBulkEmailSenderRouteImport.update({
+  id: '/gmail-bulk-email-sender',
+  path: '/gmail-bulk-email-sender',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UTokenRoute = UTokenRouteImport.update({
-  id: '/u/$token',
-  path: '/u/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FSlugRoute = FSlugRouteImport.update({
-  id: '/f/$slug',
-  path: '/f/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogWhyColdEmailIsDyingRoute = BlogWhyColdEmailIsDyingRouteImport.update({
-  id: '/why-cold-email-is-dying',
-  path: '/why-cold-email-is-dying',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogHowToCaptureEmailConsentRoute =
-  BlogHowToCaptureEmailConsentRouteImport.update({
-    id: '/how-to-capture-email-consent',
-    path: '/how-to-capture-email-consent',
-    getParentRoute: () => BlogRoute,
+const OneClickUnsubscribeEmailRoute =
+  OneClickUnsubscribeEmailRouteImport.update({
+    id: '/one-click-unsubscribe-email',
+    path: '/one-click-unsubscribe-email',
+    getParentRoute: () => rootRouteImport,
   } as any)
-const BlogGmailBulkSenderRules2024Route =
-  BlogGmailBulkSenderRules2024RouteImport.update({
-    id: '/gmail-bulk-sender-rules-2024',
-    path: '/gmail-bulk-sender-rules-2024',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdmin061106HqFullaccessRoute =
   AuthenticatedAdmin061106HqFullaccessRouteImport.update({
@@ -134,41 +102,46 @@ const AuthenticatedAdmin061106HqFullaccessRoute =
     path: '/admin-061106-hq-fullaccess',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const BlogGmailBulkSenderRules2024Route =
+  BlogGmailBulkSenderRules2024RouteImport.update({
+    id: '/gmail-bulk-sender-rules-2024',
+    path: '/gmail-bulk-sender-rules-2024',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogHowToCaptureEmailConsentRoute =
+  BlogHowToCaptureEmailConsentRouteImport.update({
+    id: '/how-to-capture-email-consent',
+    path: '/how-to-capture-email-consent',
+    getParentRoute: () => BlogRoute,
+  } as any)
+const BlogWhyColdEmailIsDyingRoute = BlogWhyColdEmailIsDyingRouteImport.update({
+  id: '/why-cold-email-is-dying',
+  path: '/why-cold-email-is-dying',
+  getParentRoute: () => BlogRoute,
+} as any)
+const FSlugRoute = FSlugRouteImport.update({
+  id: '/f/$slug',
+  path: '/f/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UTokenRoute = UTokenRouteImport.update({
+  id: '/u/$token',
+  path: '/u/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
-  id: '/api/public/dodo-webhook',
-  path: '/api/public/dodo-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAppTemplatesRoute =
-  AuthenticatedAppTemplatesRouteImport.update({
-    id: '/templates',
-    path: '/templates',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppMailboxesRoute =
-  AuthenticatedAppMailboxesRouteImport.update({
-    id: '/mailboxes',
-    path: '/mailboxes',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppListsRoute = AuthenticatedAppListsRouteImport.update({
-  id: '/lists',
-  path: '/lists',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppFormsRoute = AuthenticatedAppFormsRouteImport.update({
-  id: '/forms',
-  path: '/forms',
+const AuthenticatedAppBillingRoute = AuthenticatedAppBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 const AuthenticatedAppCampaignsRoute =
@@ -177,19 +150,46 @@ const AuthenticatedAppCampaignsRoute =
     path: '/campaigns',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppBillingRoute = AuthenticatedAppBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
+const AuthenticatedAppFormsRoute = AuthenticatedAppFormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
+const AuthenticatedAppListsRoute = AuthenticatedAppListsRouteImport.update({
+  id: '/lists',
+  path: '/lists',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppMailboxesRoute =
+  AuthenticatedAppMailboxesRouteImport.update({
+    id: '/mailboxes',
+    path: '/mailboxes',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppTemplatesRoute =
+  AuthenticatedAppTemplatesRouteImport.update({
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
+  id: '/api/public/dodo-webhook',
+  path: '/api/public/dodo-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicOauthGoogleCallbackRoute =
@@ -411,67 +411,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/one-click-unsubscribe-email': {
-      id: '/one-click-unsubscribe-email'
-      path: '/one-click-unsubscribe-email'
-      fullPath: '/one-click-unsubscribe-email'
-      preLoaderRoute: typeof OneClickUnsubscribeEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gmail-bulk-email-sender': {
-      id: '/gmail-bulk-email-sender'
-      path: '/gmail-bulk-email-sender'
-      fullPath: '/gmail-bulk-email-sender'
-      preLoaderRoute: typeof GmailBulkEmailSenderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/consent-based-email-marketing': {
-      id: '/consent-based-email-marketing'
-      path: '/consent-based-email-marketing'
-      fullPath: '/consent-based-email-marketing'
-      preLoaderRoute: typeof ConsentBasedEmailMarketingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -481,32 +425,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/u/$token': {
-      id: '/u/$token'
-      path: '/u/$token'
-      fullPath: '/u/$token'
-      preLoaderRoute: typeof UTokenRouteImport
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/f/$slug': {
-      id: '/f/$slug'
-      path: '/f/$slug'
-      fullPath: '/f/$slug'
-      preLoaderRoute: typeof FSlugRouteImport
+    '/consent-based-email-marketing': {
+      id: '/consent-based-email-marketing'
+      path: '/consent-based-email-marketing'
+      fullPath: '/consent-based-email-marketing'
+      preLoaderRoute: typeof ConsentBasedEmailMarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/why-cold-email-is-dying': {
-      id: '/blog/why-cold-email-is-dying'
-      path: '/why-cold-email-is-dying'
-      fullPath: '/blog/why-cold-email-is-dying'
-      preLoaderRoute: typeof BlogWhyColdEmailIsDyingRouteImport
+    '/gmail-bulk-email-sender': {
+      id: '/gmail-bulk-email-sender'
+      path: '/gmail-bulk-email-sender'
+      fullPath: '/gmail-bulk-email-sender'
+      preLoaderRoute: typeof GmailBulkEmailSenderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/one-click-unsubscribe-email': {
+      id: '/one-click-unsubscribe-email'
+      path: '/one-click-unsubscribe-email'
+      fullPath: '/one-click-unsubscribe-email'
+      preLoaderRoute: typeof OneClickUnsubscribeEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin-061106-hq-fullaccess': {
+      id: '/_authenticated/admin-061106-hq-fullaccess'
+      path: '/admin-061106-hq-fullaccess'
+      fullPath: '/admin-061106-hq-fullaccess'
+      preLoaderRoute: typeof AuthenticatedAdmin061106HqFullaccessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/blog/gmail-bulk-sender-rules-2024': {
+      id: '/blog/gmail-bulk-sender-rules-2024'
+      path: '/gmail-bulk-sender-rules-2024'
+      fullPath: '/blog/gmail-bulk-sender-rules-2024'
+      preLoaderRoute: typeof BlogGmailBulkSenderRules2024RouteImport
       parentRoute: typeof BlogRoute
     }
     '/blog/how-to-capture-email-consent': {
@@ -516,81 +516,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogHowToCaptureEmailConsentRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/blog/gmail-bulk-sender-rules-2024': {
-      id: '/blog/gmail-bulk-sender-rules-2024'
-      path: '/gmail-bulk-sender-rules-2024'
-      fullPath: '/blog/gmail-bulk-sender-rules-2024'
-      preLoaderRoute: typeof BlogGmailBulkSenderRules2024RouteImport
+    '/blog/why-cold-email-is-dying': {
+      id: '/blog/why-cold-email-is-dying'
+      path: '/why-cold-email-is-dying'
+      fullPath: '/blog/why-cold-email-is-dying'
+      preLoaderRoute: typeof BlogWhyColdEmailIsDyingRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/_authenticated/app': {
-      id: '/_authenticated/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/f/$slug': {
+      id: '/f/$slug'
+      path: '/f/$slug'
+      fullPath: '/f/$slug'
+      preLoaderRoute: typeof FSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin-061106-hq-fullaccess': {
-      id: '/_authenticated/admin-061106-hq-fullaccess'
-      path: '/admin-061106-hq-fullaccess'
-      fullPath: '/admin-061106-hq-fullaccess'
-      preLoaderRoute: typeof AuthenticatedAdmin061106HqFullaccessRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/u/$token': {
+      id: '/u/$token'
+      path: '/u/$token'
+      fullPath: '/u/$token'
+      preLoaderRoute: typeof UTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/api/public/dodo-webhook': {
-      id: '/api/public/dodo-webhook'
-      path: '/api/public/dodo-webhook'
-      fullPath: '/api/public/dodo-webhook'
-      preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/templates': {
-      id: '/_authenticated/app/templates'
-      path: '/templates'
-      fullPath: '/app/templates'
-      preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/profile': {
-      id: '/_authenticated/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/mailboxes': {
-      id: '/_authenticated/app/mailboxes'
-      path: '/mailboxes'
-      fullPath: '/app/mailboxes'
-      preLoaderRoute: typeof AuthenticatedAppMailboxesRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/lists': {
-      id: '/_authenticated/app/lists'
-      path: '/lists'
-      fullPath: '/app/lists'
-      preLoaderRoute: typeof AuthenticatedAppListsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/forms': {
-      id: '/_authenticated/app/forms'
-      path: '/forms'
-      fullPath: '/app/forms'
-      preLoaderRoute: typeof AuthenticatedAppFormsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/campaigns': {
-      id: '/_authenticated/app/campaigns'
-      path: '/campaigns'
-      fullPath: '/app/campaigns'
-      preLoaderRoute: typeof AuthenticatedAppCampaignsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/billing': {
@@ -600,11 +551,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppBillingRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+    '/_authenticated/app/campaigns': {
+      id: '/_authenticated/app/campaigns'
+      path: '/campaigns'
+      fullPath: '/app/campaigns'
+      preLoaderRoute: typeof AuthenticatedAppCampaignsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/forms': {
+      id: '/_authenticated/app/forms'
+      path: '/forms'
+      fullPath: '/app/forms'
+      preLoaderRoute: typeof AuthenticatedAppFormsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/lists': {
+      id: '/_authenticated/app/lists'
+      path: '/lists'
+      fullPath: '/app/lists'
+      preLoaderRoute: typeof AuthenticatedAppListsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/mailboxes': {
+      id: '/_authenticated/app/mailboxes'
+      path: '/mailboxes'
+      fullPath: '/app/mailboxes'
+      preLoaderRoute: typeof AuthenticatedAppMailboxesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/templates': {
+      id: '/_authenticated/app/templates'
+      path: '/templates'
+      fullPath: '/app/templates'
+      preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/dodo-webhook': {
+      id: '/api/public/dodo-webhook'
+      path: '/api/public/dodo-webhook'
+      fullPath: '/api/public/dodo-webhook'
+      preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/preview': {
@@ -612,6 +605,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/auth/preview'
       fullPath: '/lovable/email/auth/preview'
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/oauth/google/callback': {
