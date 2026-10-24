@@ -116,7 +116,25 @@ export function buildRawMime(
     `--${altBoundary}--`,
   ].join("\r\n");
 
-  const subjectEncoded = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(safeSubject)))}?=`;
+  // RFC 2047 encoded-words must be <= 75 bytes; chunk long subjects.
+  const encodedWords: string[] = [];
+  const rawBytes = new TextEncoder().encode(safeSubject);
+  if (rawBytes.length <= 60) {
+    encodedWords.push(`=?UTF-8?B?${b64std(safeSubject)}?=`);
+  } else {
+    let buf: number[] = [];
+    const flush = () => {
+      const s = new TextDecoder().decode(new Uint8Array(buf));
+      encodedWords.push(`=?UTF-8?B?${b64std(s)}?=`);
+      buf = [];
+    };
+    for (const b of rawBytes) {
+      buf.push(b);
+      if (buf.length >= 60) flush();
+    }
+    if (buf.length) flush();
+  }
+  const subjectEncoded = encodedWords.join(" ");
 
   if (!attachments || attachments.length === 0) {
     const headers = [
