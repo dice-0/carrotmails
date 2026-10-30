@@ -122,7 +122,7 @@ export const createAutomationDrafts = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase;
     const campaign = await loadCampaign(sb, context.userId, data.campaignId);
-    const stage = data.stage ?? "initial";
+    const stage = (data.stage ?? "initial") as "initial" | "fu1" | "fu2" | "fu3" | "fu4" | "test";
     if (campaign.status === "archived") throw new Error("Campaign is archived");
 
     const mailbox = campaign.mailbox_id

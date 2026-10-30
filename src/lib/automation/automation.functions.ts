@@ -127,7 +127,7 @@ export const updateAutomationCampaign = createServerFn({ method: "POST" })
     for (const k of allowed) if (k in data.patch) patch[k] = data.patch[k];
     const { error } = await context.supabase
       .from("automation_campaigns")
-      .update(patch)
+      .update(patch as any)
       .eq("id", data.id)
       .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
@@ -163,9 +163,9 @@ export const saveAutomationStep = createServerFn({ method: "POST" })
     for (const k of allowed) if (k in data.patch) patch[k] = data.patch[k];
     const { error } = await context.supabase
       .from("automation_steps")
-      .update(patch)
+      .update(patch as any)
       .eq("campaign_id", data.campaignId)
-      .eq("stage", data.stage)
+      .eq("stage", data.stage as any)
       .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -307,7 +307,7 @@ export const listAutomationEvents = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(Math.min(200, data.limit ?? 50));
     if (data.campaignId) q = q.eq("campaign_id", data.campaignId);
-    if (data.eventType) q = q.eq("event_type", data.eventType);
+    if (data.eventType) q = q.eq("event_type", data.eventType as any);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
@@ -335,7 +335,7 @@ export const addAutomationSuppression = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("automation_suppressions")
       .upsert(
-        { user_id: context.userId, email, reason: data.reason, note: data.note ?? null, removed_at: null },
+        { user_id: context.userId, email, reason: data.reason as any, note: data.note ?? null, removed_at: null },
         { onConflict: "user_id,email" },
       );
     if (error) throw new Error(error.message);
