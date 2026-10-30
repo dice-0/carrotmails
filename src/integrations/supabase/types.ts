@@ -14,6 +14,448 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_audits: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          summary: Json
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          summary?: Json
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          summary?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_audits_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_campaigns: {
+        Row: {
+          attachments: Json
+          body_html: string
+          consent_confirmed: boolean
+          consent_source: string | null
+          created_at: string
+          default_bcc: string | null
+          default_cc: string | null
+          from_name: string | null
+          id: string
+          last_activity_at: string | null
+          mailbox_id: string | null
+          name: string
+          status: Database["public"]["Enums"]["automation_campaign_status"]
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json
+          body_html?: string
+          consent_confirmed?: boolean
+          consent_source?: string | null
+          created_at?: string
+          default_bcc?: string | null
+          default_cc?: string | null
+          from_name?: string | null
+          id?: string
+          last_activity_at?: string | null
+          mailbox_id?: string | null
+          name: string
+          status?: Database["public"]["Enums"]["automation_campaign_status"]
+          subject?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: Json
+          body_html?: string
+          consent_confirmed?: boolean
+          consent_source?: string | null
+          created_at?: string
+          default_bcc?: string | null
+          default_cc?: string | null
+          from_name?: string | null
+          id?: string
+          last_activity_at?: string | null
+          mailbox_id?: string | null
+          name?: string
+          status?: Database["public"]["Enums"]["automation_campaign_status"]
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_campaigns_mailbox_id_fkey"
+            columns: ["mailbox_id"]
+            isOneToOne: false
+            referencedRelation: "mailbox_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_contacts: {
+        Row: {
+          bcc: string | null
+          campaign_id: string
+          cc: string | null
+          company: string | null
+          created_at: string
+          custom: Json
+          email: string
+          error: string | null
+          first_name: string | null
+          followup_cc: boolean
+          gmail_thread_id: string | null
+          id: string
+          last_sent_at: string | null
+          last_stage: Database["public"]["Enums"]["automation_stage"] | null
+          name: string | null
+          name2: string | null
+          next_followup_at: string | null
+          role: string | null
+          status: Database["public"]["Enums"]["automation_contact_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bcc?: string | null
+          campaign_id: string
+          cc?: string | null
+          company?: string | null
+          created_at?: string
+          custom?: Json
+          email: string
+          error?: string | null
+          first_name?: string | null
+          followup_cc?: boolean
+          gmail_thread_id?: string | null
+          id?: string
+          last_sent_at?: string | null
+          last_stage?: Database["public"]["Enums"]["automation_stage"] | null
+          name?: string | null
+          name2?: string | null
+          next_followup_at?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["automation_contact_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bcc?: string | null
+          campaign_id?: string
+          cc?: string | null
+          company?: string | null
+          created_at?: string
+          custom?: Json
+          email?: string
+          error?: string | null
+          first_name?: string | null
+          followup_cc?: boolean
+          gmail_thread_id?: string | null
+          id?: string
+          last_sent_at?: string | null
+          last_stage?: Database["public"]["Enums"]["automation_stage"] | null
+          name?: string | null
+          name2?: string | null
+          next_followup_at?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["automation_contact_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_contacts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_drafts: {
+        Row: {
+          campaign_id: string
+          cc_verified: boolean
+          contact_id: string
+          created_at: string
+          expected_cc: string | null
+          gmail_draft_id: string | null
+          gmail_message_id: string | null
+          id: string
+          idempotency_key: string | null
+          resolved_at: string | null
+          stage: Database["public"]["Enums"]["automation_stage"]
+          status: string
+          thread_id: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          cc_verified?: boolean
+          contact_id: string
+          created_at?: string
+          expected_cc?: string | null
+          gmail_draft_id?: string | null
+          gmail_message_id?: string | null
+          id?: string
+          idempotency_key?: string | null
+          resolved_at?: string | null
+          stage: Database["public"]["Enums"]["automation_stage"]
+          status?: string
+          thread_id?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          cc_verified?: boolean
+          contact_id?: string
+          created_at?: string
+          expected_cc?: string | null
+          gmail_draft_id?: string | null
+          gmail_message_id?: string | null
+          id?: string
+          idempotency_key?: string | null
+          resolved_at?: string | null
+          stage?: Database["public"]["Enums"]["automation_stage"]
+          status?: string
+          thread_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_drafts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_drafts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "automation_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_events: {
+        Row: {
+          campaign_id: string | null
+          contact_id: string | null
+          created_at: string
+          detail: Json
+          event_type: Database["public"]["Enums"]["automation_event_type"]
+          id: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type: Database["public"]["Enums"]["automation_event_type"]
+          id?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type?: Database["public"]["Enums"]["automation_event_type"]
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_events_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "automation_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_messages: {
+        Row: {
+          campaign_id: string | null
+          contact_id: string | null
+          created_at: string
+          direction: string
+          gmail_message_id: string
+          headers: Json | null
+          id: string
+          kind: string
+          sent_at: string | null
+          thread_id: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          direction: string
+          gmail_message_id: string
+          headers?: Json | null
+          id?: string
+          kind: string
+          sent_at?: string | null
+          thread_id?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          direction?: string
+          gmail_message_id?: string
+          headers?: Json | null
+          id?: string
+          kind?: string
+          sent_at?: string | null
+          thread_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_messages_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_messages_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "automation_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_steps: {
+        Row: {
+          attachments: Json
+          body_html: string
+          campaign_id: string
+          created_at: string
+          delay_days: number
+          delivery_mode: string
+          enabled: boolean
+          id: string
+          stage: Database["public"]["Enums"]["automation_stage"]
+          subject: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json
+          body_html?: string
+          campaign_id: string
+          created_at?: string
+          delay_days?: number
+          delivery_mode?: string
+          enabled?: boolean
+          id?: string
+          stage: Database["public"]["Enums"]["automation_stage"]
+          subject?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: Json
+          body_html?: string
+          campaign_id?: string
+          created_at?: string
+          delay_days?: number
+          delivery_mode?: string
+          enabled?: boolean
+          id?: string
+          stage?: Database["public"]["Enums"]["automation_stage"]
+          subject?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_steps_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_suppressions: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          email: string
+          id: string
+          note: string | null
+          reason: Database["public"]["Enums"]["automation_suppression_reason"]
+          removed_at: string | null
+          source_message_id: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          note?: string | null
+          reason: Database["public"]["Enums"]["automation_suppression_reason"]
+          removed_at?: string | null
+          source_message_id?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          note?: string | null
+          reason?: Database["public"]["Enums"]["automation_suppression_reason"]
+          removed_at?: string | null
+          source_message_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_suppressions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "automation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_customers: {
         Row: {
           created_at: string
@@ -702,6 +1144,41 @@ export type Database = {
         }
         Relationships: []
       }
+      mailbox_sync_state: {
+        Row: {
+          history_id: string | null
+          id: string
+          last_sync_at: string | null
+          mailbox_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          history_id?: string | null
+          id?: string
+          last_sync_at?: string | null
+          mailbox_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          history_id?: string | null
+          id?: string
+          last_sync_at?: string | null
+          mailbox_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mailbox_sync_state_mailbox_id_fkey"
+            columns: ["mailbox_id"]
+            isOneToOne: true
+            referencedRelation: "mailbox_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -812,6 +1289,47 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      automation_campaign_status:
+        | "draft"
+        | "preparing"
+        | "active"
+        | "paused"
+        | "completed"
+        | "archived"
+      automation_contact_status:
+        | "pending"
+        | "draft_created"
+        | "sent"
+        | "replied"
+        | "bounced"
+        | "suppressed"
+        | "failed"
+        | "skipped"
+        | "paused_review"
+        | "fu_pending"
+        | "completed"
+      automation_event_type:
+        | "draft_created"
+        | "email_manually_sent"
+        | "followup_generated"
+        | "followup_sent"
+        | "reply_received"
+        | "bounce_detected"
+        | "contact_suppressed"
+        | "contact_resumed"
+        | "duplicate_prevented"
+        | "invalid_recipient"
+        | "error"
+        | "ooo_detected"
+        | "manual_outreach_detected"
+        | "campaign_created"
+        | "audit_run"
+      automation_stage: "initial" | "fu1" | "fu2" | "fu3" | "fu4" | "test"
+      automation_suppression_reason:
+        | "hard_bounce"
+        | "manual"
+        | "unsubscribe"
+        | "invalid"
       campaign_status:
         | "draft"
         | "scheduled"
@@ -960,6 +1478,51 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      automation_campaign_status: [
+        "draft",
+        "preparing",
+        "active",
+        "paused",
+        "completed",
+        "archived",
+      ],
+      automation_contact_status: [
+        "pending",
+        "draft_created",
+        "sent",
+        "replied",
+        "bounced",
+        "suppressed",
+        "failed",
+        "skipped",
+        "paused_review",
+        "fu_pending",
+        "completed",
+      ],
+      automation_event_type: [
+        "draft_created",
+        "email_manually_sent",
+        "followup_generated",
+        "followup_sent",
+        "reply_received",
+        "bounce_detected",
+        "contact_suppressed",
+        "contact_resumed",
+        "duplicate_prevented",
+        "invalid_recipient",
+        "error",
+        "ooo_detected",
+        "manual_outreach_detected",
+        "campaign_created",
+        "audit_run",
+      ],
+      automation_stage: ["initial", "fu1", "fu2", "fu3", "fu4", "test"],
+      automation_suppression_reason: [
+        "hard_bounce",
+        "manual",
+        "unsubscribe",
+        "invalid",
+      ],
       campaign_status: [
         "draft",
         "scheduled",
