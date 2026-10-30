@@ -39,7 +39,6 @@ export const Route = createFileRoute("/")({
             { "@type": "Offer", name: "Premium", price: "3.50", priceCurrency: "USD", url: "https://carrotmails.work/", description: "5,000 opt-in sends per month" },
             { "@type": "Offer", name: "Lifetime", price: "49.50", priceCurrency: "USD", url: "https://carrotmails.work/", description: "One-time payment, unlimited sending, first 100 buyers" },
           ],
-          aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", reviewCount: "27" },
           featureList: [
             "Send from your own Gmail account",
             "RFC 8058 one-click unsubscribe",
@@ -58,7 +57,10 @@ export const Route = createFileRoute("/")({
           name: "Carrot Mails",
           url: "https://carrotmails.work/",
           logo: "https://carrotmails.work/favicon.svg",
-          sameAs: [],
+          sameAs: [
+            "https://www.instagram.com/carrotmails/",
+            "https://www.linkedin.com/company/carrotmails",
+          ],
         }),
       },
       {
