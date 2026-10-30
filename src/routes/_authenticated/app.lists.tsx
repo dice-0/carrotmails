@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { AppPage } from "@/components/AppPage";
 import { Button } from "@/components/ui/button";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { deleteContactList, importContactList, listContactLists } from "@/lib/lists.functions";
+import { deleteContactList, importContactList, listContactLists, getContactListsHealth } from "@/lib/lists.functions";
 
 export const Route = createFileRoute("/_authenticated/app/lists")({
   head: () => ({ meta: [
@@ -70,6 +70,9 @@ function ListsPage() {
   const [consentSource, setConsentSource] = usePersistentState("cm:lists:consentSource", "");
   const parsed = useMemo(() => parseCsv(raw), [raw]);
   const { data: lists = [], isLoading } = useQuery({ queryKey: ["contact-lists"], queryFn: () => list() });
+  const healthFn = useServerFn(getContactListsHealth);
+  const { data: health = [] } = useQuery({ queryKey: ["contact-lists-health"], queryFn: () => healthFn() });
+  const healthById = useMemo(() => new Map(health.map((h: any) => [h.listId, h])), [health]);
   const importMutation = useMutation({
     mutationFn: () => importList({ data: { name, contacts: parsed.contacts, consentConfirmed: true as const, consentSource: consentSource.trim() } }),
     onSuccess: async (result) => {
