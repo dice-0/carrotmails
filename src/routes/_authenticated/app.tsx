@@ -11,8 +11,9 @@ export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
 });
 
-const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/profile" | "/app/billing"; label: string; end?: boolean }[] = [
+const NAV: { to: "/app" | "/app/automation" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/profile" | "/app/billing"; label: string; end?: boolean; note?: string }[] = [
   { to: "/app", label: "Compose", end: true },
+  { to: "/app/automation", label: "Automation", note: "New" },
   { to: "/app/campaigns", label: "Campaigns" },
   { to: "/app/templates", label: "Templates" },
   { to: "/app/lists", label: "Lists" },
