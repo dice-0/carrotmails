@@ -112,7 +112,7 @@ function MailboxesPage() {
       </div>
 
       <p className="mt-10 text-xs text-muted-foreground">
-        Scopes requested: your basic profile and gmail.send. Carrot Mails can only send mail from your connected inbox; it never reads it.
+        Scopes requested: your basic profile, gmail.send (send mail), gmail.compose (create drafts) and gmail.readonly (detect replies, bounces and manually sent drafts). Carrot Mails never reads your inbox for anything else.
       </p>
     </div>
   );
