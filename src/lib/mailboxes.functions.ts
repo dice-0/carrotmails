@@ -37,13 +37,17 @@ function stateSecret() {
 
 export const getGoogleAuthUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { origin?: string }) => d)
+  .handler(async ({ data, context }) => {
     const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
     if (!clientId) throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
     const redirectUri = `${APP_ORIGIN}/api/public/oauth/google/callback`;
+    const returnOrigin =
+      data?.origin && RETURN_ORIGINS.has(data.origin) ? data.origin : APP_ORIGIN;
     const nonce = randomUUID();
     const expires = Date.now() + 10 * 60 * 1000;
-    const payload = `${context.userId}.${nonce}.${expires}`;
+    const originB64 = Buffer.from(returnOrigin).toString("base64url");
+    const payload = `${context.userId}.${nonce}.${expires}.${originB64}`;
     const sig = createHmac("sha256", stateSecret()).update(payload).digest("hex");
     const state = Buffer.from(`${payload}.${sig}`).toString("base64url");
 
