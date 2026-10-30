@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { CarrotLogo } from "@/components/CarrotLogo";
+import { SocialLinks } from "@/components/SocialLinks";
 
 
 export const Route = createFileRoute("/")({
