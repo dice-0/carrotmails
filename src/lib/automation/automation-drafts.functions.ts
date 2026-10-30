@@ -286,7 +286,7 @@ export const reconcileAutomationSent = createServerFn({ method: "POST" })
     const { data: contacts } = await sb.from("automation_contacts").select("id, email").in("id", contactIds).eq("user_id", context.userId);
     const contactById = new Map((contacts ?? []).map((c: any) => [c.id, c.email]));
 
-    const steps: StepRow[] = (await sb.from("automation_steps").select("*").eq("campaign_id", data.campaignId).eq("user_id", context.userId)).data ?? [];
+    const steps = ((await sb.from("automation_steps").select("*").eq("campaign_id", data.campaignId).eq("user_id", context.userId)).data ?? []) as unknown as StepRow[];
     const stepByStage = new Map(steps.map((s) => [s.stage, s]));
 
     const results: { email: string; stage: string; status: string }[] = [];

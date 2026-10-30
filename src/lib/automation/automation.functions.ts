@@ -84,7 +84,7 @@ export const listAutomationCampaigns = createServerFn({ method: "GET" })
       if (r.status === "fu_pending") a.pendingFu++;
       agg.set(r.campaign_id, a);
     }
-    for (const r of messageRows ?? []) {
+    for (const r of (messageRows ?? []) as { campaign_id: string; direction: string; kind: string }[]) {
       const a = agg.get(r.campaign_id) ?? fresh();
       if (r.direction === "out" && r.kind === "initial") a.initialSent++;
       agg.set(r.campaign_id, a);
