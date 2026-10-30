@@ -276,7 +276,9 @@ export const importAutomationContacts = createServerFn({ method: "POST" })
         if (results.invalidEmails.length < 5 && email) results.invalidEmails.push(email || "(empty)");
         continue;
       }
-      toInsert.push({ user_id: context.userId, campaign_id: data.campaignId, email, ...r, email });
+      const clean: Record<string, unknown> = { ...r };
+      delete (clean as Record<string, unknown>).email;
+      toInsert.push({ user_id: context.userId, campaign_id: data.campaignId, email, ...clean });
     }
     // Chunked inserts; duplicates inside the campaign are skipped via upsert-ignore.
     for (let i = 0; i < toInsert.length; i += 500) {

@@ -184,7 +184,7 @@ export const sendSelectedFollowUps = createServerFn({ method: "POST" })
 
     // Pre-send eligibility snapshot (also used as the dry-run preview).
     const eligible: any[] = [];
-    const preview: { email: string; stage: string; status: string; reason?: string }[] = [];
+    const preview: { contact_id?: string; email: string; stage: string; status: string; reason?: string }[] = [];
     for (const c of contacts ?? []) {
       if (suppressions.has(c.email)) { preview.push({ email: c.email, stage: "", status: "blocked", reason: "Suppressed" }); continue; }
       if (c.status !== "fu_pending") { preview.push({ email: c.email, stage: "", status: "blocked", reason: `Status ${c.status}` }); continue; }

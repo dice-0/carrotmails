@@ -66,7 +66,7 @@ export const runAutomationAudit = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase;
     const campaign = await loadCampaign(sb, context.userId, data.campaignId);
-    const stage = data.stage ?? "initial";
+    const stage = (data.stage ?? "initial") as "initial" | "fu1" | "fu2" | "fu3" | "fu4" | "test";
     const [{ data: contacts }, suppressionSet] = await Promise.all([
       sb.from("automation_contacts").select("*").eq("campaign_id", data.campaignId).eq("user_id", context.userId).order("created_at").limit(5000),
       loadSuppressionSet(sb, context.userId),
