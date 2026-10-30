@@ -129,7 +129,13 @@ function ListsPage() {
         </section>
       )}
       <div className="mb-4 flex items-center justify-between"><h2 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Saved lists</h2><span className="font-mono text-[10px] text-muted-foreground">{lists.length} total</span></div>
-      {isLoading ? <p className="text-sm text-muted-foreground">Loading lists…</p> : lists.length === 0 ? <div className="border-y border-border py-14 text-center"><h2 className="text-lg font-medium">No lists yet</h2><p className="mt-2 text-sm text-muted-foreground">Import your first clean contact list to get started.</p></div> : <div className="divide-y divide-border border-y border-border">{lists.map((item) => <article key={item.id} className="flex items-center justify-between gap-6 py-5"><div><h3 className="font-medium">{item.name}</h3><p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.contact_count} clean contacts · {new Date(item.updated_at).toLocaleDateString()}</p></div><Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${item.name}?`) && deleteMutation.mutate(item.id)}>Delete</Button></article>)}</div>}
+{isLoading ? <p className="text-sm text-muted-foreground">Loading lists…</p> : lists.length === 0 ? <div className="border-y border-border py-14 text-center"><h2 className="text-lg font-medium">No lists yet</h2><p className="mt-2 text-sm text-muted-foreground">Import your first clean contact list to get started.</p></div> : <div className="divide-y divide-border border-y border-border">{lists.map((item) => { const h = healthById.get(item.id); const warn = h && h.total > 0 && h.flagged / h.total > 0.1; return (
+<article key={item.id} className="flex items-center justify-between gap-6 py-5"><div><h3 className="font-medium">{item.name}</h3><p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.contact_count} clean contacts · {new Date(item.updated_at).toLocaleDateString()}</p>{h && h.total > 0 && (
+<p className={`mt-1 inline-flex items-center gap-2 rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${warn ? "border-warning/40 bg-warning/10 text-warning" : "border-border text-muted-foreground"}`} title={warn ? "Over 10% of this list is flagged; clean it before a campaign" : "List health"}>
+  {h.total} contacts · {h.suppressed} suppressed · {h.flagged} flagged
+</p>
+)}</div><Button variant="ghost" size="sm" className="text-destructive" onClick={() => confirm(`Delete ${item.name}?`) && deleteMutation.mutate(item.id)}>Delete</Button></article>
+); })}</div>}
     </AppPage>
   );
 }
