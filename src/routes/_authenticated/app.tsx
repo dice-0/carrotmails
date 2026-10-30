@@ -60,8 +60,9 @@ function AppShell() {
             {NAV.map((n) => {
               const active = n.end ? pathname === n.to : pathname.startsWith(n.to);
               return (
-                <Link key={n.to} to={n.to} className={`px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                  {n.label}
+                <Link key={n.to} to={n.to} className={`flex items-center justify-between px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                  <span>{n.label}</span>
+                  {n.note && <span className="ml-2 text-[9px] tracking-widest text-primary">{n.note}</span>}
                 </Link>
               );
             })}
