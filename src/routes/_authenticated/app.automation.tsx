@@ -248,6 +248,7 @@ function CampaignDetail({ id, onBack }: { id: string; onBack: () => void }) {
   const getFn = useServerFn(getAutomationCampaign);
   const { data, isLoading, error } = useQuery({ queryKey: ["automation-campaign", id], queryFn: () => getFn({ data: { id } }) });
   const [tab, setTab] = useState<"compose" | "recipients" | "followups" | "send">("compose");
+  const patch = usePatch(qc, id);
 
   if (isLoading) return <div className="mx-auto max-w-5xl p-8 text-sm text-muted-foreground">Loading…</div>;
   if (error || !data) return <div className="mx-auto max-w-5xl p-8 text-sm text-destructive">{(error as Error)?.message ?? "Not found"} <button onClick={onBack} className="underline">back</button></div>;
@@ -292,15 +293,12 @@ function usePatch(qc: any, campaignId: string) {
   const updateFn = useServerFn(updateAutomationCampaign);
   return useMutation({
     mutationFn: (p: Record<string, unknown>) => updateFn({ data: { id: campaignId, patch: p } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["automation-campaign", campaignId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["automation-campaign", campaignId] });
+      qc.invalidateQueries({ queryKey: ["automation-campaigns"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
-}
-
-function updateMutation(qc: any, campaignId: string, patch: Record<string, unknown>) {
-  qc.defaultQueryClient; // noop to avoid unused param lint
-  // Direct call through a tiny inline mutation is overkill here; reuse hook instead.
-  toast.error("Use the compose form to save changes");
 }
 
 function ComposeTab({ campaign }: { campaign: any }) {

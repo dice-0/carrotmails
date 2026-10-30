@@ -28,6 +28,7 @@ import { Route as BlogWhyColdEmailIsDyingRouteImport } from './routes/blog.why-c
 import { Route as FSlugRouteImport } from './routes/f.$slug'
 import { Route as UTokenRouteImport } from './routes/u.$token'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppAutomationRouteImport } from './routes/_authenticated/app.automation'
 import { Route as AuthenticatedAppBillingRouteImport } from './routes/_authenticated/app.billing'
 import { Route as AuthenticatedAppCampaignsRouteImport } from './routes/_authenticated/app.campaigns'
 import { Route as AuthenticatedAppFormsRouteImport } from './routes/_authenticated/app.forms'
@@ -139,6 +140,12 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppAutomationRoute =
+  AuthenticatedAppAutomationRouteImport.update({
+    id: '/automation',
+    path: '/automation',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppBillingRoute = AuthenticatedAppBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/app/automation': typeof AuthenticatedAppAutomationRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -247,6 +255,7 @@ export interface FileRoutesByTo {
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/app/automation': typeof AuthenticatedAppAutomationRoute
   '/app/billing': typeof AuthenticatedAppBillingRoute
   '/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/app/forms': typeof AuthenticatedAppFormsRoute
@@ -280,6 +289,7 @@ export interface FileRoutesById {
   '/blog/why-cold-email-is-dying': typeof BlogWhyColdEmailIsDyingRoute
   '/f/$slug': typeof FSlugRoute
   '/u/$token': typeof UTokenRoute
+  '/_authenticated/app/automation': typeof AuthenticatedAppAutomationRoute
   '/_authenticated/app/billing': typeof AuthenticatedAppBillingRoute
   '/_authenticated/app/campaigns': typeof AuthenticatedAppCampaignsRoute
   '/_authenticated/app/forms': typeof AuthenticatedAppFormsRoute
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/app/automation'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/app/automation'
     | '/app/billing'
     | '/app/campaigns'
     | '/app/forms'
@@ -375,6 +387,7 @@ export interface FileRouteTypes {
     | '/blog/why-cold-email-is-dying'
     | '/f/$slug'
     | '/u/$token'
+    | '/_authenticated/app/automation'
     | '/_authenticated/app/billing'
     | '/_authenticated/app/campaigns'
     | '/_authenticated/app/forms'
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/automation': {
+      id: '/_authenticated/app/automation'
+      path: '/automation'
+      fullPath: '/app/automation'
+      preLoaderRoute: typeof AuthenticatedAppAutomationRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/billing': {
       id: '/_authenticated/app/billing'
       path: '/billing'
@@ -625,6 +645,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppAutomationRoute: typeof AuthenticatedAppAutomationRoute
   AuthenticatedAppBillingRoute: typeof AuthenticatedAppBillingRoute
   AuthenticatedAppCampaignsRoute: typeof AuthenticatedAppCampaignsRoute
   AuthenticatedAppFormsRoute: typeof AuthenticatedAppFormsRoute
@@ -636,6 +657,7 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppAutomationRoute: AuthenticatedAppAutomationRoute,
   AuthenticatedAppBillingRoute: AuthenticatedAppBillingRoute,
   AuthenticatedAppCampaignsRoute: AuthenticatedAppCampaignsRoute,
   AuthenticatedAppFormsRoute: AuthenticatedAppFormsRoute,
