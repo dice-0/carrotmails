@@ -288,9 +288,15 @@ export const importAutomationContacts = createServerFn({ method: "POST" })
         .from("automation_contacts").insert(chunk).select("id");
       if (error) {
         if (error.code === "23505") {
-          results.duplicates += chunk.length;
-        } else throw new Error(error.message);
-      } else results.imported += inserted?.length ?? 0;
+        // A duplicate in the chunk: retry row by row, counting only real dupes.
+        for (const row of chunk) {
+          const { error: rowError } = await sb.from("automation_contacts").insert(row).select("id, email");
+          if (rowError?.code === "23505") results.duplicates++;
+          else if (rowError) throw new Error(rowError.message);
+          else results.imported++;
+        }
+      } else throw new Error(error.message);
+    } else results.imported += inserted?.length ?? 0;
     }
     return results;
   });
