@@ -58,7 +58,10 @@ export const Route = createFileRoute("/")({
           name: "Carrot Mails",
           url: "https://carrotmails.work/",
           logo: "https://carrotmails.work/favicon.svg",
-          sameAs: [],
+          sameAs: [
+            "https://www.instagram.com/carrotmails/",
+            "https://www.linkedin.com/company/carrotmails",
+          ],
         }),
       },
       {
