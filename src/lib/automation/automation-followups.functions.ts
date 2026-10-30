@@ -191,7 +191,7 @@ export const sendSelectedFollowUps = createServerFn({ method: "POST" })
       const nextStage = STAGE_ORDER.slice(STAGE_ORDER.indexOf(c.last_stage ?? "initial") + 1).find((s) => stepByStage.get(s)?.enabled);
       if (!nextStage) { preview.push({ email: c.email, stage: "", status: "blocked", reason: "No enabled follow-up remaining" }); continue; }
       eligible.push({ contact: c, stage: nextStage });
-      preview.push({ email: c.email, stage: nextStage, status: "eligible" });
+      preview.push({ contact_id: c.id, email: c.email, stage: nextStage, status: "eligible" });
     }
 
     if (!data.confirm) return { mode: "dry_run", eligibleCount: eligible.length, preview };

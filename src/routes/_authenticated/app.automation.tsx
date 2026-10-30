@@ -267,7 +267,7 @@ function CampaignDetail({ id, onBack }: { id: string; onBack: () => void }) {
             {campaign.mailbox_id ? "" : " · no mailbox selected"}
           </div>
         </div>
-        <select value={campaign.mailbox_id ?? ""} onChange={(e) => updateMutation(qc, id, { mailbox_id: e.target.value || null })}
+        <select value={campaign.mailbox_id ?? ""} onChange={(e) => patch.mutate({ mailbox_id: e.target.value || null })}
           className="border border-border px-3 py-2 text-sm">
           <option value="">Select mailbox…</option>
           {mailboxes.map((m: any) => <option key={m.id} value={m.id}>{m.email}</option>)}
