@@ -77,6 +77,7 @@ function ListsPage() {
     mutationFn: () => importList({ data: { name, contacts: parsed.contacts, consentConfirmed: true as const, consentSource: consentSource.trim() } }),
     onSuccess: async (result) => {
       await qc.invalidateQueries({ queryKey: ["contact-lists"] });
+      await qc.invalidateQueries({ queryKey: ["contact-lists-health"] });
       setShowImport(false); setRaw(""); setName(""); setFileName(""); setConsent(false); setConsentSource("");
       toast.success(`Imported ${result.report.imported} clean contacts`);
     },
