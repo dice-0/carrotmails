@@ -38,7 +38,7 @@ function MailboxesPage() {
   }, [search.connected, search.error]);
 
   const connect = useMutation({
-    mutationFn: async () => getUrl(),
+    mutationFn: async () => getUrl({ data: { origin: window.location.origin } }),
     onSuccess: (r) => { window.location.href = r.url; },
     onError: (e: Error) => toast.error(e.message),
   });
