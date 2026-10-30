@@ -17,16 +17,19 @@ const RETURN_ORIGINS: ReadonlySet<string> = new Set([
   "http://localhost:8080",
 ]);
 
-// Minimal scopes for send-only mailing.
+// Minimal scopes for the send + automation features.
 // openid/email/profile: identify the connected mailbox (non-sensitive).
-// gmail.send: send mail on the user's behalf (restricted, but lightest review path).
-// Do NOT add gmail.readonly or gmail.modify unless a feature truly needs them;
-// each extra restricted scope expands Google's verification requirements.
+// gmail.send: send mail on the user's behalf.
+// gmail.compose: create Gmail drafts for the Automation module (draft mode).
+// gmail.readonly: reconciliation of manually sent drafts + reply/bounce detection.
+// No gmail.modify: nothing in the app needs mailbox write access.
 const GOOGLE_SCOPES = [
   "openid",
   "email",
   "profile",
   "https://www.googleapis.com/auth/gmail.send",
+  "https://www.googleapis.com/auth/gmail.compose",
+  "https://www.googleapis.com/auth/gmail.readonly",
 ].join(" ");
 
 function stateSecret() {

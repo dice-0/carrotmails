@@ -11,8 +11,9 @@ export const Route = createFileRoute("/_authenticated/app")({
   component: AppShell,
 });
 
-const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/profile" | "/app/billing"; label: string; end?: boolean }[] = [
+const NAV: { to: "/app" | "/app/automation" | "/app/campaigns" | "/app/templates" | "/app/lists" | "/app/forms" | "/app/mailboxes" | "/app/profile" | "/app/billing"; label: string; end?: boolean; note?: string }[] = [
   { to: "/app", label: "Compose", end: true },
+  { to: "/app/automation", label: "Automation", note: "New" },
   { to: "/app/campaigns", label: "Campaigns" },
   { to: "/app/templates", label: "Templates" },
   { to: "/app/lists", label: "Lists" },
@@ -22,9 +23,7 @@ const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "
   { to: "/app/billing", label: "Billing" },
 ];
 
-const SOON: { label: string; note: string }[] = [
-  { label: "Automation", note: "Soon" },
-];
+const SOON: { label: string; note: string }[] = [];
 
 function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -61,8 +60,9 @@ function AppShell() {
             {NAV.map((n) => {
               const active = n.end ? pathname === n.to : pathname.startsWith(n.to);
               return (
-                <Link key={n.to} to={n.to} className={`px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                  {n.label}
+                <Link key={n.to} to={n.to} className={`flex items-center justify-between px-2 py-1.5 transition ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                  <span>{n.label}</span>
+                  {n.note && <span className="ml-2 text-[9px] tracking-widest text-primary">{n.note}</span>}
                 </Link>
               );
             })}
