@@ -82,7 +82,7 @@ function ListsPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-  const deleteMutation = useMutation({ mutationFn: (id: string) => remove({ data: { id } }), onSuccess: () => qc.invalidateQueries({ queryKey: ["contact-lists"] }), onError: (error: Error) => toast.error(error.message) });
+  const deleteMutation = useMutation({ mutationFn: (id: string) => remove({ data: { id } }), onSuccess: () => { qc.invalidateQueries({ queryKey: ["contact-lists"] }); qc.invalidateQueries({ queryKey: ["contact-lists-health"] }); }, onError: (error: Error) => toast.error(error.message) });
 
   async function readFile(file: File | undefined) {
     if (!file) return;
