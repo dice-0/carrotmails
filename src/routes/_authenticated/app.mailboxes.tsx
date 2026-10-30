@@ -33,9 +33,12 @@ function MailboxesPage() {
   });
 
   useEffect(() => {
-    if (search.connected) toast.success(`Connected ${search.connected}`);
+    if (search.connected) {
+      toast.success(`Connected ${search.connected}`);
+      qc.invalidateQueries({ queryKey: ["mailboxes"] });
+    }
     if (search.error) toast.error(`Couldn't connect: ${search.error.replace(/_/g, " ")}`);
-  }, [search.connected, search.error]);
+  }, [search.connected, search.error, qc]);
 
   const connect = useMutation({
     mutationFn: async () => getUrl({ data: { origin: window.location.origin } }),
@@ -109,7 +112,7 @@ function MailboxesPage() {
       </div>
 
       <p className="mt-10 text-xs text-muted-foreground">
-        Scopes requested: gmail.send, gmail.readonly, gmail.modify. We only read to detect replies on threads you started from Carrot Mails.
+        Scopes requested: your basic profile and gmail.send. Carrot Mails can only send mail from your connected inbox; it never reads it.
       </p>
     </div>
   );
