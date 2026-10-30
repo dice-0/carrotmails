@@ -280,7 +280,8 @@ export const importAutomationContacts = createServerFn({ method: "POST" })
       delete (clean as Record<string, unknown>).email;
       toInsert.push({ user_id: context.userId, campaign_id: data.campaignId, email, ...clean });
     }
-    // Chunked inserts; duplicates inside the campaign are skipped via upsert-ignore.
+    // Chunked inserts; duplicates inside the campaign are retried row by row so
+    // only genuinely duplicate rows are skipped.
     for (let i = 0; i < toInsert.length; i += 500) {
       const chunk = toInsert.slice(i, i + 500);
       const { data: inserted, error } = await sb
