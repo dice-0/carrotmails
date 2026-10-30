@@ -1,6 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createHmac, timingSafeEqual } from "crypto";
 
+// Hosts a user may be sent back to after the Google round-trip. Google itself
+// always lands on the production callback (that redirect_uri is the one
+// registered in Google Cloud); from there we bounce to the host the connect
+// flow started on, so the user returns to the app they clicked "Connect" in.
+const RETURN_ORIGINS: ReadonlySet<string> = new Set([
+  "https://carrotmails.work",
+  "https://www.carrotmails.work",
+  "https://id-preview--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app",
+  "http://localhost:8080",
+]);
+
+const DEFAULT_ORIGIN = "https://carrotmails.work";
+
+function originFromState(stateB64: string | null): string {
+  if (!stateB64) return DEFAULT_ORIGIN;
+  try {
+    const parts = Buffer.from(stateB64, "base64url").toString("utf8").split(".");
+    if (parts.length !== 5) return DEFAULT_ORIGIN;
+    const o = Buffer.from(parts[3], "base64url").toString("utf8");
+    return RETURN_ORIGINS.has(o) ? o : DEFAULT_ORIGIN;
+  } catch {
+    return DEFAULT_ORIGIN;
+  }
+}
+
 export const Route = createFileRoute("/api/public/oauth/google/callback")({
   server: {
     handlers: {
@@ -9,35 +34,52 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
         const code = url.searchParams.get("code");
         const stateB64 = url.searchParams.get("state");
         const errorParam = url.searchParams.get("error");
-        if (errorParam) return redirectTo(`/app/mailboxes?error=${encodeURIComponent(errorParam)}`);
-        if (!code || !stateB64) return redirectTo(`/app/mailboxes?error=missing_params`);
+        if (errorParam) {
+          return redirectTo(`/app/mailboxes?error=${encodeURIComponent(errorParam)}`, originFromState(stateB64));
+        }
+        if (!code || !stateB64) {
+          return redirectTo(`/app/mailboxes?error=missing_params`, originFromState(stateB64));
+        }
 
         const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
         if (!secret || !clientId || !clientSecret) {
-          return redirectTo(`/app/mailboxes?error=not_configured`);
+          return redirectTo(`/app/mailboxes?error=not_configured`, originFromState(stateB64));
         }
 
         let userId: string;
+        let returnOrigin = DEFAULT_ORIGIN;
         try {
           const decoded = Buffer.from(stateB64, "base64url").toString("utf8");
           const parts = decoded.split(".");
-          if (parts.length !== 4) throw new Error("state shape");
-          const [uid, nonce, expStr, sig] = parts;
-          const expected = createHmac("sha256", secret).update(`${uid}.${nonce}.${expStr}`).digest("hex");
+          // New format: uid.nonce.exp.originB64.sig. Old 4-part states (before
+          // the return-origin was added) fall back to the production origin.
+          if (parts.length !== 4 && parts.length !== 5) throw new Error("state shape");
+          const sig = parts[parts.length - 1];
+          const uid = parts[0];
+          const nonce = parts[1];
+          const expStr = parts[2];
+          const originPart = parts.length === 5 ? parts[3] : "";
+          const signedPayload =
+            parts.length === 5 ? `${uid}.${nonce}.${expStr}.${originPart}` : `${uid}.${nonce}.${expStr}`;
+          const expected = createHmac("sha256", secret).update(signedPayload).digest("hex");
           const a = Buffer.from(sig, "hex");
           const b = Buffer.from(expected, "hex");
           if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error("bad sig");
           if (Number(expStr) < Date.now()) throw new Error("expired");
           userId = uid;
+          if (originPart) {
+            const o = Buffer.from(originPart, "base64url").toString("utf8");
+            if (RETURN_ORIGINS.has(o)) returnOrigin = o;
+          }
         } catch {
-          return redirectTo(`/app/mailboxes?error=invalid_state`);
+          return redirectTo(`/app/mailboxes?error=invalid_state`, originFromState(stateB64));
         }
 
         // Must match the redirect_uri used in the auth URL exactly, regardless
         // of which host served this callback.
-        const redirectUri = `https://carrotmails.work/api/public/oauth/google/callback`;
+        const redirectUri = `${DEFAULT_ORIGIN}/api/public/oauth/google/callback`;
         const tokRes = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,7 +93,7 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
         });
         if (!tokRes.ok) {
           console.error("Google token exchange failed", await tokRes.text());
-          return redirectTo(`/app/mailboxes?error=token_exchange`);
+          return redirectTo(`/app/mailboxes?error=token_exchange`, returnOrigin);
         }
         const tok = (await tokRes.json()) as {
           access_token: string;
@@ -65,7 +107,7 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
         });
         if (!profRes.ok) {
           console.error("Gmail profile fetch failed", await profRes.text());
-          return redirectTo(`/app/mailboxes?error=profile`);
+          return redirectTo(`/app/mailboxes?error=profile`, returnOrigin);
         }
         const prof = (await profRes.json()) as { emailAddress: string };
 
@@ -83,7 +125,7 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
 
         const refreshToken = tok.refresh_token ?? existing?.refresh_token ?? null;
         if (!refreshToken) {
-          return redirectTo(`/app/mailboxes?error=no_refresh_token`);
+          return redirectTo(`/app/mailboxes?error=no_refresh_token`, returnOrigin);
         }
 
         const { error: upErr } = await supabaseAdmin
@@ -103,14 +145,17 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
           );
         if (upErr) {
           console.error("mailbox upsert failed", upErr);
-          return redirectTo(`/app/mailboxes?error=save`);
+          return redirectTo(`/app/mailboxes?error=save`, returnOrigin);
         }
-        return redirectTo(`/app/mailboxes?connected=${encodeURIComponent(prof.emailAddress)}`);
+        return redirectTo(
+          `/app/mailboxes?connected=${encodeURIComponent(prof.emailAddress)}`,
+          returnOrigin,
+        );
       },
     },
   },
 });
 
-function redirectTo(path: string) {
-  return new Response(null, { status: 302, headers: { Location: path } });
+function redirectTo(path: string, origin: string = DEFAULT_ORIGIN) {
+  return new Response(null, { status: 302, headers: { Location: `${origin}${path}` } });
 }

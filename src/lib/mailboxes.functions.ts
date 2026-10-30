@@ -7,6 +7,16 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // under a different host (preview, localhost), so pin the production origin.
 const APP_ORIGIN = "https://carrotmails.work";
 
+// After Google redirects back to the production callback, send the user back
+// to the host they started the connect flow from (preview, www, production…).
+// Only these hosts are accepted, both here and again in the callback handler.
+const RETURN_ORIGINS: ReadonlySet<string> = new Set([
+  "https://carrotmails.work",
+  "https://www.carrotmails.work",
+  "https://id-preview--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app",
+  "http://localhost:8080",
+]);
+
 // Minimal scopes for send-only mailing.
 // openid/email/profile: identify the connected mailbox (non-sensitive).
 // gmail.send: send mail on the user's behalf (restricted, but lightest review path).
@@ -27,13 +37,17 @@ function stateSecret() {
 
 export const getGoogleAuthUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { origin?: string }) => d)
+  .handler(async ({ data, context }) => {
     const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
     if (!clientId) throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
     const redirectUri = `${APP_ORIGIN}/api/public/oauth/google/callback`;
+    const returnOrigin =
+      data?.origin && RETURN_ORIGINS.has(data.origin) ? data.origin : APP_ORIGIN;
     const nonce = randomUUID();
     const expires = Date.now() + 10 * 60 * 1000;
-    const payload = `${context.userId}.${nonce}.${expires}`;
+    const originB64 = Buffer.from(returnOrigin).toString("base64url");
+    const payload = `${context.userId}.${nonce}.${expires}.${originB64}`;
     const sig = createHmac("sha256", stateSecret()).update(payload).digest("hex");
     const state = Buffer.from(`${payload}.${sig}`).toString("base64url");
 
