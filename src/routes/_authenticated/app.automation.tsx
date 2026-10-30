@@ -272,6 +272,11 @@ function CampaignDetail({ id, onBack }: { id: string; onBack: () => void }) {
           <option value="">Select mailbox…</option>
           {mailboxes.map((m: any) => <option key={m.id} value={m.id}>{m.email}</option>)}
         </select>
+        {mailboxes.length === 0 && (
+          <span className="text-xs text-muted-foreground">
+            No mailbox connected for this account. <Link to="/app/mailboxes" className="underline hover:text-foreground">Connect one</Link>
+          </span>
+        )}
       </div>
 
       <div className="mt-6 flex gap-6 border-b border-border font-mono text-[11px] uppercase tracking-widest">
