@@ -56,10 +56,13 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
           // New format: uid.nonce.exp.originB64.sig. Old 4-part states (before
           // the return-origin was added) fall back to the production origin.
           if (parts.length !== 4 && parts.length !== 5) throw new Error("state shape");
-          const [uid, nonce, expStr, a3, sig] = parts;
-          const originPart = parts.length === 5 ? a3 : "";
+          const sig = parts[parts.length - 1];
+          const uid = parts[0];
+          const nonce = parts[1];
+          const expStr = parts[2];
+          const originPart = parts.length === 5 ? parts[3] : "";
           const signedPayload =
-            parts.length === 5 ? `${uid}.${nonce}.${expStr}.${a3}` : `${uid}.${nonce}.${expStr}`;
+            parts.length === 5 ? `${uid}.${nonce}.${expStr}.${originPart}` : `${uid}.${nonce}.${expStr}`;
           const expected = createHmac("sha256", secret).update(signedPayload).digest("hex");
           const a = Buffer.from(sig, "hex");
           const b = Buffer.from(expected, "hex");
