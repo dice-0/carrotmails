@@ -26,7 +26,8 @@ type StepRow = {
   body_html: string; attachments: Attachment[] | null; delivery_mode: string;
 };
 
-async function loadCampaign(sb: ReturnType<typeof requireSupabaseAuth>["handler"] extends never ? never : any, userId: string, campaignId: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function loadCampaign(sb: any, userId: string, campaignId: string) {
   const { data: campaign, error } = await sb
     .from("automation_campaigns").select("*").eq("id", campaignId).eq("user_id", userId).maybeSingle();
   if (error) throw new Error(error.message);
@@ -203,7 +204,7 @@ export const createAutomationDrafts = createServerFn({ method: "POST" })
           user_id: context.userId, campaign_id: campaign.id, contact_id: c.id, stage,
           gmail_draft_id: draft.id, gmail_message_id: draft.message.id,
           thread_id: draft.message.threadId, expected_cc: ccList.join(", ") || null,
-          cc_verified: ccList.length === 0 ? true : true, status: "created",
+          cc_verified: true, status: "created",
         }, { onConflict: "campaign_id,contact_id,stage" });
         await sb.from("automation_contacts").update({
           status: stage === "initial" ? "draft_created" : "fu_pending",
