@@ -101,3 +101,34 @@ export const deleteContactList = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export type ListHealth = {
+  listId: string;
+  total: number;
+  suppressed: number;
+  flagged: number; // suppressed + emails that now fail validation
+};
+
+// Live health per list: revalidates stored emails against the hygiene pattern and
+// the user's current suppression list (unsubscribes/bounces added after import).
+export const getContactListsHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: contacts, error } = await context.supabase
+      .from("contacts").select("list_id, email").eq("user_id", context.userId).limit(20000);
+    if (error) throw new Error(error.message);
+    const { data: suppressionRows, error: suppressionError } = await context.supabase
+      .from("suppressions").select("email").eq("user_id", context.userId).limit(20000);
+    if (suppressionError) throw new Error(suppressionError.message);
+    const suppressedEmails = new Set((suppressionRows ?? []).map((r: any) => r.email.toLowerCase()));
+    const byList = new Map<string, ListHealth>();
+    for (const c of (contacts ?? []) as { list_id: string; email: string }[]) {
+      const h = byList.get(c.list_id) ?? { listId: c.list_id, total: 0, suppressed: 0, flagged: 0 };
+      h.total += 1;
+      const email = c.email.toLowerCase();
+      if (suppressedEmails.has(email)) { h.suppressed += 1; h.flagged += 1; }
+      else if (!emailPattern.test(email)) { h.flagged += 1; }
+      byList.set(c.list_id, h);
+    }
+    return [...byList.values()];
+  });
