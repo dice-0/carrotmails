@@ -91,7 +91,10 @@ function AppShell() {
               {unlimited && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Unlimited</div>}
               {!hasPaid && <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-primary">Choose a plan →</div>}
             </Link>
-            <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate">{email}</div>
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate">{email}</div>
+              <SocialLinks />
+            </div>
           </div>
         </aside>
         <main className="min-h-screen flex-1">
