@@ -20,17 +20,34 @@ export const Route = createFileRoute("/api/public/oauth/google/callback")({
         }
 
         let userId: string;
+        let returnOrigin = "https://carrotmails.work";
         try {
           const decoded = Buffer.from(stateB64, "base64url").toString("utf8");
           const parts = decoded.split(".");
-          if (parts.length !== 4) throw new Error("state shape");
-          const [uid, nonce, expStr, sig] = parts;
-          const expected = createHmac("sha256", secret).update(`${uid}.${nonce}.${expStr}`).digest("hex");
+          // New format: uid.nonce.exp.originB64.sig. Old 4-part states (before
+          // the return-origin was added) fall back to the production origin.
+          if (parts.length !== 4 && parts.length !== 5) throw new Error("state shape");
+          const [uid, nonce, expStr, a3, sig] = parts;
+          const originPart = parts.length === 5 ? a3 : "";
+          const signedPayload =
+            parts.length === 5 ? `${uid}.${nonce}.${expStr}.${a3}` : `${uid}.${nonce}.${expStr}`;
+          const expected = createHmac("sha256", secret).update(signedPayload).digest("hex");
           const a = Buffer.from(sig, "hex");
           const b = Buffer.from(expected, "hex");
           if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error("bad sig");
           if (Number(expStr) < Date.now()) throw new Error("expired");
           userId = uid;
+          if (originPart) {
+            const o = Buffer.from(originPart, "base64url").toString("utf8");
+            if (
+              o === "https://carrotmails.work" ||
+              o === "https://www.carrotmails.work" ||
+              o === "https://id-preview--cf95264a-acbe-437f-9c02-4e80585fd74f.lovable.app" ||
+              o === "http://localhost:8080"
+            ) {
+              returnOrigin = o;
+            }
+          }
         } catch {
           return redirectTo(`/app/mailboxes?error=invalid_state`);
         }
