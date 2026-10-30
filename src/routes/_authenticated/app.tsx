@@ -22,9 +22,7 @@ const NAV: { to: "/app" | "/app/campaigns" | "/app/templates" | "/app/lists" | "
   { to: "/app/billing", label: "Billing" },
 ];
 
-const SOON: { label: string; note: string }[] = [
-  { label: "Automation", note: "Soon" },
-];
+const SOON: { label: string; note: string }[] = [];
 
 function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
