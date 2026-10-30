@@ -1,38 +1,40 @@
 # Roadmap
 
-## Current task
-Build the Advanced Email Automation Module (uploaded spec) into the existing Automation tab.
-Reference implementation: INITIAL_EMAIL_DRAFT_CC_VERIFIED_BUNDLE.zip (Apps Script; behavior reference only, no Sheets/Apps Script dependency).
+## Current task: Advanced Email Automation Module (uploaded spec)
+Status: implemented and typechecked; browser smoke test passed (workspace opens, campaign created, compose tab renders).
 
-## Phase 1: Audit (in progress)
-- [ ] Explore agent mapping: nav, campaigns, gmail-send, lists, RichEditor, DB schema.
+Reference: INITIAL_EMAIL_DRAFT_CC_VERIFIED_BUNDLE.zip (Apps Script; behavior reference only).
 
-## Phase 2: Architecture
-- [ ] New tables: automation_campaigns, automation_contacts, automation_steps,
+## Done
+- [x] Tables: automation_campaigns, automation_contacts, automation_steps,
       automation_drafts, automation_messages, automation_events,
       automation_suppressions, automation_audits, mailbox_sync_state.
-      Additive; do not touch existing campaigns/bulk-send tables.
-- [ ] Gmail scopes: add gmail.compose (drafts) + gmail.readonly (reconciliation,
-      reply/bounce detection) to mailbox OAuth connect; existing connections
-      (work.josephraj, sharonjacobyt) already carry gmail.modify/readonly so no re-consent for them.
-
-## Phase 3: Core automation
-- [ ] Server functions: campaigns CRUD, recipients (CSV import + custom columns),
-      merge-field engine (dynamic headers, fallbacks, HTML-safe substitution),
-      Gmail draft creation (drafts.create, one draft per recipient, CC verify loop
-      from bundle), duplicate draft prevention, test draft to own mailbox.
-- [ ] UI: /app/automation workspace (Campaigns / Sequences / Activity / Suppression),
-      campaign create wizard, composer reusing RichEditor, per-recipient CC/BCC table.
-
-## Phase 4: Follow-up engine
-- [ ] FU1-FU4 stages, editable delays, same-thread reply drafts (threadId,
-      In-Reply-To, References), Mode A draft / Mode B explicit batch send,
-      manual-send reconciliation, reply + bounce detection, suppression gating,
+      Additive; existing campaigns/bulk-send untouched.
+- [x] Gmail scopes: gmail.compose + gmail.readonly added to new-connection OAuth
+      (mailboxes.functions.ts); existing connections already carry the needed scopes.
+- [x] Server functions: campaign/step/contact CRUD, CSV import with custom columns
+      and per-row duplicate counting, merge-field engine (dynamic headers, fallbacks,
+      HTML-safe substitution), Gmail draft creation with CC read-back verification,
+      duplicate draft prevention, test draft to own mailbox, conservative
+      manual-send reconciliation.
+- [x] Follow-up engine: FU1-FU4 with editable delays, same-thread reply drafts
+      (In-Reply-To/References), draft mode + explicit confirm-gated batch send,
+      manual-send reconciliation, reply/bounce/OOO detection, suppression gating,
       activity log, audit snapshots.
+- [x] UI: /app/automation workspace (campaigns / activity / suppression), composer
+      reusing RichEditor, per-recipient CC/BCC editor, follow-up preview + send.
+- [x] Unit tests: tests/automation-merge.test.ts (merge tags, fallbacks, escaping,
+      custom columns, CC parsing/validation) all passing.
+- [x] Typecheck: build OK (no type errors).
 
-## Phase 5: Testing + review
-- [ ] Unit tests for merge engine, interval math, suppression gating, CC parsing.
-- [ ] Report implemented vs untested; no live sends without approval.
+## Untested / known limits (report to user)
+- No real Gmail draft API call was made end to end (needs a live connected mailbox).
+- Existing mailboxes connected before the scope change keep working because they
+  already carry gmail.compose/readonly; any mailbox that lacks them gets a 403
+  and must reconnect.
+- Reconciliation draft-matching is conservative; edge cases (edited subjects)
+  may not match.
+- No real emails or deploys happened; nothing sends automatically.
 
 ## Standing notes
 - Never report a draft as sent; never auto-send initial emails.

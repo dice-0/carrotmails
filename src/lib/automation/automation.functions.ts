@@ -280,16 +280,23 @@ export const importAutomationContacts = createServerFn({ method: "POST" })
       delete (clean as Record<string, unknown>).email;
       toInsert.push({ user_id: context.userId, campaign_id: data.campaignId, email, ...clean });
     }
-    // Chunked inserts; duplicates inside the campaign are skipped via upsert-ignore.
+    // Chunked inserts; duplicates inside the campaign are retried row by row so
+    // only genuinely duplicate rows are skipped.
     for (let i = 0; i < toInsert.length; i += 500) {
       const chunk = toInsert.slice(i, i + 500);
       const { data: inserted, error } = await sb
         .from("automation_contacts").insert(chunk).select("id");
       if (error) {
         if (error.code === "23505") {
-          results.duplicates += chunk.length;
-        } else throw new Error(error.message);
-      } else results.imported += inserted?.length ?? 0;
+        // A duplicate in the chunk: retry row by row, counting only real dupes.
+        for (const row of chunk) {
+          const { error: rowError } = await sb.from("automation_contacts").insert(row).select("id, email");
+          if (rowError?.code === "23505") results.duplicates++;
+          else if (rowError) throw new Error(rowError.message);
+          else results.imported++;
+        }
+      } else throw new Error(error.message);
+    } else results.imported += inserted?.length ?? 0;
     }
     return results;
   });
